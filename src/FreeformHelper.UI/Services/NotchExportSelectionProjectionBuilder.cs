@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.UI.ViewModels;
 
@@ -142,14 +143,14 @@ internal static class NotchExportSelectionProjectionBuilder
         NotchExportRowItemViewModel row,
         NotchAlgorithmVersion? selectedVersion)
     {
-        return row.IsSelected && MatchesSelectedVersion(row, selectedVersion);
+        return NotchExportRowSelectionPolicy.IsEligible(row.IsSelected, row.Row.Version, selectedVersion);
     }
 
     public static bool MatchesSelectedVersion(
         NotchExportRowItemViewModel row,
         NotchAlgorithmVersion? selectedVersion)
     {
-        return !selectedVersion.HasValue || row.Row.Version == selectedVersion.Value;
+        return NotchExportRowSelectionPolicy.MatchesVersion(row.Row.Version, selectedVersion);
     }
 
     private static bool MatchesDisplayModeFilter(

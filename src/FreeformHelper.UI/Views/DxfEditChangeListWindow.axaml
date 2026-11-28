@@ -12,8 +12,8 @@
         WindowStartupLocation="CenterOwner"
         IsEnabled="{Binding Editing.IsProjectEditingEnabled}"
         ShowInTaskbar="False"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="DXF Edit Details">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/DxfEditDetails.axaml"/>
@@ -29,19 +29,19 @@
     </panels:WorkspaceShell.HeaderRight>
     <panels:WorkspaceShell.SummaryContent>
       <WrapPanel x:Name="CategorySwitches" Orientation="Horizontal">
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsHiddenKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsHiddenKindSelected}"
                       IsChecked="{Binding IsHiddenKindSelected, Mode=OneWay}"
                       Content="{Binding HiddenCategoryText}" Command="{Binding SetHiddenKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsDuplicateKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsDuplicateKindSelected}"
                       IsChecked="{Binding IsDuplicateKindSelected, Mode=OneWay}"
                       Content="{Binding DuplicateCategoryText}" Command="{Binding SetDuplicateKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsCombinedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsCombinedKindSelected}"
                       IsChecked="{Binding IsCombinedKindSelected, Mode=OneWay}"
                       Content="{Binding CombinedCategoryText}" Command="{Binding SetCombinedKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsMovedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsMovedKindSelected}"
                       IsChecked="{Binding IsMovedKindSelected, Mode=OneWay}"
                       Content="{Binding MovedCategoryText}" Command="{Binding SetMovedKindCommand}"/>
-        <ToggleButton Classes="actionGhost flat" Classes.active="{Binding IsRotatedKindSelected}"
+        <ToggleButton Classes="productFilterChip" Classes.active="{Binding IsRotatedKindSelected}"
                       IsChecked="{Binding IsRotatedKindSelected, Mode=OneWay}"
                       Content="{Binding RotatedCategoryText}" Command="{Binding SetRotatedKindCommand}"/>
       </WrapPanel>
@@ -83,12 +83,11 @@
         </Border>
         <Grid Grid.Row="2">
           <TextBlock x:Name="EmptyRowsHint" Text="No DXF edit rows in this scope."
-                     IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource BrushTextMuted}"
+                     IsVisible="{Binding HasNoRows}" Foreground="{DynamicResource NfcTextMutedBrush}"
                      Margin="{DynamicResource Inset8}" TextWrapping="Wrap"/>
-          <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="scrollV2 workspaceDataList"
+          <ListBox x:Name="RowsListBox" ItemsSource="{Binding Rows}" Classes="workspaceDataList"
                    SelectedItem="{Binding SelectedEntry, Mode=TwoWay}" IsVisible="{Binding HasRows}"
-                   Background="{DynamicResource BrushTransparent}" BorderThickness="{DynamicResource BorderNone}"
-                   ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   Background="{DynamicResource BrushTransparent}" BorderThickness="{DynamicResource BorderNone}" ScrollViewer.VerticalScrollBarVisibility="Auto"
                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemsPanel>
               <ItemsPanelTemplate>
@@ -134,9 +133,11 @@
           <Border Grid.Row="3" Classes="workspaceInspectorSection" IsVisible="{Binding HasSelectedEntry}">
             <Grid RowDefinitions="Auto,*" RowSpacing="{DynamicResource Space4}">
               <TextBlock Classes="workspaceInspectorSectionTitle" Text="Detail"/>
-              <ScrollViewer Grid.Row="1" x:Name="InspectorDetailScroll"
+              <ScrollViewer Classes="viewportBoundScroll" Grid.Row="1" x:Name="InspectorDetailScroll"
                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedRowDetailText}" TextWrapping="Wrap"/>
+                <Border Classes="viewportBoundContent">
+                  <SelectableTextBlock Classes="workspaceInspectorValue" Text="{Binding SelectedRowDetailText}" TextWrapping="Wrap"/>
+                </Border>
               </ScrollViewer>
             </Grid>
           </Border>

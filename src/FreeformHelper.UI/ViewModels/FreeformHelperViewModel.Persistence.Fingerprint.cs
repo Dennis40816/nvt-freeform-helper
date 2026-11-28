@@ -29,40 +29,24 @@ public sealed partial class FreeformHelperViewModel
     {
         ArgumentNullException.ThrowIfNull(cad);
 
-        unchecked
-        {
-            var hash = 1469598103934665603UL;
-            hash = (hash * 1099511628211UL) ^ (uint)_notchExportFingerprintRevisions.Cad;
-            hash = (hash * 1099511628211UL) ^ (uint)cad.Pads.Count;
-            hash = (hash * 1099511628211UL) ^ (uint)(_cadEdit.HiddenCadPadIds.Count + _cadEdit.AutoHiddenDuplicateCadPadIds.Count);
-            return hash;
-        }
+        return NotchExportFingerprints.BuildCadFingerprint(
+            _notchExportFingerprintRevisions.Cad, cad.Pads.Count,
+            _cadEdit.HiddenCadPadIds.Count + _cadEdit.AutoHiddenDuplicateCadPadIds.Count);
     }
 
     private ulong BuildNotchExportGridFingerprint(RegularGrid grid)
     {
         ArgumentNullException.ThrowIfNull(grid);
 
-        unchecked
-        {
-            var hash = 1469598103934665603UL;
-            hash = (hash * 1099511628211UL) ^ (uint)_notchExportFingerprintRevisions.Grid;
-            hash = (hash * 1099511628211UL) ^ (uint)grid.Pads.Count;
-            hash = (hash * 1099511628211UL) ^ (uint)_notchExportFingerprintRevisions.Index;
-            return hash;
-        }
+        return NotchExportFingerprints.BuildExportGridFingerprint(
+            _notchExportFingerprintRevisions.Grid, grid.Pads.Count, _notchExportFingerprintRevisions.Index);
     }
 
     private ulong BuildNotchComputationGridFingerprint(RegularGrid grid)
     {
         ArgumentNullException.ThrowIfNull(grid);
 
-        unchecked
-        {
-            var hash = 1469598103934665603UL;
-            hash = (hash * 1099511628211UL) ^ (uint)_notchExportFingerprintRevisions.Grid;
-            hash = (hash * 1099511628211UL) ^ (uint)grid.Pads.Count;
-            return hash;
-        }
+        return NotchExportFingerprints.BuildComputationGridFingerprint(
+            _notchExportFingerprintRevisions.Grid, grid.Pads.Count);
     }
 }

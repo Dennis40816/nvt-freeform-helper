@@ -8,8 +8,8 @@
         MinWidth="{StaticResource NotchExportColumnFilterMinWidth}"
         MinHeight="{StaticResource NotchExportColumnFilterMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Column filter">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
@@ -49,18 +49,18 @@
             <SelectableTextBlock VerticalAlignment="Center"
                                  Classes="stepNote"
                                  Text="From"/>
-            <TextBox Grid.Column="1"
+            <TextBox Classes="singleLineActionInput" Grid.Column="1"
                      Text="{Binding RangeFromText, Mode=TwoWay}"
                      PlaceholderText="min"/>
             <SelectableTextBlock Grid.Column="2"
                                  VerticalAlignment="Center"
                                  Classes="stepNote"
                                  Text="To"/>
-            <TextBox Grid.Column="3"
+            <TextBox Classes="singleLineActionInput" Grid.Column="3"
                      Text="{Binding RangeToText, Mode=TwoWay}"
                      PlaceholderText="max"/>
           </Grid>
-          <TextBlock Foreground="{DynamicResource BrushDanger}"
+          <TextBlock Foreground="{DynamicResource NfcDangerTextBrush}"
                      IsVisible="{Binding HasRangeError}" Text="{Binding RangeErrorText}" TextWrapping="Wrap"/>
           <SelectableTextBlock Classes="stepNote"
                                IsVisible="{Binding IsRangeSuggested}"
@@ -69,13 +69,12 @@
       </Border>
 
       <ListBox Grid.Row="3"
-               Classes="scrollV2 workspaceFilterOptions"
+               Classes="workspaceFilterOptions"
                BorderThickness="{StaticResource BorderThin}"
-               BorderBrush="{DynamicResource BrushBorder}"
-               Background="{DynamicResource BrushBgPanel}"
+               BorderBrush="{DynamicResource NfcBorderMutedBrush}"
+               Background="{DynamicResource NfcSurfaceSubtleBrush}"
                ItemsSource="{Binding Options}"
                IsVisible="{Binding CanShowValueList}"
-               ScrollViewer.AllowAutoHide="False"
                ScrollViewer.VerticalScrollBarVisibility="Auto"
                ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ListBox.ItemsPanel>
@@ -85,7 +84,7 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="viewModels:NotchExportColumnFilterOptionViewModel">
-            <CheckBox Classes="workspaceFilterOptionCheck"
+            <CheckBox Classes="compact workspaceFilterOptionCheck"
                       IsChecked="{Binding IsSelected, Mode=TwoWay}">
               <SelectableTextBlock Text="{Binding Display}"
                                    TextWrapping="NoWrap"

@@ -73,7 +73,7 @@ public sealed class NotchValidationDisplayBehaviorTests
     {
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _displayNames);
-        var items = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { CreateItem("ALL") };
+        var items = new ObservableCollection<NotchValidationDisplayItem> { CreateItem("ALL") };
 
         vm.NotchValidationItems = items;
 
@@ -91,7 +91,7 @@ public sealed class NotchValidationDisplayBehaviorTests
     public void NotchValidationItems_SameCollection_RaisesNothing()
     {
         var vm = new FreeformHelperViewModel();
-        var items = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { CreateItem("ALL") };
+        var items = new ObservableCollection<NotchValidationDisplayItem> { CreateItem("ALL") };
         vm.NotchValidationItems = items;
         var changes = RecordNotifications(vm, _displayNames);
 
@@ -106,7 +106,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _displayNames);
 
-        vm.NotchValidationDirectItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("DIRECT"),
         };
@@ -127,7 +127,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _displayNames);
 
-        vm.NotchValidationIncomingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("IN"),
         };
@@ -148,7 +148,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var vm = new FreeformHelperViewModel();
         var changes = RecordNotifications(vm, _displayNames);
 
-        vm.NotchValidationOutgoingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("OUT"),
         };
@@ -170,7 +170,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var changing = new List<string?>();
         vm.PropertyChanging += (_, e) => changing.Add(e.PropertyName);
 
-        vm.NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("ALL"),
         };
@@ -182,7 +182,7 @@ public sealed class NotchValidationDisplayBehaviorTests
     public void NotchValidationDirectItems_SameCollection_RaisesNothing()
     {
         var vm = new FreeformHelperViewModel();
-        var items = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { CreateItem("DIRECT") };
+        var items = new ObservableCollection<NotchValidationDisplayItem> { CreateItem("DIRECT") };
         vm.NotchValidationDirectItems = items;
         var changes = RecordNotifications(vm, _displayNames);
 
@@ -198,7 +198,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var changing = new List<string?>();
         vm.PropertyChanging += (_, e) => changing.Add(e.PropertyName);
 
-        vm.NotchValidationDirectItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("DIRECT"),
         };
@@ -210,7 +210,7 @@ public sealed class NotchValidationDisplayBehaviorTests
     public void NotchValidationIncomingItems_SameCollection_RaisesNothing()
     {
         var vm = new FreeformHelperViewModel();
-        var items = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { CreateItem("IN") };
+        var items = new ObservableCollection<NotchValidationDisplayItem> { CreateItem("IN") };
         vm.NotchValidationIncomingItems = items;
         var changes = RecordNotifications(vm, _displayNames);
 
@@ -226,7 +226,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var changing = new List<string?>();
         vm.PropertyChanging += (_, e) => changing.Add(e.PropertyName);
 
-        vm.NotchValidationIncomingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("IN"),
         };
@@ -238,7 +238,7 @@ public sealed class NotchValidationDisplayBehaviorTests
     public void NotchValidationOutgoingItems_SameCollection_RaisesNothing()
     {
         var vm = new FreeformHelperViewModel();
-        var items = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { CreateItem("OUT") };
+        var items = new ObservableCollection<NotchValidationDisplayItem> { CreateItem("OUT") };
         vm.NotchValidationOutgoingItems = items;
         var changes = RecordNotifications(vm, _displayNames);
 
@@ -254,7 +254,7 @@ public sealed class NotchValidationDisplayBehaviorTests
         var changing = new List<string?>();
         vm.PropertyChanging += (_, e) => changing.Add(e.PropertyName);
 
-        vm.NotchValidationOutgoingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             CreateItem("OUT"),
         };
@@ -400,25 +400,25 @@ public sealed class NotchValidationDisplayBehaviorTests
         var direct = CreateItem("DIRECT", isDirect: true);
         var incoming = CreateItem("IN", isIncoming: true);
         var outgoing = CreateItem("OUT", isOutgoing: true);
-        vm.NotchValidationItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem>
+        vm.NotchValidationItems = new ObservableCollection<NotchValidationDisplayItem>
         {
             direct,
             incoming,
             outgoing,
         };
-        vm.NotchValidationDirectItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { direct };
-        vm.NotchValidationIncomingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { incoming };
-        vm.NotchValidationOutgoingItems = new ObservableCollection<FreeformHelperViewModel.NotchValidationDisplayItem> { outgoing };
+        vm.NotchValidationDirectItems = new ObservableCollection<NotchValidationDisplayItem> { direct };
+        vm.NotchValidationIncomingItems = new ObservableCollection<NotchValidationDisplayItem> { incoming };
+        vm.NotchValidationOutgoingItems = new ObservableCollection<NotchValidationDisplayItem> { outgoing };
         return vm;
     }
 
-    private static FreeformHelperViewModel.NotchValidationDisplayItem CreateItem(
+    private static NotchValidationDisplayItem CreateItem(
         string kindText,
         bool isDirect = false,
         bool isIncoming = false,
         bool isOutgoing = false)
     {
-        return new FreeformHelperViewModel.NotchValidationDisplayItem(
+        return new NotchValidationDisplayItem(
             KindText: kindText,
             RowText: "#1",
             VersionText: "2.2",

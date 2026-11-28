@@ -165,9 +165,9 @@ Calculate for each overlapped regular:
 - `strictThreshold = max(eps, regularArea * strictOverlapRatio)`
 - `hasSourceArea = overlapArea > strictThreshold`
 - `ownerCadPads`: all CADs on the same regular whose overlap exceeds the strict threshold
-- `hasDirectionalBlocker`: the owners include a CAD other than itself
-- `isBoundaryRegular`: an effective boundary regular (outer boundary or an inactive neighbor)
-- `hasEffectiveExpansion = (regularArea - overlapArea) > (regularArea * 1e-9)`
+- `hasDirectionalBlocker`: the reachability result has cells blocked by another intersecting CAD pad
+- `isBoundaryRegular`: an effective boundary regular (outer boundary or an inactive neighbor). It is diagnostic only and does not gate To Full
+- `hasEffectiveExpansion`: the exact free area of the regular is larger than `max(strictThreshold, regularArea * 1e-9)`
 
 ### 5.3 reachability and Rule Engine
 The current Step3 path focuses on "rule gates":
@@ -176,11 +176,12 @@ The current Step3 path focuses on "rule gates":
 
 Rule codes:
 - `GATE_TOFULL_DISABLED`
-- `GATE_NOT_BOUNDARY`
+- `GATE_NOT_BOUNDARY` (the name and its text remain; the engine does not emit it)
 - `GATE_SOURCE_EMPTY`
 - `GATE_MULTI_OWNER`
 - `NO_EXPANSION_NEEDED`
 - `EXPAND_CLEAR_PATH`
+- `EXPAND_SHARED_REACHABLE`
 
 The optional rule trace records whether each gate passed.
 
@@ -299,7 +300,7 @@ Flow:
 First calculate compensation for each CAD:
 - `compensation = NotchV22CompensationService.Compute(...)`
 - `toRegularPercent = round(ToRegularRatio*100)`
-- `toFullPercent = round(ToFullRatio*100)` (fixed at 100 when there is no boundary candidate)
+- `toFullPercent = round(ToFullRatio*100)` (fixed at 100 when no regular is a To Full candidate)
 - `toRegularPercent` / `toFullPercent` remain in comment/diagnostics
 - `combinePercent` comes from the per-target regular coverage sum
 

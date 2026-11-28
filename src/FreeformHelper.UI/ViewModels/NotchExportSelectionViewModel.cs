@@ -75,13 +75,13 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public NotchExportSelectionViewModel(
         NotchTable table,
         Action<NotchTableRow>? previewRowChanged = null,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption>? exportTypeOptions = null,
-        FreeformHelperViewModel.NotchExportFileTypeOption? selectedExportTypeOption = null)
+        IReadOnlyList<NotchExportFileTypeOption>? exportTypeOptions = null,
+        NotchExportFileTypeOption? selectedExportTypeOption = null)
     {
         ArgumentNullException.ThrowIfNull(table);
         _previewRowChanged = previewRowChanged;
         ExportTypeOptions = exportTypeOptions is null
-            ? Array.Empty<FreeformHelperViewModel.NotchExportFileTypeOption>()
+            ? Array.Empty<NotchExportFileTypeOption>()
             : exportTypeOptions.ToList();
         VersionOptions = BuildVersionOptions(table, ExportTypeOptions);
         _selectedVersionOption = VersionOptions[0];
@@ -161,7 +161,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     public IRelayCommand EnableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand DisableWorkspaceLinkedRowsCommand { get; }
     public IRelayCommand HidePanelForInspectCommand { get; }
-    public IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> ExportTypeOptions { get; }
+    public IReadOnlyList<NotchExportFileTypeOption> ExportTypeOptions { get; }
     public IReadOnlyList<NotchExportVersionOption> VersionOptions { get; }
     public IReadOnlyList<NotchExportRowDisplayModeOption> RowDisplayModeOptions { get; }
     public IReadOnlyList<NotchExportSortModeOption> SortModeOptions { get; }
@@ -169,7 +169,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     [ObservableProperty] private int _selectedCount;
     [ObservableProperty] private NotchExportRowItemViewModel? _selectedRow;
     [ObservableProperty] private bool _showSelectedRowDetailSection;
-    [ObservableProperty] private FreeformHelperViewModel.NotchExportFileTypeOption _selectedExportTypeOption;
+    [ObservableProperty] private NotchExportFileTypeOption _selectedExportTypeOption;
     [ObservableProperty] private NotchExportVersionOption _selectedVersionOption;
     [ObservableProperty] private NotchExportRowDisplayModeOption _selectedRowDisplayModeOption;
     [ObservableProperty] private NotchExportSortModeOption _selectedSortModeOption;
@@ -294,12 +294,10 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
     public NotchTable BuildSelectedTable()
     {
-        var selected = _allRows
-            .Where(row => NotchExportSelectionProjectionBuilder.IsSelectedForExport(row, SelectedVersionOption.Value))
-            .OrderBy(row => row.RowIndex)
-            .Select(row => row.Row)
+        var rows = _allRows
+            .Select(row => new NotchExportRowSelectionPolicy.RowChoice(row.RowIndex, row.Row, row.IsSelected))
             .ToList();
-        return new NotchTable(selected);
+        return NotchExportRowSelectionPolicy.Build(rows, SelectedVersionOption.Value);
     }
 
     public void AttachSimulationSafetyAudit(SimulationSafetyAuditResult? audit)
@@ -419,7 +417,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
                 $"IC {gap.IcIndex + 1} / FW Diff {gap.SourceDiffIndex} -> FW Diff {gap.TargetDiffIndex} | CAD {string.Join("/", gap.CadPadIds)}"));
     }
 
-    partial void OnSelectedExportTypeOptionChanged(FreeformHelperViewModel.NotchExportFileTypeOption value)
+    partial void OnSelectedExportTypeOptionChanged(NotchExportFileTypeOption value)
     {
         SyncVersionSelectionToExportType();
         OnPropertyChanged(nameof(IsVersionSelectionPinnedByExportType));
@@ -468,30 +466,28 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
 
     private static List<NotchExportVersionOption> BuildVersionOptions(
         NotchTable table,
-        IReadOnlyList<FreeformHelperViewModel.NotchExportFileTypeOption> exportTypeOptions)
+        IReadOnlyList<NotchExportFileTypeOption> exportTypeOptions)
     {
-        var countsByVersion = table.Rows
-            .GroupBy(row => row.Version)
-            .ToDictionary(group => group.Key, group => group.Count());
-        var versions = new SortedSet<NotchAlgorithmVersion>(countsByVersion.Keys);
+        var rowVersions = table.Rows.Select(row => row.Version).ToList();
+        var pinnedVersions = new List<NotchAlgorithmVersion?>();
         foreach (var exportTypeOption in exportTypeOptions)
         {
             if (NotchExportFileTypeMetadata.TryGetPinnedVersion(exportTypeOption, out var pinnedVersion))
             {
-                versions.Add(pinnedVersion);
+                pinnedVersions.Add(pinnedVersion);
             }
         }
 
+        var catalog = NotchExportVersionPolicy.BuildCatalog(rowVersions, pinnedVersions);
         var options = new List<NotchExportVersionOption>
         {
             new NotchExportVersionOption(null, "All versions"),
         };
 
-        foreach (var version in versions)
+        foreach (var versionCount in catalog)
         {
-            countsByVersion.TryGetValue(version, out var count);
-            var display = $"{version.ToDisplayLabel()} ({count})";
-            options.Add(new NotchExportVersionOption(version, display));
+            var display = $"{versionCount.Version.ToDisplayLabel()} ({versionCount.Count})";
+            options.Add(new NotchExportVersionOption(versionCount.Version, display));
         }
 
         return options;
@@ -511,7 +507,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         }
     }
 
-    private NotchExportVersionOption ResolvePinnedVersionOption(FreeformHelperViewModel.NotchExportFileTypeOption exportTypeOption)
+    private NotchExportVersionOption ResolvePinnedVersionOption(NotchExportFileTypeOption exportTypeOption)
     {
         if (!NotchExportFileTypeMetadata.TryGetPinnedVersion(exportTypeOption, out var pinnedVersion))
         {

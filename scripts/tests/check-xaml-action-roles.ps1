@@ -135,87 +135,6 @@ function Add-Issue {
     })
 }
 
-function Find-StyleBySelectorParts {
-  param(
-    [Parameter(Mandatory = $true)]
-    [System.Xml.Linq.XDocument]$Document,
-    [Parameter(Mandatory = $true)]
-    [string[]]$SelectorParts
-  )
-
-  foreach ($style in $Document.Descendants() | Where-Object { $_.Name.LocalName -eq "Style" }) {
-    $selector = Get-AttributeValue -Element $style -Name "Selector"
-    if ([string]::IsNullOrWhiteSpace($selector)) {
-      continue
-    }
-
-    $matchesAll = $true
-    foreach ($part in $SelectorParts) {
-      if (-not $selector.Contains($part)) {
-        $matchesAll = $false
-        break
-      }
-    }
-
-    if ($matchesAll) {
-      return $style
-    }
-  }
-
-  return $null
-}
-
-function Get-StyleSetterProperties {
-  param(
-    [Parameter(Mandatory = $true)]
-    [System.Xml.Linq.XElement]$Style
-  )
-
-  $properties = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
-  foreach ($setter in $Style.Elements() | Where-Object { $_.Name.LocalName -eq "Setter" }) {
-    $property = Get-AttributeValue -Element $setter -Name "Property"
-    if (-not [string]::IsNullOrWhiteSpace($property)) {
-      [void]$properties.Add($property)
-    }
-  }
-
-  return $properties
-}
-
-function Assert-StyleContract {
-  param(
-    [Parameter(Mandatory = $true)]
-    [System.Xml.Linq.XDocument]$Document,
-    [Parameter(Mandatory = $true)]
-    [string]$File,
-    [Parameter(Mandatory = $true)]
-    [string[]]$SelectorParts,
-    [Parameter(Mandatory = $true)]
-    [string[]]$RequiredProperties,
-    [Parameter(Mandatory = $true)]
-    [string]$Rule,
-    [Parameter(Mandatory = $true)]
-    [string]$Description
-  )
-
-  $style = Find-StyleBySelectorParts -Document $Document -SelectorParts $SelectorParts
-  if ($null -eq $style) {
-    Add-Issue -File $File -Rule $Rule -Message "$Description style selector is missing."
-    return
-  }
-
-  $properties = Get-StyleSetterProperties -Style $style
-  $missing = @($RequiredProperties | Where-Object { -not $properties.Contains($_) })
-  if ($missing.Count -gt 0) {
-    Add-Issue `
-      -File $File `
-      -Line (Get-LineNumber -Element $style) `
-      -Rule $Rule `
-      -Message "$Description style selector is missing setter(s): $($missing -join ', ')." `
-      -Classes (Get-AttributeValue -Element $style -Name "Selector")
-  }
-}
-
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $issues = [System.Collections.Generic.List[object]]::new()
 
@@ -231,6 +150,9 @@ $roleResult = [ordered]@{
 
 $legacyTokens = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 @(
+  "actionTextButton",
+  "actionChip",
+  "actionButton",
   "panelAction",
   "panelToggle",
   "coordinateOverlayAction",
@@ -242,6 +164,8 @@ $legacyTokens = [System.Collections.Generic.HashSet[string]]::new([System.String
 ) | ForEach-Object {
   [void]$legacyTokens.Add($_)
 }
+
+$publicRoles = @("actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "actionIconButton", "chipAction")
 
 $interactiveAttributeNames = @(
   "Command",
@@ -256,7 +180,8 @@ $interactiveAttributeNames = @(
 
 $scanDirectories = @(
   "src/FreeformHelper.UI/Views",
-  "src/FreeformHelper.UI/Controls"
+  "src/FreeformHelper.UI/Controls",
+  "src/FreeformHelper.UI/Styles"
 )
 
 Push-Location $repoRoot
@@ -277,6 +202,10 @@ try {
     foreach ($element in $document.Descendants()) {
       $tokens = @(Get-ClassTokens -Element $element)
       if ($tokens.Count -eq 0) {
+        if ($element.Name.LocalName -in @("Button", "ToggleButton") -and
+            -not @($element.Ancestors() | Where-Object { $_.Name.LocalName -eq "ControlTemplate" }).Count) {
+          Add-Issue -File $relativePath -Line (Get-LineNumber -Element $element) -Rule "XAR016" -Message "General action buttons require a Core role or an explicit product class."
+        }
         continue
       }
 
@@ -289,13 +218,53 @@ try {
       $classes = $tokens -join " "
       $elementName = $element.Name.LocalName
 
+      foreach ($attribute in $element.Attributes()) {
+        if ($attribute.Name.LocalName -match '^Classes\.(actionTextButton|actionChip|actionButton)$') {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR001" -Message "Removed role class binding is not allowed." -Classes $classes
+        }
+      }
+      $adoptedRoles = @{
+        shellTab = @("actionGhost", "flat", "marked")
+        layerToggle = @("actionGhost", "flat")
+        inspectorTraceToggle = @("actionGhost", "flat", "marked")
+        workspaceFoldHeader = @("actionGhost", "flat")
+        panelBlockHeader = @()
+        dxfLayerBulkToggleButton = @("chipAction")
+      }
+      if ($tokenSet.Contains("layerToggle") -and $tokenSet.Contains("marked")) {
+        Add-Issue -File $relativePath -Line $line -Rule "XAR017" -Message "Layer visibility uses its eye glyph and muted text; marked frames are not allowed." -Classes $classes
+      }
+      foreach ($productClass in $adoptedRoles.Keys) {
+        if (-not $tokenSet.Contains($productClass)) { continue }
+        $required = $adoptedRoles[$productClass]
+        $missing = @($required | Where-Object { -not $tokenSet.Contains($_) })
+        $unexpected = @($tokens | Where-Object { $_ -in $publicRoles -and $_ -notin $required })
+        if ($missing.Count -gt 0 -or $unexpected.Count -gt 0) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR017" -Message "$productClass requires exactly the Core role and modifiers: $($required -join ' ')." -Classes $classes
+        }
+      }
+      $productRoles = @("viewportOverlayAction", "canvasQuickToggle", "canvasToolbarIcon", "productChipAction", "productFilterChip", "rightPanelTab", "rightPanelBrowserTab", "settingsNavItem", "workspaceTableHeaderButton")
+      if (@($tokens | Where-Object { $_ -in $productRoles }).Count -gt 0 -and
+          @($tokens | Where-Object { $_ -in $publicRoles }).Count -gt 0) {
+        Add-Issue -File $relativePath -Line $line -Rule "XAR014" -Message "Kept product controls must not carry a Core role that can change their geometry or states." -Classes $classes
+      }
+      foreach ($chrome in @("consoleHeaderAction", "panelChromeToggle")) {
+        if ($tokenSet.Contains($chrome) -and
+            (-not $tokenSet.Contains("actionGhost") -or ($elementName -eq "ToggleButton" -and -not $tokenSet.Contains("flat")))) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR007" -Message "Chrome actions require actionIconButton + actionGhost; state toggles also require flat." -Classes $classes
+        }
+      }
+      if ($elementName -in @("Button", "ToggleButton") -and $tokenSet.Contains("flat") -and -not $tokenSet.Contains("actionGhost")) {
+        Add-Issue -File $relativePath -Line $line -Rule "XAR015" -Message "flat is only a modifier of actionGhost." -Classes $classes
+      }
+
       foreach ($token in $tokens) {
         if ($legacyTokens.Contains($token)) {
           Add-Issue `
             -File $relativePath `
             -Line $line `
             -Rule "XAR001" `
-            -Message "Legacy action role token '$token' is not allowed in active XAML; migrate to action primitive + semantic role." `
+            -Message "Legacy action role token '$token' is not allowed in active XAML; use a Core public role or an explicit product class." `
             -Classes $classes
         }
       }
@@ -312,9 +281,9 @@ try {
         Add-Issue -File $relativePath -Line $line -Rule "XAR004" -Message "viewportOverlayAction must not be combined with panelChromeToggle." -Classes $classes
       }
 
-      $primitiveCount = @($tokens | Where-Object { $_ -in @("actionButton", "actionTextButton", "actionIconButton", "actionChip") }).Count
-      if ($primitiveCount -gt 1) {
-        Add-Issue -File $relativePath -Line $line -Rule "XAR005" -Message "Action controls must use one primitive class only." -Classes $classes
+      $roleCount = @($tokens | Where-Object { $_ -in @("actionPrimary", "actionNeutral", "actionDanger", "actionGhost", "chipAction") }).Count
+      if ($roleCount -gt 1) {
+        Add-Issue -File $relativePath -Line $line -Rule "XAR005" -Message "Choose one Core tonal role; actionIconButton is an orthogonal size role." -Classes $classes
       }
 
       if ($tokenSet.Contains("actionIconButton")) {
@@ -323,7 +292,7 @@ try {
         }
       }
 
-      foreach ($iconOnlyRole in @("consoleHeaderAction", "viewportOverlayAction", "panelChromeToggle")) {
+      foreach ($iconOnlyRole in @("consoleHeaderAction", "panelChromeToggle")) {
         if ($tokenSet.Contains($iconOnlyRole) -and -not $tokenSet.Contains("actionIconButton")) {
           Add-Issue -File $relativePath -Line $line -Rule "XAR007" -Message "$iconOnlyRole must use actionIconButton so fixed icon sizing/clip contract applies." -Classes $classes
         }
@@ -348,46 +317,76 @@ try {
           Add-Issue -File $relativePath -Line $line -Rule "XAR011" -Message "chipAction must be rendered on Button or ToggleButton." -Classes $classes
         }
 
-        if (-not $tokenSet.Contains("actionChip")) {
-          Add-Issue -File $relativePath -Line $line -Rule "XAR012" -Message "chipAction must include actionChip primitive." -Classes $classes
+        if ($tokenSet.Contains("actionChip")) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR012" -Message "chipAction is a complete Core role; the actionChip primitive is removed." -Classes $classes
         }
 
-        if (-not $isDevPreview -and -not (Test-HasAnyAttribute -Element $element -Names $interactiveAttributeNames)) {
-          Add-Issue -File $relativePath -Line $line -Rule "XAR013" -Message "chipAction must bind Command or an explicit click/tap handler outside Dev preview samples." -Classes $classes
+        $checkedBinding = $element.Attribute("IsChecked")
+        $hasTwoWayState = $elementName -eq "ToggleButton" -and $null -ne $checkedBinding -and
+          $checkedBinding.Value -match '^\{Binding\s+.+\bMode\s*=\s*TwoWay\s*\}$'
+        if (-not $isDevPreview -and -not $hasTwoWayState -and -not (Test-HasAnyAttribute -Element $element -Names $interactiveAttributeNames)) {
+          Add-Issue -File $relativePath -Line $line -Rule "XAR013" -Message "chipAction must bind Command, a two-way toggle state, or an explicit click/tap handler outside Dev preview samples." -Classes $classes
         }
       }
     }
   }
 
-  $actionStylesPath = Join-Path $repoRoot "src/FreeformHelper.UI/Styles/Controls.Action.axaml"
-  $actionStylesRelativePath = Get-RepoRelativePath -Path $actionStylesPath
-  if (-not (Test-Path -LiteralPath $actionStylesPath)) {
-    Add-Issue -File $actionStylesRelativePath -Rule "XAR100" -Message "Controls.Action.axaml is required for action role contracts."
-  } else {
-    $styleDocument = Get-XamlDocument -Path $actionStylesPath
-    Assert-StyleContract `
-      -Document $styleDocument `
-      -File $actionStylesRelativePath `
-      -SelectorParts @("Button.actionIconButton", "ToggleButton.actionIconButton") `
-      -RequiredProperties @("Width", "MinWidth", "Height", "MinHeight", "ClipToBounds") `
-      -Rule "XAR101" `
-      -Description "actionIconButton"
-
-    Assert-StyleContract `
-      -Document $styleDocument `
-      -File $actionStylesRelativePath `
-      -SelectorParts @("Button.chipAction:pointerover", "ToggleButton.chipAction:pointerover") `
-      -RequiredProperties @("Background", "BorderBrush", "Foreground") `
-      -Rule "XAR102" `
-      -Description "chipAction pointerover"
-
-    Assert-StyleContract `
-      -Document $styleDocument `
-      -File $actionStylesRelativePath `
-      -SelectorParts @("Button.chipAction:pressed", "ToggleButton.chipAction:pressed") `
-      -RequiredProperties @("Background", "BorderBrush", "Foreground") `
-      -Rule "XAR103" `
-      -Description "chipAction pressed"
+  $appearance = @("Theme", "Background", "BorderBrush", "BorderThickness", "Foreground", "Template", "CornerRadius", "Width", "Height", "MinHeight", "Padding", "FontFamily", "FontSize", "FontWeight", "Opacity", "FocusAdorner", "Transitions", "ClipToBounds", "HorizontalContentAlignment", "VerticalContentAlignment")
+  $mappedRoles = 'actionPrimary|actionNeutral|actionDanger|actionGhost|actionIconButton|chipAction|consoleHeaderAction|panelChromeToggle|simulationActionButton|workspaceActionButton|workspaceGroupActionButton|workspaceHeaderAction|workspaceInfoButton|workspaceSearchClearButton|workspaceSubtleAction|workspaceTextAction|padInfoActionButton|padInfoHeaderActionButton|padInfoInfoButton|padInfoOverrideIconButton|dxfEditMiniAction|dxfEditCompactIconAction|viewMenuButton|iconTextButton|dangerTextButton|confirmDialogActionButton|confirmDialogDangerButton'
+  foreach ($file in @($xamlFiles)) {
+    $relativePath = Get-RepoRelativePath -Path $file.FullName
+    $document = Get-XamlDocument -Path $file.FullName
+    foreach ($style in $document.Descendants() | Where-Object { $_.Name.LocalName -eq "Style" }) {
+      $selector = Get-AttributeValue -Element $style -Name "Selector"
+      if ([string]::IsNullOrWhiteSpace($selector)) { continue }
+      $positiveSelector = [regex]::Replace($selector, ':not\([^)]*\)', '')
+      if ($positiveSelector -match '\.(actionTextButton|actionChip|actionButton)\b') {
+        Add-Issue -File $relativePath -Line (Get-LineNumber -Element $style) -Rule "XAR001" -Message "Styles for removed action primitives must be deleted." -Classes $selector
+      }
+      $broadRoleStyle = $false
+      foreach ($part in ($selector -split ',')) {
+        $positivePart = [regex]::Replace($part, ':not\([^)]*\)', '')
+        if ($positivePart -match '(?:^|[ >])(Button|ToggleButton)(?=:|$)' -and
+            @($publicRoles | Where-Object { -not $part.Contains(":not(.$_)") }).Count -gt 0) {
+          $broadRoleStyle = $true
+        }
+      }
+      # A glyph inside a role button is its own control; Core sets no icon size.
+      $controlSelector = @($positiveSelector -split ',' | Where-Object { $_ -notmatch 'controls\|FontIcon[.\w]*\s*$' }) -join ','
+      $rule = if ($controlSelector -match 'Border\.chipStatus\b') { "XAR103" }
+        elseif ($controlSelector -match '(Button|ToggleButton)\.chipAction\b') { "XAR102" }
+        elseif ($controlSelector -match "(Button|ToggleButton)\.($mappedRoles)\b" -or $broadRoleStyle) { "XAR101" }
+        else { "" }
+      if ([string]::IsNullOrEmpty($rule)) { continue }
+      foreach ($setter in $style.Elements() | Where-Object { $_.Name.LocalName -eq "Setter" }) {
+        $property = Get-AttributeValue -Element $setter -Name "Property"
+        if ($property -in $appearance) {
+          Add-Issue -File $relativePath -Line (Get-LineNumber -Element $setter) -Rule $rule -Message "NFH must not set '$property' on a Core public role or a mapped action class." -Classes $selector
+        }
+      }
+    }
+    foreach ($element in $document.Descendants()) {
+      foreach ($attribute in $element.Attributes()) {
+        if ($attribute.Name.LocalName -eq "Key" -and $attribute.Value -match '^Nvt\.(Button|Focus)\.') {
+          Add-Issue -File $relativePath -Line (Get-LineNumber -Element $element) -Rule "XAR104" -Message "Core button and focus resource overrides are not allowed."
+        }
+      }
+    }
+  }
+  $appPath = Join-Path $repoRoot "src/FreeformHelper.UI/App.axaml"
+  $appDocument = Get-XamlDocument -Path $appPath
+  $buttonSource = "avares://Nvt.Core.Avalonia/Theme/ButtonStyles.axaml"
+  $appIncludes = @($appDocument.Descendants() | Where-Object { $_.Name.LocalName -eq "StyleInclude" -and (Get-AttributeValue -Element $_ -Name "Source") -eq $buttonSource })
+  if ($appIncludes.Count -ne 1) {
+    Add-Issue -File "src/FreeformHelper.UI/App.axaml" -Rule "XAR100" -Message "Load Core ButtonStyles exactly once at application level."
+  }
+  foreach ($file in @($xamlFiles)) {
+    $document = Get-XamlDocument -Path $file.FullName
+    foreach ($include in $document.Descendants() | Where-Object { $_.Name.LocalName -eq "StyleInclude" }) {
+      if ((Get-AttributeValue -Element $include -Name "Source") -eq $buttonSource) {
+        Add-Issue -File (Get-RepoRelativePath -Path $file.FullName) -Line (Get-LineNumber -Element $include) -Rule "XAR100" -Message "Remove redundant NFH-scoped Core ButtonStyles includes."
+      }
+    }
   }
 
   $roleResult.issueCount = $issues.Count

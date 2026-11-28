@@ -4,6 +4,7 @@ using Avalonia.Media;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.UI.Controls;
+using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.Tests.TestInfrastructure;
 
@@ -89,6 +90,18 @@ internal static class PadCanvasPrivateAccess
     public static extern void EnsureRegularSpatialIndex(PadCanvas canvas);
 
     // Rendering seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleRegularUnselected")]
+    public static extern ref List<RegularPad> VisibleRegularUnselected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleRegularSelected")]
+    public static extern ref List<RegularPad> VisibleRegularSelected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleCadUnselected")]
+    public static extern ref List<CadPad> VisibleCadUnselected(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_visibleCadSelected")]
+    public static extern ref List<CadPad> VisibleCadSelected(PadCanvas canvas);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildVisibleDrawLists")]
     public static extern void BuildVisibleDrawLists(
         PadCanvas canvas,
@@ -97,6 +110,12 @@ internal static class PadCanvasPrivateAccess
         bool showCad,
         bool lowDetailMode,
         double lowDetailZoomThreshold);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "GetLabelFontSize")]
+    public static extern double GetLabelFontSize(PadCanvas canvas, double step, double baseSize, double minSize, double maxSize);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "GetAxisLabelStride")]
+    public static extern int GetAxisLabelStride(PadCanvas canvas, double step, double fontSize, int count, double maxLabelWidth);
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "RecordRenderPerf")]
     public static extern void RecordRenderPerf(
@@ -136,6 +155,15 @@ internal static class PadCanvasPrivateAccess
     public static extern PadCanvas.HoverDebugSnapshot? BuildHoverDebugSnapshot(PadCanvas canvas);
 
     // Selection and view seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyAxisLabelSelection")]
+    public static extern void ApplyAxisLabelSelection(PadCanvas canvas, PadCanvas.AxisLabelHit hit, bool additive);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyHitSelection")]
+    public static extern void ApplyHitSelection(PadCanvas canvas, PadCanvas.HitResult hit, bool toggle, bool additive);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyExtendSelection")]
+    public static extern void ApplyExtendSelection(PadCanvas canvas, PadCanvas.HitResult anchorHit, PadCanvas.HitResult currentHit);
+
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "SelectPadsInWorldRect")]
     public static extern void SelectPadsInWorldRect(PadCanvas canvas, Rect2 worldRect, bool additive, bool regularOnly);
 
@@ -154,4 +182,54 @@ internal static class PadCanvasPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ResolveBestCadIdByRegular")]
     public static extern int? ResolveBestCadIdByRegular(PadCanvas canvas, int regularPadId);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "TryBuildSimulationRegularFillBrush")]
+    public static extern IBrush? TryBuildSimulationRegularFillBrush(PadCanvas canvas, RegularPad pad);
+
+    // Pointer-press seams.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_axisLabelHits")]
+    public static extern ref List<PadCanvas.AxisLabelHit> AxisLabelHits(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_pendingSingleHit")]
+    public static extern ref PadCanvas.HitResult? PendingSingleHit(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_lastSingleSelectedPad")]
+    public static extern ref PadCanvas.HitResult? LastSingleSelectedPad(PadCanvas canvas);
+
+    // Overlay data that the canvas copies from its styled properties.
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_highlightedCadIds")]
+    public static extern ref HashSet<int> HighlightedCadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_diffIndexOverrideCadIds")]
+    public static extern ref HashSet<int> DiffIndexOverrideCadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_diffIndexAnchorCadPadIds")]
+    public static extern ref HashSet<int> DiffIndexAnchorCadPadIds(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchPreviewByCadId")]
+    public static extern ref Dictionary<int, NotchCanvasPreviewItem> NotchPreviewByCadId(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchToFullSeedPolygons")]
+    public static extern ref List<Polygon2> NotchToFullSeedPolygons(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_notchToFullCandidatePolygons")]
+    public static extern ref List<Polygon2> NotchToFullCandidatePolygons(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayByRegularPadId")]
+    public static extern ref Dictionary<int, NotchApplySimulationAaDisplayCell> SimulationOverlayByRegularPadId(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMinValue")]
+    public static extern ref double SimulationOverlayMinValue(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMaxValue")]
+    public static extern ref double SimulationOverlayMaxValue(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayMaxAbsDelta")]
+    public static extern ref double SimulationOverlayMaxAbsDelta(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayAutoNegativeClampAbs")]
+    public static extern ref double SimulationOverlayAutoNegativeClampAbs(PadCanvas canvas);
+
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_simulationOverlayAutoPositiveClamp")]
+    public static extern ref double SimulationOverlayAutoPositiveClamp(PadCanvas canvas);
 }

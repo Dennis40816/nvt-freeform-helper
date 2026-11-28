@@ -1,12 +1,94 @@
+using System.Collections.Immutable;
+using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
 using FreeformHelper.Application.Settings;
+using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
+using FreeformHelper.UI.Presentation;
 using FreeformHelper.UI.ViewModels;
 
 namespace FreeformHelper.UI.Services;
 
 public sealed class NotchDetailUseCase
 {
+    /// <summary>Explains the rows export writes for one CAD, from one uncached generation with the export inputs.</summary>
+    public static NotchDetailExplanation BuildExplanation(CadPad selectedCad, CadPadSet cad, RegularGrid grid,
+        ProjectSettings settings, IReadOnlySet<int>? activeRegularPadIds,
+        IReadOnlyDictionary<int, int> cadOutputFwDiffByCadId, bool firmwareOutput = true)
+    {
+        if (settings.Notch.ComputationMode != NotchComputationMode.CadAllocation ||
+            !settings.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V22))
+        {
+            return NotchDetailExplanation.WithoutRows("Row explanations require CadAllocation with V2.2 enabled.");
+        }
+
+        var service = new NotchExportService();
+        var collector = new NotchV22ExplanationCollector(selectedCad.Id);
+        var table = service.Generate(cad, grid, settings, activeRegularPadIds: activeRegularPadIds,
+            cadOutputFwDiffIndexByCadId: cadOutputFwDiffByCadId, explanationCollector: collector);
+        var projected = NotchCadOutputFwDiffProjectionService.Project(grid, table, cadOutputFwDiffByCadId);
+        var selectedRows = NotchExportRowSelectionPolicy.Build(projected.Table.Rows.Select((row, ordinal) =>
+            new NotchExportRowSelectionPolicy.RowChoice(ordinal, row, true)).ToArray(), NotchAlgorithmVersion.V22);
+        IReadOnlyList<NotchTableRow> exportRows = firmwareOutput
+            ? NotchV22ExportRows.Project(selectedRows.Rows, settings.Notch.NullValue, settings.Notch.ExportProfile)
+            : selectedRows.Rows;
+        var evidence = collector.Explanations;
+        var won = evidence.Where(explanation => explanation.SelectedCadPadId == selectedCad.Id).ToImmutableArray();
+        var sources = won.Select(explanation => NotchRowExplanationProjector.Build(explanation, exportRows,
+                settings.Notch.CompensationModel, settings.Notch.EnabledVersions.Contains(NotchAlgorithmVersion.V21)))
+            .Where(static source => source.Rows.Length > 0).ToImmutableArray();
+        var cellIds = won.SelectMany(static explanation => explanation.Regulars)
+            .Select(static regular => regular.RegularPadId).ToHashSet();
+        var cells = grid.Pads.Where(pad => cellIds.Contains(pad.RegularPadId)).ToImmutableArray();
+        return new NotchDetailExplanation(sources,
+            sources.Length > 0 ? string.Empty : NoRowsReason(selectedCad, cad, grid, settings, evidence, service),
+            cells,
+            cad.Pads.Where(pad => pad.Id != selectedCad.Id && cells.Any(regular => regular.Bounds.Intersects(pad.Bounds)))
+                .ToImmutableArray());
+    }
+
+    private static string NoRowsReason(CadPad selectedCad, CadPadSet cad, RegularGrid grid, ProjectSettings settings,
+        ImmutableArray<NotchV22RowExplanation> explanations, NotchExportService service)
+    {
+        if (!cad.Pads.Any(pad => pad.Id == selectedCad.Id))
+        {
+            return "This CAD is outside the export CAD set.";
+        }
+
+        var lost = explanations.Where(explanation => explanation.SelectedCadPadId != selectedCad.Id &&
+            explanation.Candidates.Any(candidate => candidate.CadPadId == selectedCad.Id)).ToArray();
+        if (lost.Length > 0)
+        {
+            return string.Join(" ", lost.Select(static explanation =>
+                $"CAD {explanation.SelectedCadPadId} wins IC {explanation.IcIndex + 1} diff {explanation.SourceDiffIndex}: " +
+                NotchV22CandidateSelection.DecidingKey(explanation.Candidates) + "."));
+        }
+
+        if (explanations.Any(explanation => explanation.SelectedCadPadId == selectedCad.Id))
+        {
+            return "No V2.2 output row: the export profile omits this no-op row.";
+        }
+
+        var v22Settings = NotchComputationSettingsSnapshotFactory.Create(settings);
+        v22Settings.Notch.EnabledVersions.Clear();
+        v22Settings.Notch.EnabledVersions.Add(NotchAlgorithmVersion.V22);
+        var eligibility = service.EvaluateCadRowEligibility(selectedCad, grid, v22Settings);
+        return "No V2.2 output row. " + (eligibility.EligibleVersions.Contains(NotchAlgorithmVersion.V22)
+            ? "No freeform anchor or effective To Full influence on an active regular."
+            : eligibility.Reason);
+    }
+
+    public static RegularGrid SnapshotGrid(RegularGrid grid) => new(grid.Rows, grid.Cols,
+        grid.XEdges.ToArray(), grid.YEdges.ToArray(), grid.Pads.Select(static source =>
+            new RegularPad(source.Row, source.Col, source.RegularPadId, source.Polygon)
+            {
+                IcIndex = source.IcIndex,
+                DiffIndex = source.DiffIndex,
+                MatchedCadPadId = source.MatchedCadPadId,
+                MatchScore = source.MatchScore,
+                Freeform = source.Freeform,
+            }).ToArray());
+
     public static NotchV22CompensationResult BuildCompensation(
         CadPad cadPad,
         RegularGrid grid,
@@ -175,7 +257,7 @@ public sealed class NotchDetailUseCase
             display.ToRegularRatioText,
             display.ToFullRatioText,
             display.CombinedRatioText,
-            resolved.Stage2CandidatePolygons);
+            compensation.ToFullPolygons);
     }
 }
 

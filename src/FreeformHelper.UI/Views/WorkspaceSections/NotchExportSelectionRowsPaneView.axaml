@@ -24,37 +24,37 @@
                   IsEnabled="{Binding HasRows}" HorizontalAlignment="Center"
                   AutomationProperties.Name="Include all shown rows in export"
                   ToolTip.Tip="Include all shown rows in export"/>
-        <Button Grid.Column="1" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsRowColumnFilterActive}"
+        <Button Grid.Column="1" Classes="productFilterChip columnFilter" Classes.active="{Binding IsRowColumnFilterActive}"
                 Tag="row" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter # values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="#"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
           </StackPanel>
         </Button>
-        <Button Grid.Column="2" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsIcColumnFilterActive}"
+        <Button Grid.Column="2" Classes="productFilterChip columnFilter" Classes.active="{Binding IsIcColumnFilterActive}"
                 Tag="ic" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter IC values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="IC"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
           </StackPanel>
         </Button>
-        <Button Grid.Column="3" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsDiffColumnFilterActive}"
+        <Button Grid.Column="3" Classes="productFilterChip columnFilter" Classes.active="{Binding IsDiffColumnFilterActive}"
                 Tag="diff" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter Diff values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="Diff"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
           </StackPanel>
         </Button>
-        <Button Grid.Column="4" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsMatchColumnFilterActive}"
+        <Button Grid.Column="4" Classes="productFilterChip columnFilter" Classes.active="{Binding IsMatchColumnFilterActive}"
                 Tag="match" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter Combine values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="Combine"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
           </StackPanel>
         </Button>
-        <Button Grid.Column="5" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsMappingColumnFilterActive}"
+        <Button Grid.Column="5" Classes="productFilterChip columnFilter" Classes.active="{Binding IsMappingColumnFilterActive}"
                 Tag="map" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter REG -> CAD values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="REG → CAD"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
           </StackPanel>
         </Button>
-        <Button Grid.Column="6" Classes="actionGhost flat" Padding="{StaticResource Inset2}" Classes.active="{Binding IsStatusColumnFilterActive}"
+        <Button Grid.Column="6" Classes="productFilterChip columnFilter" Classes.active="{Binding IsStatusColumnFilterActive}"
                 Tag="status" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter Status values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
             <TextBlock Text="Status"/><controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.FilterAlt}"/>
@@ -62,9 +62,8 @@
         </Button>
       </Grid>
     </Border>
-    <ListBox Grid.Row="2" Classes="scrollV2 notchExportRows"
-             ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-             ScrollViewer.AllowAutoHide="False" ScrollViewer.VerticalScrollBarVisibility="Auto"
+    <ListBox Grid.Row="2" Classes="notchExportRows"
+             ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Auto"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
       <ListBox.ItemsPanel>
         <ItemsPanelTemplate><VirtualizingStackPanel/></ItemsPanelTemplate>
@@ -75,12 +74,12 @@
             <ContentControl Content="{Binding VisibleGroup}" IsVisible="{Binding HasVisibleGroup}">
               <ContentControl.ContentTemplate>
                 <DataTemplate x:DataType="viewModels:NotchExportIcGroupViewModel">
-                  <Border Background="{DynamicResource BrushBgPanel}" Padding="{StaticResource Inset4}">
+                  <Border Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset4}">
                     <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="{StaticResource Space6}">
                       <TextBlock Text="{Binding HeaderText}" FontWeight="SemiBold" VerticalAlignment="Center"
-                                 Foreground="{DynamicResource BrushTextPrimary}"/>
+                                 Foreground="{DynamicResource NfcTextBrush}"/>
                       <TextBlock Grid.Column="1" Text="{Binding SummaryText}" VerticalAlignment="Center"
-                                 Foreground="{DynamicResource BrushTextMuted}"/>
+                                 Foreground="{DynamicResource NfcTextMutedBrush}"/>
                       <Button Grid.Column="2" Classes="actionGhost" Content="All shown"
                               Command="{Binding SelectAllGroupCommand}" ToolTip.Tip="Check visible rows in this IC only"/>
                       <Button Grid.Column="3" Classes="actionGhost" Content="None shown"
@@ -115,7 +114,7 @@
       </ListBox.ItemTemplate>
     </ListBox>
     <Border Grid.Row="2" IsVisible="{Binding HasNoRows}" VerticalAlignment="Top"
-            Background="{DynamicResource BrushBgPanel}" Padding="{StaticResource Inset12}">
+            Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset12}">
       <StackPanel Spacing="{StaticResource Space4}">
         <TextBlock Text="No rows match the view filters."/>
         <TextBlock Classes="stepNote" Text="Use Reset filters above to show every row."/>

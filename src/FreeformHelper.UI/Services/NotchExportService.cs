@@ -24,6 +24,7 @@ public sealed class NotchExportService
     /// <param name="progress">Optional receiver of generation progress updates.</param>
     /// <param name="activeRegularPadIds">Optional IDs of the active regular pads; <c>null</c> leaves the regular pads unfiltered.</param>
     /// <param name="cadOutputFwDiffIndexByCadId">Optional map from CAD pad ID to its output FW diff index.</param>
+    /// <param name="explanationCollector">Optional fresh collector for V22 row evidence.</param>
     /// <returns>A new <see cref="NotchTable"/> containing the generated rows.</returns>
     public NotchTable Generate(
         CadPadSet cad,
@@ -31,7 +32,8 @@ public sealed class NotchExportService
         ProjectSettings settings,
         IProgress<NotchGenerationProgress>? progress = null,
         IReadOnlySet<int>? activeRegularPadIds = null,
-        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId = null)
+        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId = null,
+        NotchV22ExplanationCollector? explanationCollector = null)
     {
         return _notchGenerator.Generate(
             cad,
@@ -39,7 +41,8 @@ public sealed class NotchExportService
             settings,
             progress,
             activeRegularPadIds,
-            cadOutputFwDiffIndexByCadId);
+            cadOutputFwDiffIndexByCadId,
+            explanationCollector);
     }
 
     /// <summary>
@@ -118,16 +121,4 @@ public sealed class NotchExportService
     /// <param name="table">The notch table to export.</param>
     /// <returns>A string containing the notch table data in CSV format.</returns>
     public static string ExportCsv(NotchTable table) => NotchTableExporter.ExportAsCsv(table);
-
-    /// <summary>
-    /// Exports a given <see cref="NotchTable"/> as C-style initializer rows.
-    /// </summary>
-    public static string ExportCInitializer(
-        NotchTable table,
-        CadPadSet cad,
-        RegularGrid grid,
-        ProjectSettings settings,
-        NotchExportProfile profile = NotchExportProfile.Release,
-        IReadOnlySet<int>? activeRegularPadIds = null)
-        => NotchTableExporter.ExportAsCInitializer(table, cad, grid, settings, profile, activeRegularPadIds);
 }

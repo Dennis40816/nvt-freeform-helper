@@ -38,158 +38,22 @@ public sealed partial class PadCanvas
         long geometryDrawElapsedMs = 0;
         long overlayElapsedMs = 0;
         long labelElapsedMs = 0;
-        var renderLowDetailMode = false;
-        var renderShowRegular = false;
-        var renderShowCad = false;
-        var secondaryVisualsDeferred = false;
         var renderFrame = ResolveRenderFrame();
 
-        // Create a transformation matrix from world coordinates to screen coordinates.
-        // This accounts for zoom, pan, and inverts the Y-axis (world Y-up to screen Y-down).
-        var worldToScreen = renderFrame.ViewFrame.WorldToScreen;
-
-        // Push the transformation matrix onto the drawing context.
-        // All subsequent drawing operations will be transformed by this matrix.
-        using (context.PushTransform(worldToScreen))
+        // Push the world-to-screen matrix (zoom, pan, and Y-axis inversion) onto the drawing context.
+        // All drawing operations inside the scope are transformed by this matrix.
+        using (context.PushTransform(renderFrame.ViewFrame.WorldToScreen))
         {
-            var worldViewport = renderFrame.ViewFrame.WorldViewport;
-            // Determine if CAD or regular pads should be shown based on properties and data availability.
-            var showRegular = renderFrame.ShowRegular;
-            var showCad = renderFrame.ShowCad;
-            var cadOpacity = renderFrame.CadOpacity;
-            var regOpacity = renderFrame.RegularOpacity;
-            var cadFillOpacity = renderFrame.CadFillOpacity;
-            var regFillOpacity = renderFrame.RegularFillOpacity;
-            var lowDetailZoomThreshold = renderFrame.LowDetailZoomThreshold;
-            var selectedWidthAdd = renderFrame.SelectedWidthAdd;
-            var lowDetailMode = renderFrame.LowDetailMode;
-            renderLowDetailMode = lowDetailMode;
-            renderShowRegular = showRegular;
-            renderShowCad = showCad;
-            secondaryVisualsDeferred = renderFrame.SecondaryVisualsDeferred;
-            var highlightStrokeWidthAdjust = renderFrame.HighlightStrokeWidthAdjust;
-            var selectedOutlineWidth = renderFrame.SelectedOutlineWidth;
-
-            // Ensure necessary caches are populated only when they are actually needed.
-            if (showRegular)
-            {
-                EnsureRegularSpatialIndex();
-            }
-
-            if (showCad)
-            {
-                EnsureCadSpatialIndex();
-            }
-
-            if (showCad && ShouldEnsureCadGeometryCache(lowDetailMode))
-            {
-                EnsureCadGeometryCache();
-            }
-
-            if (lowDetailMode)
-            {
-                cadFillOpacity = 0.0;
-                regFillOpacity = 0.0;
-            }
-
-            // --- Initialize Brushes and Pens for Regular Pads ---
-            IBrush? regFillBase = null; // Base fill color for regular pads.
-            IBrush? regFillSelected = null; // Fill color for selected regular pads.
-            IBrush? regFillFreeform = null; // Fill color for freeform regular pads.
-            Pen? regPenBase = null; // Base stroke pen for regular pads.
-            Pen? regPenSelected = null; // Stroke pen for selected regular pads.
-            Pen? regPenFreeform = null; // Stroke pen for freeform regular pads.
-            Pen? regPenUnmatched = null; // Stroke pen for unmatched regular pads.
-
-            // --- Initialize Brushes and Pens for CAD Pads ---
-            IBrush? cadFillDefault = null; // Default fill color for CAD pads.
-            IBrush? cadFillSelected = null; // Fill color for selected CAD pads.
-            IBrush? cadFillOverlap = null; // Fill color for overlap-highlighted CAD pads.
-            Pen? cadPen = null; // Base stroke pen for CAD pads.
-            Pen? cadPenSelected = null; // Stroke pen for selected CAD pads.
-            Pen? cadPenOverlap = null; // Stroke pen for overlap-highlighted CAD pads.
-
-            if (showRegular)
-            {
-                var baseColor = RegularLineColor;
-                var selectedColor = RegularSelectedColor ?? GetResourceColor("ColorCanvasRegularSelected", baseColor);
-                var freeformColor = GetResourceColor("ColorCanvasRegularFreeform", baseColor);
-                var unmatchedColor = GetResourceColor("ColorCanvasRegularUnmatched", baseColor);
-
-                var regFillAlpha = GetResourceAlpha("CanvasRegularFillAlpha", 0.0);
-                var regFillSelectedAlpha = RegularSelectedFillOpacity.HasValue
-                    ? (byte)Math.Clamp((int)Math.Round(RegularSelectedFillOpacity.Value * 255.0), 0, 255)
-                    : GetResourceAlpha("CanvasRegularSelectedFillAlpha", 0.0);
-                var regFillFreeformAlpha = GetResourceAlpha("CanvasRegularFreeformFillAlpha", 0.0);
-                var regStrokeAlpha = GetResourceAlpha("CanvasRegularStrokeAlpha", 0.0);
-                var highlightAlpha = GetResourceAlpha("CanvasHighlightStrokeAlpha", regStrokeAlpha);
-
-                // Create semi-transparent fill brushes for regular pads.
-                var regBaseFillAlpha = ApplyOpacity(regFillAlpha, regFillOpacity);
-                var regSelectedFillAlpha = ApplyOpacity(regFillSelectedAlpha, regFillOpacity);
-                var regFreeformFillAlpha = ApplyOpacity(regFillFreeformAlpha, regFillOpacity);
-                regFillBase = regBaseFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regBaseFillAlpha, baseColor.R, baseColor.G, baseColor.B));
-                regFillSelected = regSelectedFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regSelectedFillAlpha, selectedColor.R, selectedColor.G, selectedColor.B));
-                regFillFreeform = regFreeformFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(regFreeformFillAlpha, freeformColor.R, freeformColor.G, freeformColor.B));
-
-                // Create pens for regular pads, including different styles for various states.
-                var baseStrokeAlpha = ApplyOpacity(regStrokeAlpha, regOpacity);
-                var stateStrokeAlpha = ApplyOpacity(highlightAlpha, regOpacity);
-                var highlightedRegularWidth = Math.Max(0.05, RegularLineWidth + highlightStrokeWidthAdjust);
-                regPenBase = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, baseColor.R, baseColor.G, baseColor.B)), RegularLineWidth);
-                regPenSelected = new Pen(GetBrush(Color.FromArgb(stateStrokeAlpha, selectedColor.R, selectedColor.G, selectedColor.B)), selectedOutlineWidth);
-                // Freeform remains color-coded, but does not get selection-style thick highlight.
-                regPenFreeform = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, freeformColor.R, freeformColor.G, freeformColor.B)), RegularLineWidth);
-                regPenUnmatched = new Pen(GetBrush(Color.FromArgb(stateStrokeAlpha, unmatchedColor.R, unmatchedColor.G, unmatchedColor.B)), highlightedRegularWidth);
-            }
-
-            if (showCad)
-            {
-                if (!lowDetailMode && ColorCadByArea)
-                {
-                    EnsureAreaColorCache(); // Ensure area-based color cache for CAD pads is built.
-                }
-
-                // Create semi-transparent fill brushes for CAD pads.
-                var cadFillDefaultColor = GetResourceColor("ColorCanvasCadFillDefault", Colors.Transparent);
-                var cadFillSelectedColor = GetResourceColor("ColorCanvasCadFillSelected", Colors.Transparent);
-                var cadFillOverlapColor = GetResourceColor("ColorCanvasCadOverlapFill", Colors.Transparent);
-                var cadDefaultFillAlpha = ApplyOpacity(cadFillDefaultColor.A, cadFillOpacity);
-                var cadSelectedFillAlpha = ApplyOpacity(cadFillSelectedColor.A, cadFillOpacity);
-                var cadOverlapFillAlpha = ApplyOpacity(cadFillOverlapColor.A, cadFillOpacity);
-                cadFillDefault = cadDefaultFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadDefaultFillAlpha, cadFillDefaultColor.R, cadFillDefaultColor.G, cadFillDefaultColor.B));
-                cadFillSelected = cadSelectedFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadSelectedFillAlpha, cadFillSelectedColor.R, cadFillSelectedColor.G, cadFillSelectedColor.B));
-                cadFillOverlap = cadOverlapFillAlpha == 0
-                    ? Brushes.Transparent
-                    : GetBrush(Color.FromArgb(cadOverlapFillAlpha, cadFillOverlapColor.R, cadFillOverlapColor.G, cadFillOverlapColor.B));
-
-                var cadStrokeAlpha = GetResourceAlpha("CanvasCadStrokeAlpha", 0.0);
-                var highlightAlpha = GetResourceAlpha("CanvasHighlightStrokeAlpha", cadStrokeAlpha);
-                var cadSelectedColor = GetResourceColor("ColorCanvasCadSelected", CadLineColor);
-                var cadOverlapColor = GetResourceColor("ColorCanvasCadOverlapStroke", cadSelectedColor);
-                var overlapWidthAdd = GetResourceDouble("CanvasCadOverlapStrokeWidthAdd", selectedWidthAdd);
-                var overlapWidth = Math.Max(CadLineWidth + 0.05, CadLineWidth + overlapWidthAdd + highlightStrokeWidthAdjust);
-
-                // Create pens for CAD pads, including a thicker pen for selected state.
-                var baseStrokeAlpha = ApplyOpacity(cadStrokeAlpha, cadOpacity);
-                var selectedStrokeAlpha = ApplyOpacity(highlightAlpha, cadOpacity);
-                cadPen = new Pen(GetBrush(Color.FromArgb(baseStrokeAlpha, CadLineColor.R, CadLineColor.G, CadLineColor.B)), CadLineWidth);
-                cadPenSelected = new Pen(GetBrush(Color.FromArgb(selectedStrokeAlpha, cadSelectedColor.R, cadSelectedColor.G, cadSelectedColor.B)), selectedOutlineWidth);
-                cadPenOverlap = new Pen(GetBrush(Color.FromArgb(selectedStrokeAlpha, cadOverlapColor.R, cadOverlapColor.G, cadOverlapColor.B)), overlapWidth);
-            }
+            EnsureFrameCaches(renderFrame);
+            var (regularStyle, cadStyle) = ResolvePadStyles(renderFrame);
 
             var visibleBuildStarted = TimeProvider.System.GetTimestamp();
-            BuildVisibleDrawLists(worldViewport, showRegular, showCad, lowDetailMode, lowDetailZoomThreshold);
+            BuildVisibleDrawLists(
+                renderFrame.ViewFrame.WorldViewport,
+                renderFrame.ShowRegular,
+                renderFrame.ShowCad,
+                renderFrame.LowDetailMode,
+                renderFrame.LowDetailZoomThreshold);
             visibleBuildElapsedMs = ElapsedMilliseconds(visibleBuildStarted);
 
             // --- Rendering Order ---
@@ -197,60 +61,130 @@ public sealed partial class PadCanvas
             // This keeps selected outlines above all unselected geometry.
             var geometryStarted = TimeProvider.System.GetTimestamp();
 
-            // 1. Draw Regular Pads (unselected)
-            if (showRegular)
-            {
-                foreach (var pad in _visibleRegularUnselected)
-                {
-                    DrawRegularPad(context, pad, isSelected: false, regFillBase!, regFillSelected!, regFillFreeform!, regPenBase!, regPenSelected!, regPenFreeform!, regPenUnmatched!);
-                }
-            }
-
-            // 2. Draw CAD Pads (unselected)
-            if (showCad)
-            {
-                foreach (var pad in _visibleCadUnselected)
-                {
-                    DrawCadPad(context, pad, isSelected: false, cadFillDefault!, cadFillSelected!, cadFillOverlap!, cadPen!, cadPenSelected!, cadPenOverlap!, lowDetailMode);
-                }
-            }
-
-            // 3. Draw Regular Pads (selected)
-            if (showRegular)
-            {
-                foreach (var pad in _visibleRegularSelected)
-                {
-                    DrawRegularPad(context, pad, isSelected: true, regFillBase!, regFillSelected!, regFillFreeform!, regPenBase!, regPenSelected!, regPenFreeform!, regPenUnmatched!);
-                }
-            }
-
-            // 4. Draw CAD Pads (selected)
-            if (showCad)
-            {
-                foreach (var pad in _visibleCadSelected)
-                {
-                    DrawCadPad(context, pad, isSelected: true, cadFillDefault!, cadFillSelected!, cadFillOverlap!, cadPen!, cadPenSelected!, cadPenOverlap!, lowDetailMode);
-                }
-            }
+            var padPainter = new PadCanvasVisiblePadPainter(
+                _visibleRegularUnselected,
+                _visibleCadUnselected,
+                _visibleRegularSelected,
+                _visibleCadSelected,
+                (ctx, pad, selected, style) => DrawRegularPad(ctx, pad, selected, style.FillBase, style.FillSelected, style.FillFreeform, style.PenBase, style.PenSelected, style.PenFreeform, style.PenUnmatched),
+                (ctx, pad, selected, style, lowDetail) => DrawCadPad(ctx, pad, selected, style.FillDefault, style.FillSelected, style.FillOverlap, style.Pen, style.PenSelected, style.PenOverlap, lowDetail));
+            padPainter.Draw(context, renderFrame.ShowRegular, renderFrame.ShowCad, regularStyle, cadStyle, renderFrame.LowDetailMode);
             geometryDrawElapsedMs = ElapsedMilliseconds(geometryStarted);
 
-            if (!_isBoxSelecting && !secondaryVisualsDeferred)
+            if (!_isBoxSelecting && !renderFrame.SecondaryVisualsDeferred)
             {
-                var overlayStarted = TimeProvider.System.GetTimestamp();
-                DrawDiffIndexOverlay(context, showCad, lowDetailMode, cadOpacity);
-                if (ShowNotchToFullSeedOverlay)
-                {
-                    DrawNotchToFullSeedOverlay(context, showCad, cadOpacity, selectedOutlineWidth);
-                }
-
-                if (ShowNotchToFullCandidateOverlay)
-                {
-                    DrawNotchToFullCandidateOverlay(context, showCad, cadOpacity, selectedOutlineWidth);
-                }
-                overlayElapsedMs += ElapsedMilliseconds(overlayStarted);
+                overlayElapsedMs += DrawWorldOverlays(context, renderFrame);
             }
         } // End of world-to-screen transform scope.
 
+        var (screenOverlayElapsedMs, screenLabelElapsedMs) = DrawScreenLayer(context, renderFrame);
+        overlayElapsedMs += screenOverlayElapsedMs;
+        labelElapsedMs += screenLabelElapsedMs;
+
+        RecordRenderPerf(
+            totalElapsedMs: ElapsedMilliseconds(renderStarted),
+            backgroundElapsedMs: backgroundElapsedMs,
+            visibleBuildElapsedMs: visibleBuildElapsedMs,
+            geometryDrawElapsedMs: geometryDrawElapsedMs,
+            overlayElapsedMs: overlayElapsedMs,
+            labelElapsedMs: labelElapsedMs,
+            viewFrameRevision: renderFrame.ViewFrame.Revision,
+            showRegular: renderFrame.ShowRegular,
+            showCad: renderFrame.ShowCad,
+            lowDetailMode: renderFrame.LowDetailMode,
+            secondaryVisualsDeferred: renderFrame.SecondaryVisualsDeferred);
+    }
+
+    // Ensure necessary caches are populated only when they are actually needed.
+    private void EnsureFrameCaches(PadCanvasRenderFrame renderFrame)
+    {
+        if (renderFrame.ShowRegular)
+        {
+            EnsureRegularSpatialIndex();
+        }
+
+        if (renderFrame.ShowCad)
+        {
+            EnsureCadSpatialIndex();
+        }
+
+        if (renderFrame.ShowCad && ShouldEnsureCadGeometryCache(renderFrame.LowDetailMode))
+        {
+            EnsureCadGeometryCache();
+        }
+    }
+
+    // The brushes and pens of each pad kind come from the style builder.
+    private (RegularPadStyle? Regular, CadPadStyle? Cad) ResolvePadStyles(PadCanvasRenderFrame renderFrame)
+    {
+        var cadFillOpacity = renderFrame.LowDetailMode ? 0.0 : renderFrame.CadFillOpacity;
+        var regFillOpacity = renderFrame.LowDetailMode ? 0.0 : renderFrame.RegularFillOpacity;
+        var styleBuilder = new PadCanvasPadStyleBuilder(new PadCanvasPadStyleBuilder.Services(
+            GetResourceColor,
+            GetResourceAlpha,
+            GetResourceDouble,
+            GetBrush,
+            ApplyOpacity));
+        RegularPadStyle? regularStyle = null;
+        CadPadStyle? cadStyle = null;
+
+        if (renderFrame.ShowRegular)
+        {
+            regularStyle = styleBuilder.BuildRegular(new PadCanvasPadStyleBuilder.RegularInput(
+                RegularLineColor,
+                RegularSelectedColor,
+                RegularSelectedFillOpacity,
+                RegularLineWidth,
+                renderFrame.RegularOpacity,
+                regFillOpacity,
+                renderFrame.SelectedOutlineWidth,
+                renderFrame.HighlightStrokeWidthAdjust));
+        }
+
+        if (renderFrame.ShowCad)
+        {
+            if (!renderFrame.LowDetailMode && ColorCadByArea)
+            {
+                EnsureAreaColorCache(); // Ensure area-based color cache for CAD pads is built.
+            }
+
+            cadStyle = styleBuilder.BuildCad(new PadCanvasPadStyleBuilder.CadInput(
+                CadLineColor,
+                CadLineWidth,
+                renderFrame.CadOpacity,
+                cadFillOpacity,
+                renderFrame.SelectedOutlineWidth,
+                renderFrame.SelectedWidthAdd,
+                renderFrame.HighlightStrokeWidthAdjust));
+        }
+
+        return (regularStyle, cadStyle);
+    }
+
+    // Draws the overlays that sit in world coordinates, right above the pads. Returns the elapsed milliseconds.
+    private long DrawWorldOverlays(DrawingContext context, PadCanvasRenderFrame renderFrame)
+    {
+        var overlayStarted = TimeProvider.System.GetTimestamp();
+        DrawDiffIndexOverlay(context, renderFrame.ShowCad, renderFrame.LowDetailMode, renderFrame.CadOpacity);
+        if (ShowNotchToFullSeedOverlay)
+        {
+            DrawNotchToFullSeedOverlay(context, renderFrame.ShowCad, renderFrame.CadOpacity, renderFrame.SelectedOutlineWidth);
+        }
+
+        if (ShowNotchToFullCandidateOverlay)
+        {
+            DrawNotchToFullCandidateOverlay(context, renderFrame.ShowCad, renderFrame.CadOpacity, renderFrame.SelectedOutlineWidth);
+        }
+
+        return ElapsedMilliseconds(overlayStarted);
+    }
+
+    // Draws labels, the final To-Full result, the box selection and the axis labels on top of the pads.
+    private (long OverlayElapsedMs, long LabelElapsedMs) DrawScreenLayer(DrawingContext context, PadCanvasRenderFrame renderFrame)
+    {
+        long overlayElapsedMs = 0;
+        long labelElapsedMs = 0;
+        var secondaryVisualsDeferred = renderFrame.SecondaryVisualsDeferred;
         var occupiedRatioLabelRects = new List<Rect>();
         if (!_isBoxSelecting && !secondaryVisualsDeferred && !ShouldSimplifyAggregateNotchPreviewVisuals())
         {
@@ -276,16 +210,9 @@ public sealed partial class PadCanvas
         var hasToFullPreview = _notchPreviewByCadId.Values.Any(item => item.IsToFullEnabled);
         if (!_isBoxSelecting && !secondaryVisualsDeferred && ShowNotchToFullFinalOverlay && showCadFinal && hasToFullPreview)
         {
-            var cadOpacityFinal = Math.Clamp(CadLineOpacity, 0.0, 1.0);
-            var highlightStrokeWidthAdjustFinal = HighlightStrokeWidthAdjust;
-            var selectedWidthAddFinal = GetResourceDouble("CanvasCadSelectedStrokeWidthAdd", 0.8);
-            var selectedOutlineBaseFinal = Math.Max(CadLineWidth, RegularLineWidth);
-            var selectedOutlineWidthFinal = Math.Max(
-                selectedOutlineBaseFinal + 0.05,
-                selectedOutlineBaseFinal + selectedWidthAddFinal + highlightStrokeWidthAdjustFinal);
-            using (context.PushTransform(worldToScreen))
+            using (context.PushTransform(renderFrame.ViewFrame.WorldToScreen))
             {
-                DrawNotchToFullOverlay(context, showCadFinal, cadOpacityFinal, selectedOutlineWidthFinal);
+                DrawNotchToFullOverlay(context, showCadFinal, renderFrame.CadOpacity, renderFrame.SelectedOutlineWidth);
             }
         }
 
@@ -315,19 +242,7 @@ public sealed partial class PadCanvas
         }
 
         labelElapsedMs += ElapsedMilliseconds(labelTailStarted);
-
-        RecordRenderPerf(
-            totalElapsedMs: ElapsedMilliseconds(renderStarted),
-            backgroundElapsedMs: backgroundElapsedMs,
-            visibleBuildElapsedMs: visibleBuildElapsedMs,
-            geometryDrawElapsedMs: geometryDrawElapsedMs,
-            overlayElapsedMs: overlayElapsedMs,
-            labelElapsedMs: labelElapsedMs,
-            viewFrameRevision: renderFrame.ViewFrame.Revision,
-            showRegular: renderShowRegular,
-            showCad: renderShowCad,
-            lowDetailMode: renderLowDetailMode,
-            secondaryVisualsDeferred: secondaryVisualsDeferred);
+        return (overlayElapsedMs, labelElapsedMs);
     }
 
     private void BuildVisibleDrawLists(Rect2 worldViewport, bool showRegular, bool showCad, bool lowDetailMode, double lowDetailZoomThreshold)

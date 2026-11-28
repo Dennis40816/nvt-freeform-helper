@@ -11,12 +11,12 @@
       <Ellipse x:Name="SpinnerTrack"
                Width="30"
                Height="30"
-               Stroke="{DynamicResource BrushTextMuted}"
+               Stroke="{DynamicResource NfcTextMutedBrush}"
                StrokeThickness="{StaticResource CadLoadCanvasOverlaySpinnerStrokeThickness}"/>
       <Ellipse x:Name="SpinnerFlow"
                Width="30"
                Height="30"
-               Stroke="{DynamicResource BrushAccent}"
+               Stroke="{DynamicResource NfcAccentBrush}"
                StrokeThickness="{StaticResource CadLoadCanvasOverlaySpinnerStrokeThickness}"
                StrokeLineCap="Round"
                StrokeDashArray="5,18"/>

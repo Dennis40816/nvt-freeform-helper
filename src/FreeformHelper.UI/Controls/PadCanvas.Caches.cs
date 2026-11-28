@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Media;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using Nvt.Core.Avalonia.Theme;
@@ -109,44 +110,8 @@ public sealed partial class PadCanvas
             return;
         }
 
-        // Clamp the area bucket tolerance to a reasonable range (0% to 50% relative difference).
-        var tol = Math.Clamp(AreaBucketTolerance, 0.0, 0.5);
-
-        // Sort CAD pads by their area to facilitate bucketing.
-        var areas = CadPads.Select(p => (p.Id, a: p.Area)).OrderBy(t => t.a).ToList();
-
-        var buckets = new List<List<int>>(); // Stores lists of CadPad IDs, where each list is a bucket.
-        var current = new List<int>(); // Current bucket being filled.
-        var currentRef = 0.0; // Reference area for the current bucket.
-
-        // Iterate through sorted pads to group them into area buckets.
-        foreach (var (id, a) in areas)
-        {
-            if (current.Count == 0)
-            {
-                // Start a new bucket with the first pad.
-                currentRef = a;
-                current.Add(id);
-                continue;
-            }
-
-            // Calculate the relative difference between the current pad's area and the bucket's reference area.
-            var rel = Math.Abs(a - currentRef) / Math.Max(currentRef, 1e-12);
-            if (rel <= tol)
-            {
-                // If within tolerance, add to the current bucket.
-                current.Add(id);
-            }
-            else
-            {
-                // Otherwise, finalize the current bucket and start a new one.
-                buckets.Add(current);
-                current = new List<int> { id };
-                currentRef = a;
-            }
-        }
-        // Add the last bucket if it contains any pads.
-        if (current.Count > 0) buckets.Add(current);
+        var pads = CadPads.ToList();
+        var buckets = CadAreaBucketService.BuildBuckets(pads, AreaBucketTolerance);
 
         // Determine the number of unique colors needed, up to MaxAreaBuckets.
         var maxBuckets = (int)Math.Clamp(MaxAreaBuckets, 1, 1024);

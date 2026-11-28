@@ -7,9 +7,6 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.CoordinatePlannerCalibrationSectionView"
              x:DataType="vm:CoordinatePlannerWorkspaceViewModel"
              x:CompileBindings="True">
-  <UserControl.Styles>
-    <StyleInclude Source="avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"/>
-  </UserControl.Styles>
   <panels:CollapsiblePanel Title="Calibration" IsExpanded="{Binding ShowCalibrationDetails, Mode=TwoWay}">
     <panels:CollapsiblePanel.HeaderRight>
       <TextBlock Text="{Binding MachineSummaryText}"
@@ -92,7 +89,7 @@
                  Classes="workspaceSectionMeta"
                  TextWrapping="Wrap"/>
       <Button Content="Sync"
-              Classes="actionNeutral actionTextButton"
+              Classes="actionNeutral"
               HorizontalAlignment="Right"
               Command="{Binding SyncFromWorkspaceCommand}"
               ToolTip.Tip="{x:Static vm:CoordinatePlannerWorkspaceViewModel.SyncConsequenceText}"/>

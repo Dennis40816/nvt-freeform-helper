@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     x:DataType="viewModels:SimulationWorkspaceViewModel"
     x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceViewOptionsView">
@@ -55,7 +55,7 @@
             IsVisible="{Binding ShowLegendCenterLabel}">
           <Grid ColumnDefinitions="1.25*,1.1*,1.1*,1.05*,1*"
               ColumnSpacing="{DynamicResource Space1}"
-              Background="{DynamicResource BrushBgSurfaceInset}">
+              Background="{DynamicResource NfcSurfaceSubtleBrush}">
             <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleLow}"/>
             <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleZero}"/>
             <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleMid}"/>
@@ -69,7 +69,7 @@
             IsVisible="{Binding ShowSequentialLegend}">
           <Grid ColumnDefinitions="1.4*,1.2*,1.1*,1*"
               ColumnSpacing="{DynamicResource Space1}"
-              Background="{DynamicResource BrushBgSurfaceInset}">
+              Background="{DynamicResource NfcSurfaceSubtleBrush}">
             <Border Grid.Column="0" Background="{DynamicResource BrushSimulationScaleZero}"/>
             <Border Grid.Column="1" Background="{DynamicResource BrushSimulationScaleMid}"/>
             <Border Grid.Column="2" Background="{DynamicResource BrushSimulationScaleWarm}"/>

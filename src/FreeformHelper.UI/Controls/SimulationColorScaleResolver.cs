@@ -93,33 +93,6 @@ internal static class SimulationColorScaleResolver
         return Lerp(zeroColor, lowColor, remapped);
     }
 
-    public static Color ResolveSequentialColor(
-        double normalized,
-        Color lowColor,
-        Color zeroColor,
-        Color midColor,
-        Color warmColor,
-        Color highColor)
-    {
-        var t = Math.Clamp(normalized, 0d, 1d);
-        if (t <= 0.38d)
-        {
-            return Lerp(lowColor, zeroColor, t / 0.38d);
-        }
-
-        if (t <= 0.62d)
-        {
-            return Lerp(zeroColor, midColor, (t - 0.38d) / 0.24d);
-        }
-
-        if (t <= 0.82d)
-        {
-            return Lerp(midColor, warmColor, (t - 0.62d) / 0.20d);
-        }
-
-        return Lerp(warmColor, highColor, (t - 0.82d) / 0.18d);
-    }
-
     public static Color ResolveSignedColor(
         double value,
         double maxAbs,

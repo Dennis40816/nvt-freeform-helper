@@ -70,60 +70,10 @@ public sealed partial class PadCanvas
         }
 
         // --- Right Mouse Button Context Menu / Selection ---
-        if (props.IsRightButtonPressed)
+        if (props.IsRightButtonPressed && CreateContextPressHandler().Handle(_lastPointer, e.KeyModifiers))
         {
-            var modifiers = e.KeyModifiers;
-            var hit = HitTest(_lastPointer, modifiers.HasFlag(KeyModifiers.Alt));
-            if (hit.kind == HitKind.None)
-            {
-                ClearSelectionInternal(); // Clear selection if nothing was hit.
-                RequestVisualRefresh();
-                e.Handled = true;
-                return;
-            }
-
-            var isControlDown = modifiers.HasFlag(KeyModifiers.Control);
-
-            var isAlreadySelected = IsHitSelected(hit);
-
-            // If Ctrl is held, perform additive toggle.
-            if (isControlDown)
-            {
-                // Toggle the item. Additive ensures existing selection is not cleared.
-                ApplyHitSelection(hit, toggle: true, additive: true);
-            }
-            else
-            {
-                // If Ctrl is not held, and the item is not already selected, select it (non-toggle, non-additive).
-                // If it IS already selected and Ctrl is not held, do nothing to selection, just raise context menu.
-                if (!isAlreadySelected)
-                {
-                    ApplyHitSelection(hit, toggle: false, additive: false);
-                }
-            }
-
-            // Raise context menu events based on the type of hit item.
-            if (hit.kind == HitKind.Cad && CadPads is { Count: > 0 })
-            {
-                var cad = CadPads.FirstOrDefault(p => p.Id == hit.idOrIndex);
-                if (cad is not null)
-                {
-                    CadPadContextRequested?.Invoke(this, new CadPadContextRequestedEventArgs(cad));
-                    e.Handled = true;
-                    return;
-                }
-            }
-
-            if (hit.kind == HitKind.Regular && RegularPads is { Count: > 0 })
-            {
-                var pad = RegularPads.FirstOrDefault(p => p.Index == hit.idOrIndex);
-                if (pad is not null)
-                {
-                    RegularPadContextRequested?.Invoke(this, new RegularPadContextRequestedEventArgs(pad));
-                    e.Handled = true;
-                    return;
-                }
-            }
+            e.Handled = true;
+            return;
         }
 
         // --- Spacebar Panning (alternative to middle mouse) ---
@@ -148,6 +98,17 @@ public sealed partial class PadCanvas
             e.Handled = true;
         }
     }
+
+    private PadCanvasContextPressHandler CreateContextPressHandler() => new(new PadCanvasContextPressHandler.Services(
+        HitTest,
+        () => ClearSelectionInternal(),
+        () => RequestVisualRefresh(),
+        IsHitSelected,
+        ApplyHitSelection,
+        id => CadPads?.FirstOrDefault(p => p.Id == id),
+        index => RegularPads?.FirstOrDefault(p => p.Index == index),
+        pad => CadPadContextRequested?.Invoke(this, new CadPadContextRequestedEventArgs(pad)),
+        pad => RegularPadContextRequested?.Invoke(this, new RegularPadContextRequestedEventArgs(pad))));
 
     /// <summary>
     /// Handles <see cref="PointerReleasedEventArgs"/> events, finalizing interactions.
@@ -192,57 +153,23 @@ public sealed partial class PadCanvas
         // --- Single Click Selection Completion ---
         if (_isLeftPointerDown)
         {
-            var modifiers = e.KeyModifiers;
-            var hit = HitTest(e.GetPosition(this), modifiers.HasFlag(KeyModifiers.Alt)); // Perform hit test at release position.
-
-            // Handle Shift for extend selection (if not also Ctrl)
-            if (modifiers.HasFlag(KeyModifiers.Shift) && !modifiers.HasFlag(KeyModifiers.Control) && hit.kind != HitKind.None)
-            {
-                if (_lastSingleSelectedPad.HasValue)
-                {
-                    ApplyExtendSelection(_lastSingleSelectedPad.Value, hit);
-                }
-                else // If no anchor, just select the current hit, and set it as anchor
-                {
-                    ClearSelectionInternal(); // Clear existing selections if no anchor
-                    ApplyHitSelection(hit, toggle: false, additive: false);
-                    _lastSingleSelectedPad = hit;
-                }
-            }
-            else // All other single left clicks (Ctrl, no modifiers, or both Ctrl+Shift)
-            {
-                var toggle = modifiers.HasFlag(KeyModifiers.Control) || modifiers.HasFlag(KeyModifiers.Shift); // True if Ctrl or Shift is pressed
-                var additive = toggle; // If toggle, it's also additive (doesn't clear others)
-
-                if (hit.kind == HitKind.None && !toggle && !additive)
-                {
-                    ClearSelectionInternal(); // Clear selection if no item hit and no modifiers
-                    _lastSingleSelectedPad = null; // Clear anchor if nothing is selected
-                    RequestVisualRefresh(); // Coalesce stale-highlight redraw without forcing synchronous layout.
-                }
-                else
-                {
-                    var totalSelected = _selectedCadIds.Count + _selectedRegIdx.Count;
-                    var alreadySelected = IsHitSelected(hit);
-
-                    // If multiple items are selected and the user clicks on an already selected item
-                    // without toggle/additive modifiers, it's a potential single selection intent.
-                    if (!toggle && !additive && alreadySelected && totalSelected > 1)
-                    {
-                        SchedulePendingSingleSelection(hit); // Schedule a delayed single selection.
-                    }
-                    else
-                    {
-                        ApplyHitSelection(hit, toggle, additive); // Apply immediate selection.
-                        _lastSingleSelectedPad = hit; // Update anchor for single selection
-                    }
-                }
-            }
-
+            CreateClickReleaseHandler().Handle(e.GetPosition(this), e.KeyModifiers);
             _isLeftPointerDown = false;
             ReleaseGestureCapture(e.Pointer);
             e.Handled = true;
-            RefreshHoverDebugHitFromCurrentPointer(modifiers);
+            RefreshHoverDebugHitFromCurrentPointer(e.KeyModifiers);
         }
     }
+
+    private PadCanvasClickReleaseHandler CreateClickReleaseHandler() => new(new PadCanvasClickReleaseHandler.Services(
+        HitTest,
+        () => _lastSingleSelectedPad,
+        hit => _lastSingleSelectedPad = hit,
+        ApplyExtendSelection,
+        () => ClearSelectionInternal(),
+        () => RequestVisualRefresh(),
+        () => _selectedCadIds.Count + _selectedRegIdx.Count,
+        IsHitSelected,
+        SchedulePendingSingleSelection,
+        ApplyHitSelection));
 }

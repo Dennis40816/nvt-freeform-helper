@@ -58,10 +58,11 @@ public partial class DevView : UserControl
 
     private string BuildProbeText()
     {
-        var brushBgFound = this.TryFindResource("BrushBgApp", out var brushBg);
+        // The Core colour keys live in theme dictionaries, so the lookup needs the variant.
+        var brushBgFound = this.TryFindResource("NfcAppBackgroundBrush", ActualThemeVariant, out var brushBg);
         UiThread.IsCurrent(out _, out var app);
-        var brushTextFound = this.TryFindResource("BrushTextPrimary", out var brushText);
-        var brushElevatedFound = this.TryFindResource("BrushBgElevated", out var brushElevated);
+        var brushTextFound = this.TryFindResource("NfcTextBrush", ActualThemeVariant, out var brushText);
+        var brushElevatedFound = this.TryFindResource("NfcSurfaceBrush", ActualThemeVariant, out var brushElevated);
         var baseDir = AppContext.BaseDirectory;
         var fontLoaded = false;
         var fontProbe = "FontSymbolsOutlined: not found";
@@ -76,11 +77,10 @@ public partial class DevView : UserControl
         return string.Join(Environment.NewLine,
             $"Probe: baseDir={baseDir}",
             $"Theme: requested={app?.RequestedThemeVariant} actual={ActualThemeVariant}",
-            $"Token BrushBgApp: found={brushBgFound} type={brushBg?.GetType().Name ?? "null"}",
-            $"Token BrushTextPrimary: found={brushTextFound} type={brushText?.GetType().Name ?? "null"}",
-            $"Token BrushBgElevated: found={brushElevatedFound} type={brushElevated?.GetType().Name ?? "null"}",
+            $"Token NfcAppBackgroundBrush: found={brushBgFound} type={brushBg?.GetType().Name ?? "null"}",
+            $"Token NfcTextBrush: found={brushTextFound} type={brushText?.GetType().Name ?? "null"}",
+            $"Token NfcSurfaceBrush: found={brushElevatedFound} type={brushElevated?.GetType().Name ?? "null"}",
             $"{fontProbe}",
             $"Font Material Symbols loaded={fontLoaded}");
     }
 }
-

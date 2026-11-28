@@ -1,20 +1,24 @@
 using System.Collections.Frozen;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using FreeformHelper.Application.Export;
 using FreeformHelper.Application.Services;
-using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Notch;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Interaction;
 using FreeformHelper.UI.Logging;
 using FreeformHelper.UI.Services;
+using FreeformHelper.UI.Services.CadEditing;
+using FreeformHelper.UI.UseCases.ProjectLoad;
+using FreeformHelper.UI.ViewModels.Grid;
+using FreeformHelper.UI.ViewModels.Project;
+using FreeformHelper.UI.ViewModels.Sizing;
 using NLog;
 using Nvt.Core.Lifecycle;
 using Nvt.Core.Threading;
-using NotchResolvedCacheEntry = (int Revision, ulong CadPoolFingerprint, int ActiveRegularHash, ulong GridFingerprint, bool EnableToRegular, bool EnableToFull, bool EnableToFullRuleEngine, bool EnableToFullRuleTrace, double StrictOverlapRatio, int? AnchorIcIndex, int? AnchorDiffIndex, FreeformHelper.Application.Services.NotchV22TargetAllocationAreaMode TargetAllocationAreaMode, FreeformHelper.Application.Services.NotchV22ResolvedResult Resolved);
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -24,7 +28,7 @@ namespace FreeformHelper.UI.ViewModels;
 /// coordinating between the UI (via commands and observable properties),
 /// application services, and data models.
 /// </summary>
-public sealed partial class FreeformHelperViewModel : ObservableObject
+public sealed partial class FreeformHelperViewModel : ObservableObject, IProjectEditingAvailability
 {
     internal UiEventRunner UiEvents { get; }
 
@@ -40,25 +44,27 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public ICanvasHost? CanvasHost { get; set; }
 
+    private readonly ViewCallbacks _viewCallbacks = new();
+
     // --- Delegates for UI-specific Dialogs ---
     // These delegates are set by the View (FreeformHelperView) to enable the ViewModel
     // to trigger platform-specific file dialogs or confirmation prompts.
-    public Func<Task<string?>>? PickOpenDxfPathAsync { get; set; }
-    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get; set; }
-    public Func<Task<string?>>? PickLoadProjectPathAsync { get; set; }
-    public Func<Task<string?>>? PickSaveProjectPathAsync { get; set; }
-    public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get; set; }
-    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get; set; }
-    public Func<Task<bool>>? ConfirmEmbedDxfAsync { get; set; }
-    public Func<string, string, Task>? ShowWarningAsync { get; set; }
-    public Func<bool>? EnsureNoPendingEdits { get; set; }
-    public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get; set; }
-    public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get; set; }
-    public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get; set; }
-    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get; set; }
-    public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get; set; }
-    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get; set; }
-    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get; set; }
+    public Func<Task<string?>>? PickOpenDxfPathAsync { get => _viewCallbacks.PickOpenDxfPathAsync; set => _viewCallbacks.PickOpenDxfPathAsync = value; }
+    public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get => RegularMask.PickOpenRegularVisibilityMaskPathAsync; set => RegularMask.PickOpenRegularVisibilityMaskPathAsync = value; }
+    public Func<Task<string?>>? PickLoadProjectPathAsync { get => _viewCallbacks.PickLoadProjectPathAsync; set => _viewCallbacks.PickLoadProjectPathAsync = value; }
+    public Func<Task<string?>>? PickSaveProjectPathAsync { get => _viewCallbacks.PickSaveProjectPathAsync; set => _viewCallbacks.PickSaveProjectPathAsync = value; }
+    public Func<string, string, Task<string?>>? PickSaveNotchPathAsync { get => _viewCallbacks.PickSaveNotchPathAsync; set => _viewCallbacks.PickSaveNotchPathAsync = value; }
+    public Func<string, string, Task<string?>>? PickSaveExportPathAsync { get => CadExport.Dialogs.PickSaveExportPathAsync; set => CadExport.Dialogs.PickSaveExportPathAsync = value; }
+    public Func<Task<bool>>? ConfirmEmbedDxfAsync { get => _viewCallbacks.ConfirmEmbedDxfAsync; set => _viewCallbacks.ConfirmEmbedDxfAsync = value; }
+    public Func<string, string, Task>? ShowWarningAsync { get => CadExport.Dialogs.ShowWarningAsync; set => CadExport.Dialogs.ShowWarningAsync = value; }
+    public Func<bool>? EnsureNoPendingEdits { get => _viewCallbacks.EnsureNoPendingEdits; set => _viewCallbacks.EnsureNoPendingEdits = value; }
+    public Func<NotchDetailViewModel, Task>? OpenNotchDetailAsync { get => _viewCallbacks.OpenNotchDetailAsync; set => _viewCallbacks.OpenNotchDetailAsync = value; }
+    public Func<NotchExportSelectionViewModel, Task<NotchTable?>>? OpenNotchExportSelectionAsync { get => _viewCallbacks.OpenNotchExportSelectionAsync; set => _viewCallbacks.OpenNotchExportSelectionAsync = value; }
+    public Func<SimulationSafetyAuditResult?>? GetCurrentSimulationSafetyAudit { get => _viewCallbacks.GetCurrentSimulationSafetyAudit; set => _viewCallbacks.GetCurrentSimulationSafetyAudit = value; }
+    public Func<DxfEditChangeListViewModel, Task>? OpenDxfEditChangeListAsync { get => DxfEdit.OpenDxfEditChangeListAsync; set => DxfEdit.OpenDxfEditChangeListAsync = value; }
+    public Func<IndexMappingReportViewModel, Task>? OpenIndexMappingReportAsync { get => _viewCallbacks.OpenIndexMappingReportAsync; set => _viewCallbacks.OpenIndexMappingReportAsync = value; }
+    public Func<DxfOverlapReportViewModel, Task>? OpenDxfOverlapReportAsync { get => _viewCallbacks.OpenDxfOverlapReportAsync; set => _viewCallbacks.OpenDxfOverlapReportAsync = value; }
+    public Func<LayerImageExportContext, Task<LayerImageExportRequest?>>? OpenDxfLayerImageExportAsync { get => CadExport.Dialogs.OpenDxfLayerImageExportAsync; set => CadExport.Dialogs.OpenDxfLayerImageExportAsync = value; }
 
     // --- Application Services ---
     // Instances of various services responsible for business logic and data manipulation.
@@ -69,14 +75,9 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
 
     // --- Internal State Management ---
     private readonly Dictionary<int, double> _cadPadCustomValues = new(); // Stores custom user-defined values for CAD pads.
-    private readonly CadEditState _cadEdit = new(); // Holds the hidden, duplicate and baseline data of the CAD edits.
-    private readonly CombinedCadState _combinedCad = new();
-    private readonly Dictionary<string, WorkspaceHeaderItem> _workspaceHeaderItemMap = new(); // Maps keys to header items.
-    private string? _lastSavedPath; // Stores the path where the project was last saved.
     // Independent nesting-safe suppression counters; UI-thread-only access.
     private readonly SettingsSuppressionScopes _settingsSuppression = new();
-    private readonly PendingLayerSelectionState _pendingLayerSelection = new(); // Holds the layer selection data that waits for the next CAD load or layer toggle.
-    private ProjectFile _projectFile = new(); // The core project data model.
+    private ProjectFile _projectFile { get => _projectSession.Document; set => _projectSession.Document = value; }
 
     /// <summary>
     /// Gets the <see cref="WorkspaceInteractionState"/> instance, which manages global UI interaction states
@@ -84,31 +85,17 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public WorkspaceInteractionState InteractionState { get; } = new();
 
-    private CadPadSet? _cad; // The loaded CAD pad data.
+    /// <summary>Gets the stable CAD export child for this workspace.</summary>
+    public CadExportViewModel CadExport { get; }
+
+    internal CadDocumentSession CadDocument { get; } = new();
+    public DxfEditViewModel DxfEdit { get; }
+
+    private readonly CadEditWorkflow _cadEditWorkflow;
+    private readonly CadEditReplay _cadEditReplay;
+    private CadPadSet? _cad { get => CadDocument.Cad; set => CadDocument.Cad = value; }
     private RegularGrid? _grid; // The generated regular grid data.
     private readonly WorkflowDataState _workflowData = new(); // Holds the latest pad match result and the cached workflow data snapshot built from it.
-    private CadPadSet? _cachedFilteredCadForBuild; // Cache for layer-filtered CAD pads.
-    // The four per-CAD-pad index tables are stored once. The members below keep the old names and
-    // read through it: members that carry analyzer debt read them, and renaming them would change
-    // their ledger fingerprints.
-    private readonly CadIndexMaps _cadIndexMaps = new();
-
-    internal CadIndexMaps CadIndexMaps => _cadIndexMaps;
-
-    // Maps CAD pad ID -> Step 4 CAD output FW diff idx.
-    private Dictionary<int, int> _cadOutputFwDiffIndexByCadId => _cadIndexMaps.OutputFwDiffIndexByCadId;
-
-    // Maps CAD pad ID -> stable display index (L->R, T->B, 1-based).
-    private Dictionary<int, int> _cadDisplayIndexByCadId => _cadIndexMaps.DisplayIndexByCadId;
-
-    // Maps CAD pad ID -> inferred IC index (grid partition based).
-    private Dictionary<int, int> _cadIcIndexByCadId => _cadIndexMaps.IcIndexByCadId;
-
-    private IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> _latestCadOutputFwDiffAssignmentDecisionsByCadId
-    {
-        get => _cadIndexMaps.LatestAssignmentDecisionsByCadId;
-        set => _cadIndexMaps.LatestAssignmentDecisionsByCadId = value;
-    }
 
     private int _workflowDataSnapshotRevision = 1;
     private readonly GridStartupState _gridStartup = new(); // Holds the one-time startup flags and the fit request of the grid build.
@@ -117,14 +104,15 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     private readonly CadLoadUseCase _cadLoadUseCase;
     private readonly CadLoadWorkflowService _cadLoadWorkflowService;
     private readonly LayerCatalogStateService _layerCatalogStateService;
-    private readonly ProjectPersistenceUseCase _projectPersistenceUseCase;
-    private readonly NotchExportGenerationCacheService _notchExportGenerationCacheService = new();
+    private readonly ProjectPersistenceCoordinator _projectPersistenceCoordinator;
     private readonly UndoService _undoService = new();
     private readonly UiOperationStatusReporter _statusReporter;
-    private readonly NotchResultCacheState _notchCache = new(); // Holds the notch compensation and validation caches and the last generated notch table.
-    private int _notchCompensationCacheRevision;
-    private readonly NotchCompensationCacheCounters _notchCompensationCacheCounters = new();
-    private readonly NotchExportFingerprintRevisions _notchExportFingerprintRevisions = new();
+
+    /// <summary>Gets the confirmation hooks for project save and load that the View wires.</summary>
+    public ProjectDialogHooks ProjectDialogs { get; } = new();
+
+    /// <summary>Gets the mask child, whose identity survives project replacement.</summary>
+    public RegularMaskViewModel RegularMask { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperViewModel"/> class.
@@ -135,55 +123,109 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     {
     }
 
+    private (CadEditWorkflow Workflow, CadEditReplay Replay, IDxfEditActions Actions, DxfEditInteraction Interaction) CreateCadEditEngine()
+    {
+        var publication = new CadEditPublication(
+            CaptureCadEditNotifications, SyncRelayeredCadState, SyncRotatedCadState,
+            SyncHiddenCadIdsToProject, SyncCombinedCadState, SyncDuplicateCadState);
+        var layers = new CadEditLayers(
+            CaptureLayerSelectionSnapshot, PreserveDxfDependentLayerSelections, UpdateLayerToggles,
+            RestoreLayerSelectionAfterCadLayerEdit, CadLayersMatchDocument, name => DxfEditTargetLayerName = name);
+        var effects = new CadEditEffects(
+            InteractionState.ClosePadInfo, () => _selectionCoordinator.ClearSelection(CanvasHost),
+            FilterCadPadsByLayer, RebuildAfterCadEdit, SetStatus, MarkUnsaved, PushUndo);
+        var interaction = CreateDxfEditInteraction();
+        var workflow = new CadEditWorkflow(CadDocument, publication, layers, effects, interaction);
+        var actions = new DxfEditWorkflow(CadDocument, workflow, publication, layers, effects, interaction);
+        return (workflow, new CadEditReplay(CadDocument, workflow, publication, layers), actions, interaction);
+    }
+
+    private DxfEditInteraction CreateDxfEditInteraction() => new(
+        () => _selectedCadIds, () => DxfEdit.PanelInput, name => DxfEdit.DxfEditNewLayerName = name,
+        FocusDxfEditCadPad, SetStatus,
+        () => OnPropertyChanged(nameof(CanOffsetSelectedCadOutputFwDiffIndices)),
+        () => OnPropertyChanged(nameof(Step4DiffShiftSelectionSummary)));
+
+    private DxfEditViewModel CreateDxfEditChild(IDxfEditActions actions, DxfEditInteraction interaction)
+    {
+        var child = new DxfEditViewModel(
+            CadDocument, actions, interaction,
+            new CadEditPersistence(ids => _projectFile.HiddenCadPadIds = ids, ids => _projectFile.VisibleDuplicateCadPadIds = ids),
+            () => _projectEditingSession.IsProjectEditingEnabled);
+        child.PropertyChanging += (_, args) => OnPropertyChanging(args);
+        child.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName != nameof(IsProjectEditingEnabled)) OnPropertyChanged(args);
+        };
+        return child;
+    }
+
+    private void FocusDxfEditCadPad(int cadPadId)
+    {
+        TryLocateSelection(
+            new[] { cadPadId }, Array.Empty<int>(), focusSelection: true,
+            notVisibleStatus: $"CAD {cadPadId} is not visible.",
+            successStatusBuilder: (cadCount, _) => $"DXF edit focused: CAD {cadPadId} (CAD output={cadCount}).");
+    }
+
+    private CadExportViewModel CreateCadExport()
+    {
+        var inputs = new CadExportInputs(
+            () => CadPads, () => RegularSourceMode, () => SelectedRegularSourceLayerOption?.Name,
+            () => (_projectFile.Settings.ActiveAreaPixels.X, _projectFile.Settings.ActiveAreaPixels.Y),
+            () => _dxfLayerImagePreferenceState.Value);
+        var effects = new CadExportEffects(SetStatus, SetStatusError, _dxfLayerImagePreferenceState.Remember);
+        return new CadExportViewModel(
+            dialogs => new CadExportWorkflow(CadDocument, dialogs, inputs, effects, _logger), CreateEditingAsyncCommand);
+    }
+
+    internal DxfCombinedGroupReplayResult? ApplyCapturedDxfEditProjectState(
+        PersistedDxfEditProjectState state, string? cadFallbackWarning = null) => _cadEditReplay.Apply(state, cadFallbackWarning);
+
+    private readonly ProjectEditingSession _projectEditingSession;
+
     internal FreeformHelperViewModel(AppGeneralSettingsStore? appGeneralSettingsStore, UiEventRunner? uiEvents)
     {
+        var editEngine = CreateCadEditEngine();
+        (_cadEditWorkflow, _cadEditReplay) = (editEngine.Workflow, editEngine.Replay);
+        _selectionOwner = new(CreateSelectionOwner, LazyThreadSafetyMode.None);
+        _settingsState = new SettingsStateViewModel(this);
+        _fwAssignmentSettings = new FwAssignmentSettingsViewModel(this);
+        _workspaceToggleRegistry = new WorkspaceToggleRegistry(OnPropertyChanging, OnPropertyChanged);
+        _canvasAppearance = CreateCanvasAppearanceState();
+        _cadImportChoices = new CadImportChoices(TrackUndo, OnPropertyChanging, OnPropertyChanged);
+        _workflowDispatch = new WorkflowDispatchCoordinator(this);
+        _workspaceNavigation = new WorkspaceNavigationPresentation(this, MoveToWorkflowStep, OnPropertyChanged);
+        _workflowPanelState = new WorkflowPanelState(SelectWorkspaceWorkStep, OnPropertyChanging, OnPropertyChanged);
+        _projectEditingSession = new ProjectEditingSession(PublishProjectEditingAvailabilityChange);
+        _projectSession = new ProjectSessionState(
+            new ProjectFile(), () => _cad is not null, () => _projectEditingSession.IsProjectEditingEnabled,
+            load => _projectEditingSession.RunLoadAsync(load), OnPropertyChanging, OnPropertyChanged);
+        _manualSizingOwner = new Lazy<ManualSizingOwner>(CreateManualSizingOwner, LazyThreadSafetyMode.None);
+        _gridMatchingOwner = new Lazy<GridMatchingOwner>(CreateGridMatchingOwner, LazyThreadSafetyMode.None);
+        DxfEdit = CreateDxfEditChild(editEngine.Actions, editEngine.Interaction);
+        _dxfLayerImagePreferenceState = new DxfLayerImagePreferenceState(MarkUnsaved, SchedulePersistAppGeneralSettings);
+        _projectUiSnapshotMapper = new ProjectUiSnapshotMapper(CreateProjectSnapshotReaders());
         StartupPerfTracker.Mark("workspace.vm-ctor-start");
-        _statusReporter = new UiOperationStatusReporter(message => StatusText = message);
+        (_statusReporter, _simulationSessionBuilder) = CreateSimulationServices();
+        RegularMask = CreateRegularMask();
         UiEvents = uiEvents ?? new UiEventRunner(new UiEventFailureReporter(_statusReporter).Report, EmergencyLogSink.Report);
         _appGeneralSettingsStore = appGeneralSettingsStore ?? new AppGeneralSettingsStore();
+        _appGeneralPersistenceCoordinator = new AppGeneralPersistenceCoordinator(this, _appGeneralPersistence);
         InitializeAppGeneralSettingsPersistence();
-        // Populate dropdown options for ScanOrder.
-        ScanOrderOptions = new List<ScanOrderOption>
-        {
-            new(ScanOrder.LeftToRight_TopToBottom, "L->R, T->B"),
-            new(ScanOrder.RightToLeft_TopToBottom, "R->L, T->B"),
-            new(ScanOrder.LeftToRight_BottomToTop, "L->R, B->T"),
-            new(ScanOrder.RightToLeft_BottomToTop, "R->L, B->T"),
-        };
-        // Populate dropdown options for GridAlignment.
-        GridAlignmentOptions = new List<GridAlignmentOption>
-        {
-            new(GridAlignmentMode.FromPanelAa, "Use panel AA"),
-            new(GridAlignmentMode.FromCadBounds, "Use DXF bounds"),
-        };
-        RegularSourceModeOptions = new List<RegularSourceModeOption>
-        {
-            new(RegularSourceMode.GeneratedGrid, "Generated grid"),
-            new(RegularSourceMode.FromDxfLayer, "DXF layer pads"),
-        };
-        DxfEditRotationScopeOptions = BuildDxfEditRotationScopeOptions();
-        LogLevelOptions = LoggingBootstrapper.SupportedMinimumLevels
-            .Select(static level => new LogLevelOption(level, level))
-            .ToList();
+        ScanOrderOptions = BuildScanOrderOptions();
+        GridAlignmentOptions = BuildGridAlignmentOptions();
+        RegularSourceModeOptions = BuildRegularSourceModeOptions();
+        LogLevelOptions = BuildLogLevelOptions();
         CadOutputFwDiffAutoModeOptions = BuildCadOutputFwDiffAutoModeOptions();
-        NotchExportFileTypeOptions = new List<NotchExportFileTypeOption>
-        {
-            new(NotchExportFileType.Csv, "CSV review (.csv)", "csv"),
-            new(NotchExportFileType.Cv21, "C v2.1 (.c)", "c", NotchAlgorithmVersion.V21),
-            new(NotchExportFileType.Cv22, "C v2.2 (.c)", "c", NotchAlgorithmVersion.V22),
-        };
-        NotchExportProfileOptions = new List<NotchExportProfileOption>
-        {
-            new(NotchExportProfile.Release, "Release (minimal FW)"),
-            new(NotchExportProfile.Debug, "Debug (trace + sim mask)"),
-        };
+        NotchExportFileTypeOptions = BuildNotchExportFileTypeOptions();
+        NotchExportProfileOptions = BuildNotchExportProfileOptions();
         NotchCompensationModelOptions = BuildNotchCompensationModelOptions();
         _selectedNotchExportFileTypeOption = NotchExportFileTypeOptions[0];
         _selectedNotchExportProfileOption = NotchExportProfileOptions[0];
         _selectedNotchCompensationModelOption = NotchCompensationModelOptions[0];
         _selectedLogLevelOption = ResolveInitialLogLevelOption();
         InitializeLayerSelectionOptions();
-        _dxfEditPanel = _dxfEditPanel with { SelectedDxfEditRotationScopeOption = DxfEditRotationScopeOptions[0] };
         StartupPerfTracker.Mark("workspace.vm-options-initialized");
         // Layered settings precedence: Project > App General > Built-in defaults.
         // At startup without a project file loaded, app general overrides default values.
@@ -196,91 +238,53 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         ApplyImportSnapshot(_projectFile.UiSnapshot.Import);
         _appGeneralPersistence.SuppressPersistence = false;
         StartupPerfTracker.Mark("workspace.vm-settings-loaded");
-        InitializeWorkspaceHeaderItems(); // Set up items for the workspace header menu.
+        _workspaceToggleRegistry.InitializeWorkspaceHeaderItems(_canvasAppearance);
         StartupPerfTracker.Mark("workspace.vm-header-initialized");
         RebuildCascadeSettings(); // Initialize cascade-related settings.
         StartupPerfTracker.Mark("workspace.vm-cascade-initialized");
-        InitializeCommands(); // Set up all UI commands.
+        _notchCommands = CreateNotchCommands(); // Register Notch commands first.
+        // Register project commands next, through the existing editing session registry.
+        _projectCommands = new ProjectCommandOwner(
+            CreateEditingAsyncCommand, CreateEditingAsyncCommand, SaveProjectAsync, LoadProjectAsync);
+        _selectionCommands = CreateSelectionCommands(); // Register selection commands next.
+        CadExport = CreateCadExport(); // Export commands register before the other DXF commands.
+        _dxfWorkspaceCommands = CreateDxfWorkspaceCommands();
+        _generalCommands = CreateGeneralCommands(); // Finish command registration in the original order.
         StartupPerfTracker.Mark("workspace.vm-commands-initialized");
-        // Subscribe to selection changes from the InteractionState.
         InteractionState.SelectionChanged += OnInteractionSelectionChanged;
         _gridRebuildUseCase = new GridRebuildUseCase(RequestFitAfterNextRebuild, RebuildGridAsync);
         _selectionCoordinator = new SelectionCoordinator(InteractionState);
         _cadLoadUseCase = new CadLoadUseCase(_dxfImportService);
         _cadLoadWorkflowService = new CadLoadWorkflowService(_cadLoadUseCase);
         _layerCatalogStateService = new LayerCatalogStateService(_dxfLayerCatalogReader);
-        _projectPersistenceUseCase = new ProjectPersistenceUseCase(_projectStore);
+        (_projectPersistenceCoordinator, _notchExportWorkflow) = CreatePersistenceOwners();
         StartupPerfTracker.Mark("workspace.vm-usecases-initialized");
         _logger.Debug(CultureInfo.InvariantCulture, "FreeformHelperViewModel initialized.");
         StartupPerfTracker.Mark("workspace.vm-ctor-complete");
     }
 
-    private static List<DxfEditRotationScopeOption> BuildDxfEditRotationScopeOptions() =>
-        new List<DxfEditRotationScopeOption>
-        {
-            new(DxfEditRotationScope.SelectedPads, "Selected pads", "Rotate the currently selected baseline CAD pads as one rigid group."),
-            new(DxfEditRotationScope.TargetLayer, "Target layer", "Rotate all visible baseline CAD pads in the selected rotation layer as one rigid group."),
-        };
-
-    private static List<CadOutputFwDiffAutoModeOption> BuildCadOutputFwDiffAutoModeOptions() =>
-        new List<CadOutputFwDiffAutoModeOption>
-        {
-            new(
-                CadOutputFwDiffAutoMode.BestMatchDirect,
-                "Geometry seed",
-                "Use each CAD pad's geometry-seeded regular diff directly. Choose this when hardware behavior should follow the primary regular one-to-one."),
-            new(
-                CadOutputFwDiffAutoMode.StrictUnique,
-                "Geometry seed (unique per IC)",
-                "Use geometry seed directly, but keep diff idx unique within each IC. Conflicts stay unresolved instead of shifting other CAD pads."),
-        };
-
-    private static List<NotchCompensationModelOption> BuildNotchCompensationModelOptions() =>
-        new List<NotchCompensationModelOption>
-        {
-            new(
-                NotchCompensationModel.CurrentGain,
-                "Current (Gain)",
-                "To Regular x To Full (current model)."),
-            new(
-                NotchCompensationModel.ConservativeNoGain,
-                "Conservative (No Gain)",
-                "Apply ToRegular source combine; ToFull only gates boundary support."),
-            new(
-                NotchCompensationModel.Disabled,
-                "Disabled",
-                "Turn off To Full and To Regular for baseline comparison."),
-        };
-
-    private LogLevelOption ResolveInitialLogLevelOption()
+    private RegularMaskViewModel CreateRegularMask()
     {
-        var initialLogLevelName = LoggingBootstrapper.GetCurrentMinimumLevelName();
-        var initialLogLevel = LogLevelOptions.FirstOrDefault(option =>
-            string.Equals(option.Value, initialLogLevelName, StringComparison.OrdinalIgnoreCase));
-        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
-        {
-            initialLogLevel = LogLevelOptions.Count > 0 ? LogLevelOptions[0] : default;
-        }
-        if (string.IsNullOrWhiteSpace(initialLogLevel.Display))
-        {
-            initialLogLevel = new LogLevelOption("Info", "Info");
-        }
-
-        return initialLogLevel;
-    }
-
-    private void InitializeLayerSelectionOptions()
-    {
-        using (_settingsSuppression.EnterBoundLayerSelectionChange())
-        {
-            BoundLayerOptions.Add(new BoundLayerOption(null, "Auto (visible layers)"));
-            SelectedBoundLayerOption = BoundLayerOptions[0];
-        }
-        using (_settingsSuppression.EnterRegularSourceLayerSelectionChange())
-        {
-            RegularSourceLayerOptions.Add(new RegularSourceLayerOption(null, "Select layer"));
-            SelectedRegularSourceLayerOption = RegularSourceLayerOptions[0];
-        }
+        var stateChange = _settingsSuppression.RegularMaskStateChange;
+        var effects = new RegularMaskEffects(
+            GetGrid: () => _grid,
+            HasCad: () => _cad is not null,
+            GetVisiblePads: () => CadPads.Count > 0 ? CadPads.ToList() : BuildFilteredCadPadSet()?.Pads.ToList(),
+            UpdateMapping: UpdateCadOutputFwDiffIndexing,
+            InvalidateCanvas: () => CanvasHost?.Invalidate(),
+            InvalidateDownstream: () => InvalidateDownstreamFromStep4(showStatus: false),
+            PublishSimulationChange: NotifySimulationWorkspaceSourceChanged,
+            InvalidateSnapshot: InvalidateWorkflowDataSnapshot,
+            RefreshDuplicateGroups: () => RefreshStep4DuplicateDiffGroups(),
+            ClearProjectEmbeddedMask: () =>
+            {
+                _projectFile.EmbeddedRegularVisibilityMask = null;
+                _projectFile.EmbeddedRegularVisibilityMaskName = null;
+            },
+            SetStatus: message => SetStatus(message),
+            EnterStateChange: stateChange.Enter,
+            IsStateChangeActive: stateChange.IsActive);
+        return new RegularMaskViewModel(presentation => new RegularMaskWorkflow(presentation, effects, _logger));
     }
 
     private void RequestFitAfterNextRebuild()
@@ -334,15 +338,16 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
     /// </summary>
     public void EnsureInitialFit()
     {
-        if (CanvasHost is null)
+        var action = InitialCanvasFitPolicy.Decide(CanvasHost is not null, CadPads.Count > 0, RegularPads.Count > 0);
+        if (action == InitialFitAction.None)
         {
             return; // Cannot fit if canvas host is not available.
         }
 
         // If there's data to display, fit it immediately.
-        if (CadPads.Count > 0 || RegularPads.Count > 0)
+        if (action == InitialFitAction.FitNow)
         {
-            CanvasHost.FitToContent();
+            CanvasHost?.FitToContent();
         }
         else
         {
@@ -352,16 +357,8 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         }
     }
 
-    public bool TryGetCadOutputFwDiffIndex(int cadPadId, out int dxfIndex)
-    {
-        return _cadOutputFwDiffIndexByCadId.TryGetValue(cadPadId, out dxfIndex);
-    }
-
     /// <summary>Gets the pad match and workflow snapshot holder for tests.</summary>
     internal WorkflowDataState WorkflowDataForTests => _workflowData;
-
-    /// <summary>Gets the notch result cache holder for tests.</summary>
-    internal NotchResultCacheState NotchCacheForTests => _notchCache;
 
     internal int WorkflowDataSnapshotBuildCount { get; private set; }
 
@@ -373,7 +370,7 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
             return cached.Snapshot;
         }
 
-        var activeMask = GetActiveRegularVisibilityMaskPadIds()?.ToFrozenSet();
+        var activeMask = RegularMask.Workflow.ActiveRegularPadIds?.ToFrozenSet();
 
         var cadToRegular = _workflowData.LatestPadMatch.CadToRegular
             .ToDictionary(
@@ -405,22 +402,6 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         InvalidateWorkflowDataSnapshot();
     }
 
-    private void SetLatestCadOutputFwDiffAssignmentDecisions(IReadOnlyDictionary<int, CadOutputFwDiffAssignmentDecision> decisions)
-    {
-        _latestCadOutputFwDiffAssignmentDecisionsByCadId = decisions;
-        InvalidateWorkflowDataSnapshot();
-    }
-
-    public bool TryGetCadIcIndex(int cadPadId, out int icIndex)
-    {
-        return _cadIcIndexByCadId.TryGetValue(cadPadId, out icIndex);
-    }
-
-    public bool TryGetCadDisplayIndex(int cadPadId, out int displayIndex)
-    {
-        return _cadDisplayIndexByCadId.TryGetValue(cadPadId, out displayIndex);
-    }
-
     /// <summary>
     /// Holds the latest pad match result and the cached workflow data snapshot with the revision it was built for, for the main view model.
     /// </summary>
@@ -432,23 +413,4 @@ public sealed partial class FreeformHelperViewModel : ObservableObject
         /// <summary>Gets or sets the last built workflow data snapshot with the revision it was built for.</summary>
         internal (int Revision, WorkflowDataSnapshot Snapshot)? SnapshotCache { get; set; }
     }
-
-    /// <summary>
-    /// Holds the notch compensation result cache, the notch validation bucket cache, the last generated notch table and the last preview visibility seen by playback, for the main view model.
-    /// </summary>
-    internal sealed class NotchResultCacheState
-    {
-        /// <summary>Gets the resolved notch result cache keyed by CAD pad id.</summary>
-        internal Dictionary<int, NotchResolvedCacheEntry> ResolvedResultByCadId { get; } = new();
-
-        /// <summary>Gets or sets the cached validation bucket with the table and null diff value it was built for.</summary>
-        internal (NotchValidationBucket Bucket, NotchTable Table, int NullDiffValue)? ValidationBucket { get; set; }
-
-        /// <summary>Gets or sets the table of the last notch generation.</summary>
-        internal NotchTable? LastGeneratedTable { get; set; }
-
-        /// <summary>Gets or sets the preview visibility that the last playback sync saw.</summary>
-        internal bool LastPreviewVisibleForPlayback { get; set; }
-    }
 }
-

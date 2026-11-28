@@ -1,8 +1,10 @@
 using System.Runtime.CompilerServices;
 using FreeformHelper.Application.Services;
+using FreeformHelper.Application.Settings;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Infrastructure.Dxf;
 using FreeformHelper.Infrastructure.Project;
+using FreeformHelper.UI.CadEditing;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 using Nvt.Core.Lifecycle;
@@ -15,8 +17,7 @@ internal static class FreeformHelperViewModelPrivateAccess
 {
     private const string NotchTableGenerationTaskType = "System.Threading.Tasks.Task`1[[FreeformHelper.UI.ViewModels.FreeformHelperViewModel+NotchTableGenerationResult, FreeformHelper.UI]]";
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cad")]
-    public static extern ref CadPadSet? Cad(FreeformHelperViewModel viewModel);
+    public static ref CadPadSet? Cad(FreeformHelperViewModel viewModel) => ref viewModel.CadDocument.Cad;
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_undoSuppression")]
     public static extern ref UndoSuppression UndoSuppression(FreeformHelperViewModel viewModel);
@@ -27,11 +28,12 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_grid")]
     public static extern ref RegularGrid? Grid(FreeformHelperViewModel viewModel);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_projectFile")]
-    public static extern ref ProjectFile ProjectFile(FreeformHelperViewModel viewModel);
+    public static ProjectFile ProjectFile(FreeformHelperViewModel viewModel) => viewModel.ProjectSession.Document;
 
-    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_cadEdit")]
-    public static extern ref CadEditState CadEdit(FreeformHelperViewModel viewModel);
+    public static void ReplaceProjectFile(FreeformHelperViewModel viewModel, ProjectFile document)
+        => viewModel.ProjectSession.Document = document;
+
+    public static CadEditState CadEdit(FreeformHelperViewModel viewModel) => viewModel.CadDocument.Edit;
 
     [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_dxfImportService")]
     public static extern ref DxfImportService DxfImportService(FreeformHelperViewModel viewModel);
@@ -57,17 +59,19 @@ internal static class FreeformHelperViewModelPrivateAccess
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyCadLoadOutcomeAsync")]
     public static extern Task ApplyCadLoadOutcomeAsync(FreeformHelperViewModel viewModel, CadLoadOutcome outcome, UiViewSnapshot? snapshot);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildDxfEditChangeEntries")]
-    public static extern List<DxfEditChangeListEntry> BuildDxfEditChangeEntries(FreeformHelperViewModel viewModel);
+    public static List<DxfEditChangeListEntry> BuildDxfEditChangeEntries(FreeformHelperViewModel viewModel) =>
+        viewModel.DxfEdit.BuildDxfEditChangeEntries();
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "ApplyDxfEditChangeEntry")]
-    public static extern void ApplyDxfEditChangeEntry(FreeformHelperViewModel viewModel, DxfEditChangeListEntry entry);
+    public static void ApplyDxfEditChangeEntry(FreeformHelperViewModel viewModel, DxfEditChangeListEntry entry) =>
+        viewModel.DxfEdit.ApplyDxfEditChangeEntry(entry);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "RestoreHiddenCadPad")]
-    public static extern void RestoreHiddenCadPad(FreeformHelperViewModel viewModel, int cadPadId);
+    [UnsafeAccessor(UnsafeAccessorKind.Field, Name = "_actions")]
+    private static extern ref IDxfEditActions DxfEditActions(DxfEditViewModel viewModel);
 
-    [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildActiveCadPadSet")]
-    public static extern CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel);
+    public static void RestoreHiddenCadPad(FreeformHelperViewModel viewModel, int cadPadId) =>
+        DxfEditActions(viewModel.DxfEdit).RestoreHiddenEntry(cadPadId);
+
+    public static CadPadSet? BuildActiveCadPadSet(FreeformHelperViewModel viewModel) => viewModel.CadDocument.BuildActiveCad();
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BuildFilteredCadPadSet")]
     public static extern CadPadSet? BuildFilteredCadPadSet(FreeformHelperViewModel viewModel);
@@ -98,4 +102,7 @@ internal static class FreeformHelperViewModelPrivateAccess
 
     [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "BumpNotchExportGridFingerprint")]
     public static extern void BumpNotchExportGridFingerprint(FreeformHelperViewModel viewModel);
+
+    [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "CreateExportSettingsSnapshot")]
+    public static extern ProjectSettings CreateExportSettingsSnapshot(FreeformHelperViewModel? owner, ProjectSettings source);
 }

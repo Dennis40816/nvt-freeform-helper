@@ -10,9 +10,9 @@ using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using FreeformHelper.Tests.TestInfrastructure;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
+using Nvt.Core.Avalonia.Icons;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -40,8 +40,9 @@ public sealed class DxfEditDetailsIntegratedLayoutTests
             Assert.Equal(_categoryLabels, toggles.Select(static toggle => Assert.IsType<string>(toggle.Content)));
             Assert.All(toggles, static toggle =>
             {
-                Assert.Contains("actionGhost", toggle.Classes);
-                Assert.Contains("flat", toggle.Classes);
+                Assert.Contains("productFilterChip", toggle.Classes);
+                Assert.DoesNotContain("actionGhost", toggle.Classes);
+                Assert.DoesNotContain("flat", toggle.Classes);
             });
             Assert.Same(vm.SetDuplicateKindCommand, Assert.Single(toggles, static toggle => toggle.IsChecked == true).Command);
             Assert.DoesNotContain(VisibleTextOutsideSwitches(window), text => _categoryLabels.Contains(text, StringComparer.Ordinal));
@@ -96,7 +97,9 @@ public sealed class DxfEditDetailsIntegratedLayoutTests
                 var scroll = Assert.IsType<ScrollViewer>(window.FindControl<ScrollViewer>("InspectorDetailScroll"));
                 Assert.Equal(ScrollBarVisibility.Auto, scroll.VerticalScrollBarVisibility);
                 Assert.Equal(ScrollBarVisibility.Disabled, scroll.HorizontalScrollBarVisibility);
-                var detail = Assert.IsType<SelectableTextBlock>(scroll.Content);
+                var content = Assert.IsType<Border>(scroll.Content);
+                Assert.Equal(scroll.Viewport.Width, content.Bounds.Width, precision: 3);
+                var detail = Assert.IsType<SelectableTextBlock>(content.Child);
                 Assert.Equal(TextWrapping.Wrap, detail.TextWrapping);
                 Assert.Equal(vm.SelectedRowDetailText, detail.Text);
             }
@@ -315,6 +318,6 @@ public sealed class DxfEditDetailsIntegratedLayoutTests
     {
         return new DxfEditChangeListEntry(
             kind, cadPadId, cadPadId, $"PAD_{cadPadId}", kind.ToString(), "Layer 0", "detail", "Complete change detail.",
-            IconGlyphs.Undo, actionLabel, "Apply this row's scoped action.", canFocus: true, canApply: true);
+            NvtIcons.Undo, actionLabel, "Apply this row's scoped action.", canFocus: true, canApply: true);
     }
 }

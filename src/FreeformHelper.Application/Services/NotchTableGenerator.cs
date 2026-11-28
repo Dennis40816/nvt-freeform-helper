@@ -49,6 +49,7 @@ public sealed partial class NotchTableGenerator
     /// <param name="progress">Optional receiver of generation progress updates.</param>
     /// <param name="activeRegularPadIds">Optional IDs of the active regular pads; <c>null</c> leaves the regular pads unfiltered.</param>
     /// <param name="cadOutputFwDiffIndexByCadId">Optional map from CAD pad ID to its output FW diff index.</param>
+    /// <param name="explanationCollector">Optional fresh collector for CadAllocation V22 row evidence.</param>
     /// <returns>A new <see cref="NotchTable"/> containing the generated rows.</returns>
     public NotchTable Generate(
         CadPadSet cad,
@@ -56,10 +57,17 @@ public sealed partial class NotchTableGenerator
         ProjectSettings settings,
         IProgress<NotchGenerationProgress>? progress = null,
         IReadOnlySet<int>? activeRegularPadIds = null,
-        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId = null)
+        IReadOnlyDictionary<int, int>? cadOutputFwDiffIndexByCadId = null,
+        NotchV22ExplanationCollector? explanationCollector = null)
     {
         settings.ValidateOrThrow();
         var enabled = settings.Notch.EnabledVersions;
+        if (explanationCollector is not null &&
+            (settings.Notch.ComputationMode != NotchComputationMode.CadAllocation ||
+             !enabled.Contains(NotchAlgorithmVersion.V22)))
+        {
+            throw new ArgumentException("Row explanations require CadAllocation with V22 enabled.", nameof(explanationCollector));
+        }
         if (enabled.Count == 0)
         {
             progress?.Report(new NotchGenerationProgress(0, 0, 0, null, null));
@@ -75,7 +83,8 @@ public sealed partial class NotchTableGenerator
                 settings,
                 progress,
                 activeRegularPadIds,
-                cadOutputFwDiffIndexByCadId).Table,
+                cadOutputFwDiffIndexByCadId,
+                explanationCollector).Table,
             _ => GenerateLegacyRegularAnchor(
                 cad,
                 grid,
@@ -102,12 +111,7 @@ public sealed partial class NotchTableGenerator
             .ToList();
         if (enabled.Count == 0)
         {
-            return new NotchCadRowEligibility(
-                CadPadId: cadPad.Id,
-                EligibleVersions: Array.Empty<NotchAlgorithmVersion>(),
-                EstimatedRowCount: 0,
-                AnchorRegularPadId: null,
-                Reason: "No notch version enabled.");
+            return CreateEmptyCadRowEligibility(cadPad.Id, "No notch version enabled.");
         }
 
         return settings.Notch.ComputationMode switch

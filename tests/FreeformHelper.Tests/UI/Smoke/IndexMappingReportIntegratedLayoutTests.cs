@@ -249,6 +249,13 @@ public sealed class IndexMappingReportIntegratedLayoutTests
                 static text => Grid.GetColumn(text) == 2);
             var reason = Assert.Single(rowButton.GetVisualDescendants().OfType<TextBlock>(),
                 static text => Grid.GetColumn(text) == 3);
+            foreach (var title in header.GetVisualDescendants().OfType<TextBlock>())
+            {
+                var cell = Assert.Single(rowButton.GetVisualDescendants().OfType<TextBlock>(),
+                    text => Grid.GetColumn(text) == Grid.GetColumn(title));
+                // The header has a 1 px border and the flat row has none.
+                Assert.InRange(title.TranslatePoint(default, window)!.Value.X - cell.TranslatePoint(default, window)!.Value.X, 0d, 1d);
+            }
             Assert.Equal(row.StatusDisplay, TipText(result));
             Assert.Equal(row.ReasonText, TipText(reason));
             Assert.False(model.SyncFilterWithStepRail);

@@ -13,22 +13,11 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
     {
         if (regularIds.Count == 0)
         {
-            return "Unmatched";
+            return PadMatchTextFormatter.CadMatchText(regularIds, Array.Empty<int>(), getRegularPadIcDiff);
         }
 
-        var ordered = links
-            .Select(link => link.RegularPadId)
-            .Concat(regularIds)
-            .Distinct()
-            .ToList();
-        var bestRegularId = ordered[0];
-        var bestText = BuildRegularMatchKey(bestRegularId, getRegularPadIcDiff);
-        if (ordered.Count == 1)
-        {
-            return bestText;
-        }
-
-        return $"{bestText} (+{ordered.Count - 1})";
+        return PadMatchTextFormatter.CadMatchText(
+            regularIds, links.Select(link => link.RegularPadId), getRegularPadIcDiff);
     }
 
     private static string BuildCadMatchDetailsText(
@@ -53,16 +42,6 @@ public sealed partial class CadPadInfoViewModel : ObservableObject, IPadInfoChan
             .Select(link => $"{BuildRegularMatchDetail(link.RegularPadId, getRegularPadIcDiff)}: {(link.CadCoverage * 100):0.#}%")
             .ToList();
         return string.Join(Environment.NewLine, lines);
-    }
-
-    private static string BuildRegularMatchKey(
-        int regularPadId,
-        Func<int, (int IcIndex, int DiffIndex)?>? getRegularPadIcDiff)
-    {
-        var match = getRegularPadIcDiff?.Invoke(regularPadId);
-        return match.HasValue
-            ? $"IC{match.Value.IcIndex + 1}/diff{match.Value.DiffIndex}"
-            : $"regId {regularPadId}";
     }
 
     private static string BuildRegularMatchDetail(

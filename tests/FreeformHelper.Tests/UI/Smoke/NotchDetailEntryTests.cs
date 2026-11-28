@@ -54,7 +54,8 @@ public sealed class NotchDetailEntryTests
             Assert.True(command.CanExecute(button.CommandParameter));
 
             command.Execute(button.CommandParameter);
-            await HeadlessUiPump.FlushQueueAsync();
+            await HeadlessUiPump.WaitUntilAsync(() => owner.OwnedWindows.OfType<NotchDetailWindow>().Any(),
+                "Notch detail did not open after its background generation completed.");
 
             var detail = Assert.Single(owner.OwnedWindows.OfType<NotchDetailWindow>());
             Assert.True(detail.IsVisible);

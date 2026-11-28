@@ -406,6 +406,8 @@ try {
                 function git { $global:LASTEXITCODE = 0; return ("a" * 40) }
                 function dotnet {
                     $calls.Add($args)
+                    # The shard builds the test project once before its groups. The build always succeeds here.
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     $index = [Array]::IndexOf($args, '--results-directory')
                     if ($index -ge 0) { Write-FixtureTrx -Directory $args[$index + 1] -Tests $samples }
                     Write-Output 'CONFIDENTIAL_SENTINEL'
@@ -420,15 +422,23 @@ try {
                             -EnforceFloors:$case.Enforce -Unverified:$case.Unverified -SummaryPath $summaryFile 6>&1
                     } catch { $message = $_.Exception.Message }
                 )
-                $expectedCalls = if (-not $case.Enforce -and $case.Fail) { 1 } else { 4 }
+                # A CI run (floors enforced) builds once, then runs each of the four groups without a build.
+                $expectedCalls = if (-not $case.Enforce -and $case.Fail) { 1 } elseif ($case.Enforce) { 5 } else { 4 }
                 Assert-Policy ($calls.Count -eq $expectedCalls)
                 Assert-Policy (((($entryOutput -join '') -match 'CONFIDENTIAL_SENTINEL') -eq (-not $case.Enforce)))
                 Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo "build/ci-test-results")))
                 Assert-Policy (-not (Test-Path -LiteralPath (Join-Path $fakeRepo "tests/FreeformHelper.Tests/TestResults")))
                 foreach ($call in $calls) {
-                    Assert-Policy (($call -contains '--logger') -eq $case.Enforce)
                     Assert-Policy (-not ($call -contains '--no-restore'))
+                    if ($call[0] -ceq 'build') {
+                        Assert-Policy ($case.Enforce -and $call.Count -ge 4 -and ($call -contains '/p:UseAppHost=false') -and
+                            ($call -contains '-m:4') -and -not ($call -contains '--logger') -and -not ($call -contains '--no-build'))
+                        continue
+                    }
+                    Assert-Policy (($call -contains '--logger') -eq $case.Enforce)
+                    Assert-Policy (($call -contains '--no-build') -eq $case.Enforce)
                 }
+                Assert-Policy (@($calls | Where-Object { $_[0] -ceq 'build' }).Count -eq $(if ($case.Enforce) { 1 } else { 0 }))
                 if ($case.Enforce) {
                     $summaryText = Get-Content -LiteralPath $summaryFile -Raw
                     Assert-Policy (Test-Json -Json $summaryText -SchemaFile $summarySchema)
@@ -441,7 +451,11 @@ try {
                         '[check-test-shard] total 12 passed 12 failed 0 skipped 0 notExecuted 0'
                     )
                     if (-not $case.Fail -and -not $case.Unverified) { $expectedOutput += '[verify] OK (test)' }
-                    Assert-Policy (($entryOutput -join "`n") -ceq ($expectedOutput -join "`n"))
+                    # The build step prints one line with the exit code and the seconds; the seconds vary.
+                    $buildLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] build-step *' })
+                    Assert-Policy ($buildLines.Count -eq 1 -and [string]$buildLines[0] -cmatch '^\[verify\] build-step shard=core exit=0 elapsed-seconds=[0-9]+$')
+                    $outputWithoutBuild = @($entryOutput | Where-Object { [string]$_ -notlike '[[]verify] build-step *' })
+                    Assert-Policy (($outputWithoutBuild -join "`n") -ceq ($expectedOutput -join "`n"))
                 } else {
                     Assert-Policy (-not (Test-Path -LiteralPath $summaryFile) -and ($message.Length -gt 0) -eq $case.Fail)
                     if ($case.Fail) { Assert-Policy ($message -ceq "Test group 'notch-core' failed with exit code 1.") }
@@ -465,6 +479,7 @@ try {
             & {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
                 function dotnet {
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     $index = [Array]::IndexOf($args, '--results-directory')
                     $directory = $args[$index + 1]
                     Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'
@@ -518,12 +533,39 @@ try {
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT The active test run was aborted. Reason: Test host process crashed : PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'test-host-crashed,test-run-aborted' },
         @{ Lines = @('  Another thread created Dispatcher.UIThread while the headless application was being set up PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'dispatcher-uithread-race' },
         @{ Lines = @('x.cs(1,1): error CS1002: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: again'); Exit = 1; Expected = 'build-error' },
-        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0 },
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT', 'Test Run Aborted.'); Exit = 1; Expected = 'no-test-matches-filter,test-run-aborted'; Listed = 0
+            Attempts = 1; Rows = @('No test matches the given testcase filter <filter> in <path>', 'Test Run Aborted.') },
+        # A run without a test prints its redacted shape. Only a known message shape keeps its fixed words and numbers.
+        # Every other line, including a test name, a path or a build message text, prints as <line>, and equal rows in a row print once.
+        @{ Lines = @('Test run for C:\PRIVATE-MARKER-DO-NOT-PRINT\FreeformHelper.Tests.dll(.NETCoreApp,Version=v10.0)',
+                'VSTest version 18.7.0 (x64)',
+                '[xUnit.net 00:00:01.23]   Discovering: FreeformHelper.Tests',
+                '[xUnit.net 00:00:02.50]     PRIVATE-MARKER-DO-NOT-PRINT [FAIL]',
+                'FreeformHelper.Tests.PRIVATE-MARKER-DO-NOT-PRINT.Case failed',
+                'PRIVATE-MARKER-DO-NOT-PRINT second line',
+                'src/PRIVATE-MARKER-DO-NOT-PRINT.cs(1,1): warning CS8618: PRIVATE-MARKER-DO-NOT-PRINT',
+                'FreeformHelper.UI -> C:\PRIVATE-MARKER-DO-NOT-PRINTin\FreeformHelper.UI.dll',
+                'No test matches the given testcase filter `FullyQualifiedName~.PRIVATE-MARKER-DO-NOT-PRINT.` in C:\PRIVATE-MARKER-DO-NOT-PRINT\FreeformHelper.Tests.dll'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 0
+            Attempts = 1; Rows = @('Test run for <path>(.NETCoreApp,Version=v10.0)', 'VSTest version 18.7.0 (x64)',
+                '[xUnit.net 00:00:01.23] Discovering: <assembly>', '[xUnit.net 00:00:02.50] <text>', '<line> (x2)',
+                '<location>: warning CS8618: <text>', '<project> -> <path>',
+                'No test matches the given testcase filter <filter> in <path>') },
         # The host lists tests again after the empty run. Only the number is printed, never a listed name.
+        # Because the host lists tests, the empty start is run once more. The second start is empty as well, so the group stays failed.
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = 2
-            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '') },
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '    PRIVATE-MARKER-DO-NOT-PRINT.Second', '')
+            Retry = 'retries=1 listed-tests=2 executed-tests=-1'; Attempts = 2 },
         @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = 'no-test-matches-filter'; Listed = -1
-            ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1 },
+            ListLines = @('PRIVATE-MARKER-DO-NOT-PRINT listing failed'); ListExit = 1; Attempts = 1 },
+        # An empty start is run once more when the host lists tests now.
+        # The second run finds the tests. The group ends with the exit code of the second run and prints its test count.
+        @{ Lines = @('No test matches the given testcase filter PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 1; Expected = ''
+            SecondLines = @('Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); SecondExit = 0
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '')
+            Retry = 'retries=1 listed-tests=1 executed-tests=7'; Attempts = 1 },
+        # A failing test is final: the host found the tests, so nothing is run again.
+        @{ Lines = @('Failed!  - Failed:     1, Passed:     4, Skipped:     0, Total:     5, Duration: 1 s - FreeformHelper.Tests.dll (net10.0)'); Exit = 1; Expected = ''
+            ListLines = @('The following Tests are available:', '    PRIVATE-MARKER-DO-NOT-PRINT.First', '') },
         @{ Lines = @('Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'); Exit = 0; Expected = '' },
         @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Exit = 1; Expected = '' },
         @{ Lines = @(); StdErr = 'Test host process crashed PRIVATE-MARKER-DO-NOT-PRINT'; Exit = 1; Expected = 'test-host-crashed' },
@@ -534,10 +576,18 @@ try {
         Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
             & {
                 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                $runCalls = @{ Count = 0 }
                 function dotnet {
+                    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
                     if ($args -contains '--list-tests') {
                         if ($case.ContainsKey('ListLines')) { foreach ($line in $case.ListLines) { Write-Output $line } }
                         $global:LASTEXITCODE = $(if ($case.ContainsKey('ListExit')) { $case.ListExit } else { 0 })
+                        return
+                    }
+                    $runCalls.Count++
+                    if ($runCalls.Count -gt 1 -and $case.ContainsKey('SecondExit')) {
+                        foreach ($line in $case.SecondLines) { Write-Output $line }
+                        $global:LASTEXITCODE = $case.SecondExit
                         return
                     }
                     foreach ($line in $case.Lines) { Write-Output $line }
@@ -574,15 +624,82 @@ try {
                 Assert-Policy (@($entryOutput | Where-Object { [string]$_ -like '*skipped tests on this machine*' }).Count -eq 0)
                 Assert-Policy (($entryOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
                 Assert-Policy ($message -ceq 'Shard validation failed.')
+                # Only a start that found no test prints its redacted rows, one block for each start, and the rows hold no private text.
+                $redactedHeaders = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] redacted-host-output group=*' })
+                $expectedAttempts = if ($case.ContainsKey('Attempts')) { $case.Attempts } else { 0 }
+                Assert-Policy ($redactedHeaders.Count -eq $expectedAttempts)
+                Assert-Policy (@($entryOutput | Where-Object { [string]$_ -ceq '[verify] redacted-host-output end' }).Count -eq $expectedAttempts)
+                if ($case.ContainsKey('Rows')) {
+                    $startIndex = [Array]::FindIndex($entryOutput, [Predicate[object]]{ param($line) [string]$line -like '[[]verify] redacted-host-output group=*' })
+                    $rows = @($entryOutput[($startIndex + 1)..($startIndex + $case.Rows.Count)] | ForEach-Object { ([string]$_).Substring(2) })
+                    Assert-Policy (($rows -join "`n") -ceq ($case.Rows -join "`n"))
+                    Assert-Policy ([string]$entryOutput[$startIndex + $case.Rows.Count + 1] -ceq '[verify] redacted-host-output end')
+                }
+                # A group is run again only after an empty start that the host can list tests for. The line holds numbers only.
+                $retryLines = @($entryOutput | Where-Object { [string]$_ -like '[[]verify] retry-diagnostic *' })
+                if ($case.ContainsKey('Retry')) {
+                    Assert-Policy ($retryLines.Count -eq 1 -and
+                        [string]$retryLines[0] -ceq ('[verify] retry-diagnostic group=ui-snapshots {0}' -f $case.Retry))
+                } else {
+                    Assert-Policy ($retryLines.Count -eq 0)
+                }
                 # The native command finished with the exit code of the case. A runner exception before that
                 # would leave the exit code unset and change the phase, so the case could not pass by accident.
-                $expectedPhase = if ($case.Exit -eq 0) { 'read-results' } else { 'run-tests' }
+                $finalExit = if ($case.ContainsKey('SecondExit')) { $case.SecondExit } else { $case.Exit }
+                $expectedPhase = if ($finalExit -eq 0) { 'read-results' } else { 'run-tests' }
                 $expectedDiagnostic = '[check-test-shard] diagnostic shard=snapshots group=ui-snapshots phase={0} exit={1} trx-files=0 results-dir=missing' -f
-                    $expectedPhase, $case.Exit
+                    $expectedPhase, $finalExit
                 $diagnostics = @($entryOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
                 Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
                 $caseSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
-                Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $case.Exit)
+                Assert-Policy (@($caseSummary.groups).Count -eq 1 -and $caseSummary.groups[0].exitCode -eq $finalExit)
+            }
+        }
+    }
+    # A failed build stops the shard before any group runs. The log gets the exit code, the seconds and the error codes
+    # only, never a line of the build output, and each group is recorded with the build phase.
+    foreach ($buildCase in @(
+            @{ Lines = @('x.cs(1,1): error CS0103: PRIVATE-MARKER-DO-NOT-PRINT', 'y.cs(2,2): error MSB3027: PRIVATE-MARKER-DO-NOT-PRINT',
+                    'z.cs(3,3): error CS0103: again PRIVATE-MARKER-DO-NOT-PRINT'); Codes = 'CS0103,MSB3027' },
+            @{ Lines = @('PRIVATE-MARKER-DO-NOT-PRINT and nothing else'); Codes = '' })) {
+        Invoke-WithTemporaryEnvironmentVariables -Settings @{ FREEFORMHELPER_TEST_AREA = (Join-Path $testRoot 'test-area') } -Action {
+            & {
+                function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
+                $testCalls = @{ Count = 0 }
+                function dotnet {
+                    if ($args[0] -ceq 'build') {
+                        foreach ($line in $buildCase.Lines) { Write-Output $line }
+                        $global:LASTEXITCODE = 1
+                        return
+                    }
+                    $testCalls.Count++
+                    $global:LASTEXITCODE = 0
+                }
+                $summaryFile = Join-Path $fakeRepo 'summary.json'
+                if (Test-Path -LiteralPath $summaryFile) { Remove-Item -LiteralPath $summaryFile }
+                $message = ''
+                $buildOutput = @(
+                    try {
+                        & (Join-Path $fakeRepo 'scripts/verify.ps1') -CiLane test -Shard snapshots -AllowMissingExampleData `
+                            -EnforceFloors -SummaryPath $summaryFile *>&1
+                    } catch { $message = $_.Exception.Message }
+                )
+                Assert-Policy ($testCalls.Count -eq 0)
+                Assert-Policy ($message -ceq 'Shard validation failed.')
+                Assert-Policy (($buildOutput -join "`n") -notmatch 'PRIVATE-MARKER-DO-NOT-PRINT')
+                $stepLines = @($buildOutput | Where-Object { [string]$_ -like '[[]verify] build-step *' })
+                Assert-Policy ($stepLines.Count -eq 1 -and [string]$stepLines[0] -cmatch '^\[verify\] build-step shard=snapshots exit=1 elapsed-seconds=[0-9]+$')
+                $codeLines = @($buildOutput | Where-Object { [string]$_ -like '[[]verify] build-step-errors *' })
+                if ($buildCase.Codes -ceq '') {
+                    Assert-Policy ($codeLines.Count -eq 0)
+                } else {
+                    Assert-Policy ($codeLines.Count -eq 1 -and [string]$codeLines[0] -ceq ('[verify] build-step-errors shard=snapshots codes={0}' -f $buildCase.Codes))
+                }
+                $expectedDiagnostic = '[check-test-shard] diagnostic shard=snapshots group=ui-snapshots phase=build exit=1 trx-files=0 results-dir=missing'
+                $diagnostics = @($buildOutput | Where-Object { [string]$_ -like '[[]check-test-shard] diagnostic *' })
+                Assert-Policy ($diagnostics.Count -eq 1 -and [string]$diagnostics[0] -ceq $expectedDiagnostic)
+                $buildSummary = Get-Content -LiteralPath $summaryFile -Raw | ConvertFrom-Json
+                Assert-Policy ($buildSummary.outcome -ceq 'failed' -and $buildSummary.total -eq 0)
             }
         }
     }
@@ -613,6 +730,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 function git { $global:LASTEXITCODE = 0; return ('a' * 40) }
 function dotnet {
+    if ($args[0] -ceq 'build') { $global:LASTEXITCODE = 0; return }
     $index = [Array]::IndexOf($args, '--results-directory')
     $directory = $args[$index + 1]
     Write-Output 'PRIVATE-MARKER-DO-NOT-PRINT'

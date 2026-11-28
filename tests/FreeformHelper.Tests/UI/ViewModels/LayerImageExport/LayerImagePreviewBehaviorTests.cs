@@ -3,6 +3,7 @@
 using System.Threading.Channels;
 using Avalonia.Headless.XUnit;
 using FreeformHelper.Application.Services;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.ViewModels;
 using Xunit;
 

@@ -16,15 +16,15 @@
       },
       "Nvt.Core": {
         "type": "Direct",
-        "requested": "[0.9.5, 0.9.5]",
-        "resolved": "0.9.5",
-        "contentHash": "M+BES6LRngIOX1Xh3smiWCJGSEeMs6iRCUQx4fNVkb0bSEcpWTvMiC9KgktdW1PJh1XdzmE6BcfvecEthfkpuQ=="
+        "requested": "[0.9.7, 0.9.7]",
+        "resolved": "0.9.7",
+        "contentHash": "rcy73nzLheGnnEMIdbrYb2CpkP38voV/EU+J6Fyyan21GN1HYmSV/WE23UEN292zXD0GnbU4Q4kunf7OniGMtw=="
       },
       "freeformhelper.application": {
         "type": "Project",
         "dependencies": {
           "Clipper2": "[2.0.0, )",
-          "FreeformHelper.Domain": "[1.0.0, )"
+          "FreeformHelper.Domain": "[1.0.0-g.4, )"
         }
       },
       "freeformhelper.domain": {

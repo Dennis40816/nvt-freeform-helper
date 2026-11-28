@@ -20,10 +20,10 @@ public sealed class ExampleProjectFixtureTests
 
         await vm.LoadProjectCommand.ExecuteAsync(null);
 
-        var mask = vm.RegularVisibilityMaskForTests.Mask;
+        var mask = vm.RegularMask.Workflow.Mask;
         Assert.Equal(RegularVisibilityMaskStatus.Loaded, mask.Status);
         Assert.True(mask.ActiveRegularCount > 0);
-        Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+        Assert.True(vm.RegularMask.IsEnabled);
     }
 
     [Theory]

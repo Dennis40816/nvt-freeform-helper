@@ -270,6 +270,8 @@ public sealed partial class NotchV22CompensationService
             : 0.0;
         var effectiveExpansionThreshold = Math.Max(strictOverlapThreshold, effectiveExpansionEpsilon);
         var hasEffectiveExpansion = hasSourceArea && exactFreeArea > effectiveExpansionThreshold;
+        // isBoundaryRegular is deliberately not a gate: interior regulars with reachable free area expand too.
+        // It is diagnostic only. See docs/reference/notch-system-reference.md section 4.2.
         var requiresReachability = enableToFull && hasSourceArea && hasEffectiveExpansion;
         return (
             regularArea, hasSourceArea, ownerCadIds, blockerCandidates, isBoundaryRegular,

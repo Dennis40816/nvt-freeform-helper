@@ -1,5 +1,6 @@
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 
 namespace FreeformHelper.UI.Controls;
@@ -80,17 +81,7 @@ public sealed partial class PadCanvas
     /// <returns>The calculated font size.</returns>
     private double GetLabelFontSize(double step, double baseSize, double minSize, double maxSize)
     {
-        // Font size scales with the square root of zoom to make it visually balanced.
-        var sizeFromZoom = baseSize * Math.Sqrt(Math.Max(_zoom, 1e-6));
-        if (step > 0)
-        {
-            // Also constrain font size by the space available (step size).
-            // This prevents labels from overlapping when zoomed out.
-            var sizeFromStep = step * 0.6; // Use 60% of the step to ensure some padding.
-            sizeFromZoom = Math.Min(sizeFromZoom, sizeFromStep);
-        }
-
-        return Math.Clamp(sizeFromZoom, minSize, maxSize); // Clamp to overall min/max.
+        return AxisLabelMetricsPolicy.FontSize(_zoom, step, baseSize, minSize, maxSize);
     }
 
     /// <summary>
@@ -126,10 +117,8 @@ public sealed partial class PadCanvas
             return 1;
         }
 
-        var expectedLabelWidth = Math.Max(fontSize, Math.Max(1.0, maxLabelWidth));
-        var axisLabelMinGap = Math.Max(GetResourceDouble("CanvasAxisLabelMinGap", GetResourceDouble("Space8", 8.0)), 1.0);
-        var minSpacing = Math.Max(GetResourceDouble("Space20", 20.0), expectedLabelWidth + axisLabelMinGap);
-        var stride = (int)Math.Ceiling(minSpacing / step);
-        return Math.Clamp(stride, 1, count);
+        var minGap = GetResourceDouble("CanvasAxisLabelMinGap", GetResourceDouble("Space8", 8.0));
+        var space20 = GetResourceDouble("Space20", 20.0);
+        return AxisLabelMetricsPolicy.Stride(step, fontSize, count, maxLabelWidth, minGap, space20);
     }
 }

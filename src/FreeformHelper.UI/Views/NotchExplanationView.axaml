@@ -1,0 +1,108 @@
+<!-- Copyright (c) 2026 Dennis Liu. All rights reserved. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:p="clr-namespace:FreeformHelper.UI.Presentation"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:converters="clr-namespace:Avalonia.Data.Converters;assembly=Avalonia.Base"
+             x:Class="FreeformHelper.UI.Views.NotchExplanationView"
+             x:DataType="p:NotchSourcePresentation" x:CompileBindings="True">
+  <StackPanel Spacing="{DynamicResource Space12}">
+    <StackPanel x:Name="OutputRowsSection" Spacing="{DynamicResource Space4}">
+      <SelectableTextBlock Classes="explainHeading" Text="{Binding RowsTitle}"/>
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderBottomThin}">
+        <Grid ColumnDefinitions="Auto,*">
+        <Border Width="{DynamicResource NotchExplanationRowLabelWidth}"/>
+        <UniformGrid Grid.Column="1" Columns="7" Classes="explainTableHeader">
+          <TextBlock Text="source diff"/><TextBlock Text="combine %"/>
+          <TextBlock Text="to diff"/><TextBlock Text="%"/>
+          <TextBlock Text="to diff"/><TextBlock Text="%"/><TextBlock Text="flags"/>
+        </UniformGrid>
+        </Grid>
+      </Border>
+      <ItemsControl x:Name="OutputRows" ItemsSource="{Binding Rows}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Space8}"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="p:NotchOutputRow">
+            <Grid ColumnDefinitions="Auto,*" Classes="explainOutputRow">
+              <TextBlock Text="{Binding Label}" Width="{DynamicResource NotchExplanationRowLabelWidth}"
+                         Foreground="{DynamicResource NfcTextMutedBrush}"/>
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding Values}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="1" Columns="7"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="p:NotchOutputValue">
+                    <SelectableTextBlock Classes="explainOutputValue" Classes.muted="{Binding IsMuted}" Text="{Binding Text}"/>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Classes="explainNote" Text="{Binding Footnote}" TextWrapping="Wrap"/>
+    </StackPanel>
+    <StackPanel x:Name="WhySection" Spacing="{DynamicResource Space4}">
+      <SelectableTextBlock Classes="explainHeading" Text="{Binding WhyTitle}"/>
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderBottomThin}">
+        <Grid ColumnDefinitions="1.15*,1.15*,0.7*,1.55*,0.8*,0.7*" ColumnSpacing="{DynamicResource Space4}"
+            Classes="explainTableHeader">
+        <TextBlock Text="cell" HorizontalAlignment="Left"/>
+        <Grid Grid.Column="2" ColumnDefinitions="Auto,*" Classes="explainCoverageHeader" IsVisible="{Binding ShowCoverage}">
+          <Rectangle Classes="explainCoverageSwatch" Fill="{DynamicResource BrushNotchExplanationArea}"/>
+          <TextBlock Grid.Column="1" Text="CAD"/>
+        </Grid>
+        <Grid Grid.Column="3" ColumnDefinitions="Auto,*" Classes="explainCoverageHeader" IsVisible="{Binding ShowCoverage}">
+          <Rectangle Classes="explainCoverageSwatch" Fill="{DynamicResource BrushNotchExplanationHatch}"/>
+          <TextBlock Grid.Column="1" Text="{Binding AddedTitle}"/>
+        </Grid>
+        <TextBlock Grid.Column="4" Text="exact"/><TextBlock Grid.Column="5" Text="in row"/>
+        </Grid>
+      </Border>
+      <ItemsControl x:Name="WhyCells" ItemsSource="{Binding Cells}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="{DynamicResource Space8}"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="p:NotchCellPresentation">
+            <Grid Classes="explainCellRow" RowDefinitions="Auto,Auto" ColumnDefinitions="1.15*,1.15*,0.7*,1.55*,0.8*,0.7*"
+                  ColumnSpacing="{DynamicResource Space4}">
+              <SelectableTextBlock>
+                <Run Text="{Binding CellText, Mode=OneWay}"/><Run Text=" "/><Run Text="{Binding SourceText, Mode=OneWay}"
+                    Foreground="{DynamicResource NfcTextMutedBrush}"/>
+              </SelectableTextBlock>
+              <controls:NotchCoverageBar Grid.Column="1" Cell="{Binding}" IsVisible="{Binding ShowCoverage}"
+                                        Height="{DynamicResource NotchExplanationBarHeight}" VerticalAlignment="Center"/>
+              <SelectableTextBlock Grid.Column="2" Classes="explainNumber" Text="{Binding CadText}" IsVisible="{Binding ShowCoverage}"/>
+              <SelectableTextBlock Grid.Column="3" Classes="explainNumber" IsVisible="{Binding ShowCoverage}">
+                <Run Text="{Binding AddedText, Mode=OneWay}"/><Run Text=" "/><Run Text="{Binding LimitText, Mode=OneWay}"
+                    FontFamily="{DynamicResource FontFamilyUi}" Foreground="{DynamicResource NfcTextMutedBrush}"/>
+              </SelectableTextBlock>
+              <SelectableTextBlock Grid.Column="4" Classes="explainNumber" Text="{Binding ExactText}"/>
+              <SelectableTextBlock Grid.Column="5" Classes="explainNumber" Text="{Binding InRowText}" FontWeight="SemiBold"/>
+              <TextBlock Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3" Classes="explainNote"
+                         Text="{Binding OmissionReason}" TextWrapping="Wrap" HorizontalAlignment="Right"
+                         IsVisible="{Binding OmissionReason, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}">
+        <Grid ColumnDefinitions="1.15*,1.15*,0.7*,1.55*,0.8*,0.7*" ColumnSpacing="{DynamicResource Space4}"
+              Classes="explainCellRow">
+          <TextBlock Text="total"/>
+          <Border Grid.Column="1" Grid.ColumnSpan="3" Classes="explainDifference" HorizontalAlignment="Right" IsVisible="{Binding HasDifference}">
+            <SelectableTextBlock Classes="explainNote" Foreground="{DynamicResource NfcWarningTextBrush}" Text="{Binding DifferenceText}"/>
+          </Border>
+          <SelectableTextBlock Grid.Column="4" Classes="explainNumber" Text="{Binding ExactTotalText}"/>
+          <SelectableTextBlock Grid.Column="5" Classes="explainNumber" FontWeight="SemiBold" Text="{Binding RowTotalText}"/>
+        </Grid>
+      </Border>
+    </StackPanel>
+    <Border x:Name="FormulaCard" Classes="explainCard">
+      <ItemsControl ItemsSource="{Binding FormulaLines}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <SelectableTextBlock Classes="explainFormula" Text="{Binding}" TextWrapping="Wrap"/>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Border>
+  </StackPanel>
+</UserControl>

@@ -19,9 +19,9 @@ This document collects the Notch 2.2 goals, mathematical definitions, UI/output 
 1. `Undo NF (To Regular)`
 2. `To Full`
 3. `X/Y Freeform splitting and lateral parameter generation`
-- The 2.2 To Full implementation has been updated to "polygon-overlap seed + boundary regular expansion":
+- The 2.2 To Full implementation has been updated to "polygon-overlap seed + reachable-area expansion":
   - The seed starts from the actual overlap of `CAD polygon ∩ regular` (not a bbox-only seed).
-  - Expansion is still subject to boundary/collision constraints; this does not mean that final compensation directly uses the bbox area.
+  - Expansion is still subject to the regular outer boundary and collision constraints; this does not mean that final compensation directly uses the bbox area.
 
 ## 3. Notch 2.2 Flow (Post Algo)
 1. `CAD -> Regular` allocation (retains CadAllocation)
@@ -53,13 +53,14 @@ This document collects the Notch 2.2 goals, mathematical definitions, UI/output 
 ### 5.1 Physical Meaning
 - The goal is to extend boundary freeform pads as far as possible to the outermost regular boundary, simulating compensation for missing boundary pads.
 - Closely packed interior pads should theoretically not expand significantly.
+- Current behavior differs from the original goal above: `ToFull` is not limited to pads at the panel boundary (see the canonical reference, section 4.2).
 
 ### 5.2 Geometry/Flow Constraints
 - The extension target can only be the regular pad outer boundary (outer boundary).
 - Extension must not collide with "pads that have completed To Full".
 - If a neighboring pad blocks extension, partial or no extension is allowed (preserving physical feasibility).
-- **Interior CAD pads (not touching regulars at the panel outer boundary) do not undergo To Full expansion**; theoretically, `ToFullRatio = 1.0`.
-- Enable To Full only for "overlapping boundary regulars"; non-overlapping regulars do not participate.
+- Interior CAD pads expand too, wherever they have reachable free area. The earlier rule "interior pads do not undergo To Full" was removed on purpose in 2026-03.
+- Enable To Full for every overlapped regular that passes the Step3 gates; non-overlapping regulars do not participate.
 
 ### 5.3 UI and Visualization Requirements
 - Provide a To Full toggle in the right Panel.
@@ -76,7 +77,7 @@ This document collects the Notch 2.2 goals, mathematical definitions, UI/output 
 - When `To Full rule trace EN` is enabled, retain per-regular rule traces, with runtime query (`query notch` / `query multi-owner`) returning `ruleTrace` details.
 - AA area staged preview (Step3):
   1. `Seed`（CAD polygon overlap source）
-  2. `Boundary candidates` (expandable boundary regulars)
+  2. `Boundary candidates` (expandable regulars; they need not be at the panel boundary)
   3. `Final To Full` (expanded result)
 - Stage preview display contract:
   - `Stage 1` shows only `Seed`
@@ -216,7 +217,7 @@ File: `src/FreeformHelper.Application/Services/DxfOverlapAnalyzer.cs`
 - Phase-1 implemented:
   - The `Undo NF (To Regular)` formula is integrated into the 2.2 path.
   - `To Full` provides a right-side toggle and ratio fields.
-  - To Full core rules have been updated: only boundary regulars can expand; center regulars do not expand.
+  - To Full core rules have been updated: only boundary regulars can expand; center regulars do not expand. (Removed in 2026-03: any regular with reachable free area can expand.)
   - Step3 supports AA staged preview (seed / candidate / final).
   - Notch detail can display `ToRegular / ToFull / Combined` separately.
   - The invalidation chain between Steps is implemented (changes to an earlier step can clear later results), and each step provides a clear action.
@@ -231,11 +232,11 @@ File: `src/FreeformHelper.Application/Services/DxfOverlapAnalyzer.cs`
   - Runtime CLI adds `query notch-stage --cad-id` to retrieve stage1/2/3 overlay polygons directly for comparison with the screen.
   - The quick-view `Why` above the Work Area now uses linear link expansion (popup) to prevent long explanatory text from crowding the main view.
 - Phase-2 pending:
-  - To Full geometric expansion + collision constraints for completed pads + outer boundary connectivity restrictions.
+  - To Full geometric expansion + collision constraints for completed pads + outer boundary connectivity restrictions (the boundary restriction is not adopted, see section 5.2).
   - Manage Notch/Freeform rule dependencies and automatic recomputation through a Rule pipeline (DAG + dirty propagation).
   - The pad presentation snapshot is shared by Popover, Runtime CLI, and the right Inspector; deferred Inspector still computes compensation separately, and R13.102/102a consolidates computation into a single result.
   - Layered UI presentation: the first phase is complete (Top Strip summary + Why, right Inspector details from the same source); only information density/placement adjustments remain.
-  - The first version of stricter To Full boundary blocking is implemented (boundary connectivity + no expansion for multi-owner + actual Stage3 area computation); case refinements and geometry visualization adjustments remain.
+  - The first version of stricter To Full boundary blocking is implemented (boundary connectivity + no expansion for multi-owner + actual Stage3 area computation; today there is no boundary limit, and a shared regular still expands where it has reachable free area); case refinements and geometry visualization adjustments remain.
   - `To Full enabled` is determined by "at least one cell with `IsToFullApplied=true`" to avoid semantic confusion between enabled/100%.
 
 ## 15. Goals Confirmed for This Round (Freeze Before Implementation)

@@ -7,7 +7,7 @@
         Width="{DynamicResource LayerImageExportSettingsWidth}"
         Height="{DynamicResource LayerImageExportSettingsHeight}"
         CanResize="False" WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}" Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}" Foreground="{DynamicResource NfcTextBrush}"
         FontFamily="{DynamicResource FontFamilyUi}" FontSize="{DynamicResource FontSizeMd}"
         Title="Export settings">
   <Window.Styles>
@@ -44,7 +44,7 @@
       <TextBlock x:Name="SaveErrorText" Text="{Binding SaveErrorText}" IsVisible="{Binding HasSaveError}"
                  Classes="exportMuted" TextWrapping="Wrap"/>
     </StackPanel>
-    <Border Grid.Row="1" BorderBrush="{DynamicResource BrushBorderMuted}" BorderThickness="{DynamicResource BorderTopThin}"
+    <Border Grid.Row="1" BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderTopThin}"
             Padding="{DynamicResource Inset12_10}">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock x:Name="FooterText" Text="{Binding FooterText}" Classes="exportMuted"/>

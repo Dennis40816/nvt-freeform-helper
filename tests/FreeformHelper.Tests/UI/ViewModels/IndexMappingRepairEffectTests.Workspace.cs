@@ -94,7 +94,7 @@ public sealed partial class IndexMappingRepairEffectTests
             await vm.ImportRegularVisibilityMaskCommand.ExecuteAsync(null);
             Assert.Equal(4, vm.CadPads.Count);
             Assert.Equal(8, vm.RegularPads.Count);
-            Assert.True(vm.RegularVisibilityMaskUi.IsEnabled);
+            Assert.True(vm.RegularMask.IsEnabled);
             // Keep the four assignments deliberately wrong, so every proposed repair has an observable effect.
             foreach (var cadId in vm.CadPads.Select(pad => pad.Id).ToArray())
             {

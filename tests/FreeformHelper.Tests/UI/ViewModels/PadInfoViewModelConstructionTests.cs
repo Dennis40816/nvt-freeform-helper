@@ -173,7 +173,7 @@ public sealed class PadInfoViewModelConstructionTests
                 (35, 1.0),
             ],
             getNotchRowsByRegularPad: static id => Enumerable.Range(1, 9)
-                .Select(n => new FreeformHelperViewModel.NotchRowPreview(
+                .Select(n => new NotchRowPreview(
                     10 - n,
                     n % 2 == 0 ? NotchAlgorithmVersion.V22 : NotchAlgorithmVersion.V21,
                     n % 3,

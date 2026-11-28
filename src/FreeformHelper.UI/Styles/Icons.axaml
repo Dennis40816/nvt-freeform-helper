@@ -10,7 +10,7 @@
   <Style Selector="controls|FontIcon.symbols">
     <Setter Property="FontFamily" Value="{StaticResource FontSymbolsOutlined}"/>
     <Setter Property="FontSize" Value="{DynamicResource IconSizeMd}"/>
-    <Setter Property="Foreground" Value="{DynamicResource BrushIcon}"/>
+    <Setter Property="Foreground" Value="{DynamicResource NfcTextSecondaryBrush}"/>
     <Setter Property="HorizontalAlignment" Value="Center"/>
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="FontFeatures">

@@ -6,7 +6,7 @@
              x:Class="FreeformHelper.UI.Views.WorkspaceSections.IndexMappingReportLeftPaneView"
              x:DataType="viewModels:IndexMappingReportViewModel">
   <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{DynamicResource Space6}">
-    <Border Classes="workspaceTableHeader">
+    <Border Classes="workspaceTableHeader mappingDecisionHeader">
       <Grid Classes="mappingDecisionColumns" ColumnSpacing="{DynamicResource Space8}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{DynamicResource IndexMappingReportCadColumnWidth}"/>
@@ -22,8 +22,8 @@
     </Border>
     <Grid Grid.Row="1">
       <SelectableTextBlock Text="No CAD/REG entity rows under current filter."
-                           Foreground="{DynamicResource BrushTextMuted}" IsVisible="{Binding HasNoDecisionRows}"/>
-      <ListBox x:Name="DecisionList" Classes="scrollV2 workspaceDataList mappingDecisions"
+                           Foreground="{DynamicResource NfcTextMutedBrush}" IsVisible="{Binding HasNoDecisionRows}"/>
+      <ListBox x:Name="DecisionList" Classes="workspaceDataList mappingDecisions"
                ItemsSource="{Binding DecisionRows}" SelectedItem="{Binding SelectedDecision, Mode=TwoWay}"
                IsVisible="{Binding HasDecisionRows}" Background="{DynamicResource BrushTransparent}"
                BorderThickness="{DynamicResource BorderNone}"
@@ -61,28 +61,30 @@
     </Grid>
     <controls:HidePanelBlock x:Name="AggregateDiagnostics" Grid.Row="2" Title="{Binding AggregateDecisionTitle}"
                              DefaultExpanded="False" IsExpanded="False" IsVisible="{Binding HasAggregateDecisionRows}">
-      <ScrollViewer Classes="scrollV2" MaxHeight="{DynamicResource IndexMappingReportAggregateMaxHeight}"
+      <ScrollViewer Classes="viewportBoundScroll" MaxHeight="{DynamicResource IndexMappingReportAggregateMaxHeight}"
                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Spacing="{DynamicResource Space6}">
-          <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding AggregateDecisionSummaryText}"
-                               TextWrapping="WrapWithOverflow"/>
-          <ItemsControl ItemsSource="{Binding AggregateDecisionRows}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="viewModels:IndexMappingDecisionRowViewModel">
-                <Button Classes="actionGhost flat" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-                        ToolTip.Tip="{Binding ReasonText}"
-                        Command="{Binding $parent[UserControl].((viewModels:IndexMappingReportViewModel)DataContext).SelectDecisionCommand}"
-                        CommandParameter="{Binding}">
-                  <Grid ColumnDefinitions="1.4*,1*,*" ColumnSpacing="{DynamicResource Space8}">
-                    <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="1" Text="{Binding DecisionReasonCodeText}" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" Text="{Binding ActionHint}" TextTrimming="CharacterEllipsis"/>
-                  </Grid>
-                </Button>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
+        <Border Classes="viewportBoundContent">
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding AggregateDecisionSummaryText}"
+                                 TextWrapping="WrapWithOverflow"/>
+            <ItemsControl ItemsSource="{Binding AggregateDecisionRows}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:IndexMappingDecisionRowViewModel">
+                  <Button Classes="actionGhost flat" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                          ToolTip.Tip="{Binding ReasonText}"
+                          Command="{Binding $parent[UserControl].((viewModels:IndexMappingReportViewModel)DataContext).SelectDecisionCommand}"
+                          CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="1.4*,1*,*" ColumnSpacing="{DynamicResource Space8}">
+                      <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Grid.Column="1" Text="{Binding DecisionReasonCodeText}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock Grid.Column="2" Text="{Binding ActionHint}" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
       </ScrollViewer>
     </controls:HidePanelBlock>
   </Grid>

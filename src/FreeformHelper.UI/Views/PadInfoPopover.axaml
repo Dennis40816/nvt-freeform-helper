@@ -28,10 +28,10 @@
           <StackPanel Orientation="Horizontal"
                       Spacing="{DynamicResource Space8}"
                       HorizontalAlignment="Right">
-            <Button Classes="actionTextButton actionGhost" Content="Discard"
+            <Button Classes="actionGhost" Content="Discard"
                     ToolTip.Tip="Discard changes and close."
                     Click="DiscardAndClose_Click"/>
-            <Button Classes="actionTextButton actionNeutral" Content="Apply"
+            <Button Classes="actionNeutral" Content="Apply"
                     ToolTip.Tip="Apply changes and close."
                     Click="ApplyAndClose_Click"/>
           </StackPanel>

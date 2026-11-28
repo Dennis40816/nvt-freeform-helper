@@ -2,8 +2,8 @@ using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 using FreeformHelper.Tests.TestInfrastructure;
+using FreeformHelper.UI.CadExport;
 using FreeformHelper.UI.Services;
-using FreeformHelper.UI.ViewModels;
 using SkiaSharp;
 using Xunit;
 

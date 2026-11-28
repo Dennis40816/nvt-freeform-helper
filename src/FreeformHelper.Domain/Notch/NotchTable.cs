@@ -35,11 +35,4 @@ public sealed class NotchTable
         ToFullCoverageAudit = toFullCoverageAudit ?? NotchToFullCoverageAudit.Empty;
         GenerationPhaseTimings = generationPhaseTimings ?? NotchGenerationPhaseTimings.Empty;
     }
-
-    /// <summary>
-    /// Retrieves all <see cref="NotchTableRow"/> entries that belong to a specific IC (Integrated Circuit).
-    /// </summary>
-    /// <param name="icIndex">The zero-based index of the IC to filter by.</param>
-    /// <returns>An enumerable collection of <see cref="NotchTableRow"/> objects for the specified IC.</returns>
-    public IEnumerable<NotchTableRow> RowsForIc(int icIndex) => Rows.Where(r => r.IcIndex == icIndex);
 }

@@ -12,12 +12,6 @@ namespace FreeformHelper.UI.Views;
 /// </summary>
 public sealed partial class FreeformHelperView
 {
-    private static readonly string[] _dxfFilePatterns = ["*.dxf"];
-    private static readonly string[] _jsonFilePatterns = ["*.json"];
-    private static readonly string[] _cFilePatterns = ["*.c"];
-    private static readonly string[] _csvFilePatterns = ["*.csv"];
-    private static readonly string[] _allFilesPatterns = ["*"];
-
     /// <summary>
     /// Attaches the <see cref="FreeformHelperViewModel"/> to this view and
     /// configures necessary UI-related delegates for file pickers and initial setup.
@@ -40,11 +34,11 @@ public sealed partial class FreeformHelperView
         viewModel.OpenNotchDetailAsync = ShowNotchDetailWindowAsync;
         viewModel.OpenNotchExportSelectionAsync = ShowNotchExportSelectionWindowAsync;
         viewModel.GetCurrentSimulationSafetyAudit = ResolveCurrentSimulationSafetyAudit;
-        viewModel.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
+        viewModel.DxfEdit.OpenDxfEditChangeListAsync = ShowDxfEditChangeListWindowAsync;
         viewModel.OpenIndexMappingReportAsync = ShowIndexMappingReportWindowAsync;
         viewModel.OpenDxfOverlapReportAsync = ShowDxfOverlapReportWindowAsync;
-        viewModel.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
-        viewModel.ShowWarningAsync = ShowWarningDialogAsync;
+        viewModel.CadExport.Dialogs.OpenDxfLayerImageExportAsync = ShowDxfLayerImageExportWindowAsync;
+        viewModel.CadExport.Dialogs.ShowWarningAsync = ShowWarningDialogAsync;
         AttachCadLoadSpinnerWindow(viewModel);
     }
 
@@ -73,21 +67,22 @@ public sealed partial class FreeformHelperView
         viewModel.InteractionState.PadInfoChanged -= OnPadInfoChanged;
         // Clear all delegate references to prevent memory leaks.
         viewModel.PickOpenDxfPathAsync = null;
-        viewModel.PickOpenRegularVisibilityMaskPathAsync = null;
+        viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = null;
         viewModel.PickLoadProjectPathAsync = null;
         viewModel.PickSaveProjectPathAsync = null;
         viewModel.PickSaveNotchPathAsync = null;
-        viewModel.PickSaveExportPathAsync = null;
+        viewModel.CadExport.Dialogs.PickSaveExportPathAsync = null;
         viewModel.ConfirmEmbedDxfAsync = null;
+        viewModel.ProjectDialogs.ConfirmSaveBeforeLoadAsync = null;
         viewModel.EnsureNoPendingEdits = null;
         viewModel.OpenNotchDetailAsync = null;
         viewModel.OpenNotchExportSelectionAsync = null;
         viewModel.GetCurrentSimulationSafetyAudit = null;
-        viewModel.OpenDxfEditChangeListAsync = null;
+        viewModel.DxfEdit.OpenDxfEditChangeListAsync = null;
         viewModel.OpenIndexMappingReportAsync = null;
         viewModel.OpenDxfOverlapReportAsync = null;
-        viewModel.OpenDxfLayerImageExportAsync = null;
-        viewModel.ShowWarningAsync = null;
+        viewModel.CadExport.Dialogs.OpenDxfLayerImageExportAsync = null;
+        viewModel.CadExport.Dialogs.ShowWarningAsync = null;
         DetachCadLoadSpinnerWindow(viewModel);
     }
 
@@ -107,238 +102,18 @@ public sealed partial class FreeformHelperView
     /// <param name="storage">The <see cref="IStorageProvider"/> for file operations.</param>
     private void ConfigureFilePickers(FreeformHelperViewModel viewModel, IStorageProvider storage)
     {
-        // Delegate for opening a DXF file.
-        viewModel.PickOpenDxfPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(BuildOpenDxfOptions());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null; // Return local path of selected file.
-        };
+        var pickers = new MainWindowFilePickerService(storage);
 
-        viewModel.PickOpenRegularVisibilityMaskPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(BuildOpenRegularVisibilityMaskOptions());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
-        };
+        viewModel.PickOpenDxfPathAsync = pickers.OpenDxfAsync;
+        viewModel.RegularMask.PickOpenRegularVisibilityMaskPathAsync = pickers.OpenRegularVisibilityMaskAsync;
+        viewModel.PickLoadProjectPathAsync = pickers.OpenProjectAsync;
+        viewModel.PickSaveProjectPathAsync = pickers.SaveProjectAsync;
+        viewModel.PickSaveNotchPathAsync = pickers.SaveNotchAsync;
+        viewModel.CadExport.Dialogs.PickSaveExportPathAsync = pickers.SaveExportAsync;
 
-        // Delegate for loading a project file.
-        viewModel.PickLoadProjectPathAsync = async () =>
-        {
-            var res = await storage.OpenFilePickerAsync(BuildOpenProjectOptions());
-            return res is { Count: > 0 } ? res[0].Path.LocalPath : null;
-        };
-
-        // Delegate for saving a project file.
-        viewModel.PickSaveProjectPathAsync = async () =>
-        {
-            var res = await storage.SaveFilePickerAsync(BuildSaveProjectOptions());
-            return res?.Path.LocalPath;
-        };
-
-        // Delegate for saving notch table files.
-        viewModel.PickSaveNotchPathAsync = async (baseName, ext) =>
-        {
-            var res = await storage.SaveFilePickerAsync(BuildSaveNotchOptions(baseName, ext));
-            return res?.Path.LocalPath;
-        };
-
-        // Delegate for saving generic export files (DXF, image, etc.).
-        viewModel.PickSaveExportPathAsync = async (baseName, ext) =>
-        {
-            var res = await storage.SaveFilePickerAsync(BuildSaveExportOptions(baseName, ext));
-            return res?.Path.LocalPath;
-        };
-
-        // Delegate for confirming whether to embed DXF data.
-        viewModel.ConfirmEmbedDxfAsync = async () =>
-        {
-            var owner = TopLevel.GetTopLevel(this) as Window; // Get parent window for dialog ownership.
-            if (owner is null)
-            {
-                return false; // Cannot show dialog without a parent window.
-            }
-
-            var dialog = new ConfirmDialog(
-                "Embed DXF", "Embed the current DXF into the project file?",
-                "Embed", "Skip",
-                confirmTip: "Embed DXF into the project file.",
-                cancelTip: "Cancel and keep external DXF reference.",
-                consequenceText: "This increases file size but keeps the project self-contained.");
-
-            return await dialog.ShowDialog<bool>(owner); // Return the boolean result from the dialog.
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerOpenOptions"/> for opening a DXF file.
-    /// </summary>
-    private static FilePickerOpenOptions BuildOpenDxfOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Open DXF",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("DXF") { Patterns = _dxfFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerOpenOptions"/> for opening a project file.
-    /// </summary>
-    private static FilePickerOpenOptions BuildOpenProjectOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Open Project",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns }, // Custom project file extension.
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static FilePickerOpenOptions BuildOpenRegularVisibilityMaskOptions()
-    {
-        return new FilePickerOpenOptions
-        {
-            AllowMultiple = false,
-            Title = "Import Regular Visibility Mask (SeeRegular.csv)",
-            FileTypeFilter = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("CSV") { Patterns = _csvFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for saving a project file.
-    /// </summary>
-    private static FilePickerSaveOptions BuildSaveProjectOptions()
-    {
-        return new FilePickerSaveOptions
-        {
-            Title = "Save Project",
-            DefaultExtension = "json",
-            SuggestedFileName = "freeform_helper_project.json",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new FilePickerFileType("FreeformHelper Project") { Patterns = _jsonFilePatterns },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for notch table exports.
-    /// </summary>
-    /// <param name="baseName">The suggested base name for the file.</param>
-    /// <param name="ext">The suggested file extension.</param>
-    private static FilePickerSaveOptions BuildSaveNotchOptions(string baseName, string ext)
-    {
-        var normalizedExt = NormalizeNotchSaveExtension(ext);
-        var primary = BuildNotchFileTypeChoice(normalizedExt);
-        var secondary = BuildNotchFileTypeChoice(normalizedExt switch
-        {
-            "csv" => "c",
-            "c" => "csv",
-            _ => "csv",
-        });
-
-        return new FilePickerSaveOptions
-        {
-            Title = "Save Notch Table",
-            DefaultExtension = normalizedExt,
-            SuggestedFileName = $"{baseName}.{normalizedExt}",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                primary,
-                secondary,
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static FilePickerFileType BuildNotchFileTypeChoice(string ext)
-    {
-        return ext.ToLowerInvariant() switch
-        {
-            "c" => new FilePickerFileType("C source (*.c)") { Patterns = _cFilePatterns },
-            _ => new FilePickerFileType("CSV (*.csv)") { Patterns = _csvFilePatterns },
-        };
-    }
-
-    private static string NormalizeNotchSaveExtension(string ext)
-    {
-        var normalized = NormalizeExtension(ext, "csv");
-        return normalized switch
-        {
-            "c" => "c",
-            _ => "csv",
-        };
-    }
-
-    /// <summary>
-    /// Builds <see cref="FilePickerSaveOptions"/> for generic exports such as DXF and images.
-    /// </summary>
-    /// <param name="baseName">The suggested base name for the file.</param>
-    /// <param name="ext">The suggested file extension.</param>
-    private static FilePickerSaveOptions BuildSaveExportOptions(string baseName, string ext)
-    {
-        var normalizedExt = NormalizeExtension(ext, "dat");
-        var pattern = $"*.{normalizedExt}";
-        var title = ResolveExportDialogTitle(normalizedExt);
-        var typeDisplay = ResolveExportFileTypeDisplay(normalizedExt);
-
-        return new FilePickerSaveOptions
-        {
-            Title = title,
-            DefaultExtension = normalizedExt,
-            SuggestedFileName = $"{baseName}.{normalizedExt}",
-            FileTypeChoices = new List<FilePickerFileType>
-            {
-                new FilePickerFileType(typeDisplay) { Patterns = new[] { pattern } },
-                new FilePickerFileType("All files") { Patterns = _allFilesPatterns },
-            }
-        };
-    }
-
-    private static string ResolveExportDialogTitle(string ext)
-    {
-        return ext switch
-        {
-            "png" or "bmp" or "jpg" or "jpeg" => "Save Image",
-            "dxf" => "Save DXF",
-            _ => "Save Export File",
-        };
-    }
-
-    private static string ResolveExportFileTypeDisplay(string ext)
-    {
-        return ext switch
-        {
-            "png" => "PNG image",
-            "bmp" => "BMP image",
-            "jpg" or "jpeg" => "JPG image",
-            "dxf" => "DXF file",
-            _ => $"{ext.ToUpperInvariant()} file",
-        };
-    }
-
-    private static string NormalizeExtension(string ext, string fallback)
-    {
-        var trimmed = (ext ?? string.Empty).Trim();
-        if (trimmed.StartsWith('.'))
-        {
-            trimmed = trimmed[1..];
-        }
-
-        return string.IsNullOrWhiteSpace(trimmed) ? fallback : trimmed.ToLowerInvariant();
+        // Delegates for the project save/load confirmation dialogs.
+        viewModel.ConfirmEmbedDxfAsync = () => ProjectDialogPrompts.ConfirmEmbedDxfAsync(TopLevel.GetTopLevel(this) as Window);
+        viewModel.ProjectDialogs.ConfirmSaveBeforeLoadAsync = backupPath => ProjectDialogPrompts.ConfirmSaveBeforeLoadAsync(TopLevel.GetTopLevel(this) as Window, backupPath);
     }
 
     private async Task ShowWarningDialogAsync(string title, string message)

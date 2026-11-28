@@ -1,12 +1,12 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-    xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+    xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     x:Class="FreeformHelper.UI.Views.WorkspaceSections.SimulationWorkspaceDetailsPaneView">
   <Border Grid.Column="4"
       Classes="workspaceSidePane right">
-    <ScrollViewer Classes="scrollDevCandidate viewportBoundScroll"
+    <ScrollViewer Classes="viewportBoundScroll"
         MinHeight="0"
         VerticalScrollBarVisibility="Auto"
         HorizontalScrollBarVisibility="Disabled">
@@ -105,7 +105,7 @@
                 <ItemsControl ItemsSource="{Binding SimulationHighRiskDiffs}">
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                      <Button Classes="actionChip chipAction"
+                      <Button Classes="productChipAction"
                           Margin="{StaticResource InsetBottom6}"
                           Command="{Binding DataContext.SelectSimulationRiskDiffCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                           CommandParameter="{Binding}"
@@ -123,7 +123,8 @@
                               Spacing="{StaticResource Space2}">
                             <SelectableTextBlock Text="{Binding LocationText}"
                                 FontWeight="SemiBold"
-                                TextWrapping="Wrap"/>
+                                TextWrapping="Wrap"
+                                MaxLines="2"/>
                             <SelectableTextBlock Classes="workspaceSectionMeta"
                                 Text="{Binding StatusText}"
                                 TextWrapping="Wrap"/>

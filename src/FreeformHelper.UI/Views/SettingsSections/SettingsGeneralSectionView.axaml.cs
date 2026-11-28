@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Nvt.Core.Threading;
 
@@ -23,6 +24,16 @@ public sealed partial class SettingsGeneralSectionView : UserControl
     private void EditCascadeDetailsButton_Click(object? sender, RoutedEventArgs e)
     {
         _uiEvents?.Run("Settings.CascadeDetails", _ => ShowCascadeDetailsAsync(), CancellationToken.None);
+    }
+
+    private void SizingScopeText_PointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (e.InitialPressMouseButton == MouseButton.Left)
+        {
+            var toggle = this.FindControl<ToggleSwitch>("SizingScopeSwitch")!;
+            toggle.SetCurrentValue(ToggleSwitch.IsCheckedProperty, toggle.IsChecked != true);
+            e.Handled = true;
+        }
     }
 
     private async Task ShowCascadeDetailsAsync()

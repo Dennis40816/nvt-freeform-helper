@@ -32,7 +32,7 @@ internal static class SharedToolTipStyleService
             TextWrapping = TextWrapping.Wrap,
             Foreground = UiResourceResolver.GetBrush(
                 target,
-                "BrushTooltipForeground",
+                "NfcTextStrongBrush",
                 Brushes.Black,
                 static color => new SolidColorBrush(color)),
         };
@@ -40,7 +40,7 @@ internal static class SharedToolTipStyleService
         textBlock.AttachedToVisualTree += (_, _) =>
             textBlock.Foreground = UiResourceResolver.GetBrush(
                 textBlock,
-                "BrushTooltipForeground",
+                "NfcTextStrongBrush",
                 Brushes.Black,
                 static color => new SolidColorBrush(color));
 

@@ -2,8 +2,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FreeformHelper.UI.Icons;
 using FreeformHelper.UI.Services;
+using Nvt.Core.Avalonia.Icons;
 
 namespace FreeformHelper.UI.ViewModels;
 
@@ -65,8 +65,8 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     private readonly Func<List<DxfEditChangeListEntry>> _entryLoader;
     private readonly Action<DxfEditChangeListEntry> _focusEntry;
     private readonly Action<DxfEditChangeListEntry> _applyEntry;
-    private readonly string _restoreSelectedDuplicateGlyph = IconGlyphs.Undo;
-    private readonly string _rehideSelectedDuplicateGlyph = IconGlyphs.VisibilityOff;
+    private readonly string _restoreSelectedDuplicateGlyph = NvtIcons.Undo;
+    private readonly string _rehideSelectedDuplicateGlyph = NvtIcons.VisibilityOff;
     private IReadOnlyList<DxfEditChangeListEntry> _allEntries = Array.Empty<DxfEditChangeListEntry>();
     private readonly string _titleText = "DXF edit details";
     private readonly string _subtitleText = "Review modified CAD pads and apply scoped actions.";
@@ -142,7 +142,8 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     }
     public bool IsDuplicateBulkMode => SelectedKind == DxfEditChangeKind.Duplicate;
     public bool IsSingleActionBulkMode => !IsDuplicateBulkMode;
-    public bool CanApplySelectedEntries => SelectedVisibleCount > 0 && IsSingleActionBulkMode;
+    // Enabled only when a checked row can really be applied, so the button never stays on while Apply does nothing.
+    public bool CanApplySelectedEntries => IsSingleActionBulkMode && GetApplicableSelectedRows().Count > 0;
     public bool CanRestoreSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRestorableDuplicate);
     public bool CanRehideSelectedDuplicateEntries => GetSelectedVisibleRows().Any(IsRehidableDuplicate);
     public string VisibleRowsSummaryText => $"Showing {Rows.Count} rows";
@@ -157,11 +158,11 @@ public sealed partial class DxfEditChangeListViewModel : ObservableObject
     public bool CanApplySelectedEntry => SelectedEntry?.CanApply == true;
     public string BulkActionGlyph => SelectedKind switch
     {
-        DxfEditChangeKind.Hidden => IconGlyphs.Undo,
-        DxfEditChangeKind.Combined => IconGlyphs.CallSplit,
-        DxfEditChangeKind.Moved => IconGlyphs.DriveFileMove,
-        DxfEditChangeKind.Rotated => IconGlyphs.Undo,
-        _ => IconGlyphs.Edit,
+        DxfEditChangeKind.Hidden => NvtIcons.Undo,
+        DxfEditChangeKind.Combined => NvtIcons.CallSplit,
+        DxfEditChangeKind.Moved => NvtIcons.DriveFileMove,
+        DxfEditChangeKind.Rotated => NvtIcons.Undo,
+        _ => NvtIcons.Edit,
     };
     public string RestoreSelectedDuplicateGlyph => _restoreSelectedDuplicateGlyph;
     public string RehideSelectedDuplicateGlyph => _rehideSelectedDuplicateGlyph;

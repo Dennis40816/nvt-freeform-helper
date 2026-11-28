@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using FreeformHelper.Application.Services;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
 
@@ -137,9 +138,8 @@ public sealed partial class PadCanvas
                 return 1;
             }
 
-            var maxStep = Math.Max(1, (int)Math.Round(_owner.GetResourceDouble("CanvasLowDetailRegularDecimationMaxStep", 4.0)));
-            var zoomRatio = lowDetailZoomThreshold / Math.Max(_owner._zoom, 1e-6);
-            return Math.Clamp((int)Math.Ceiling(zoomRatio), 1, maxStep);
+            var maxStepResource = _owner.GetResourceDouble("CanvasLowDetailRegularDecimationMaxStep", 4.0);
+            return PadDrawDensityPolicy.RegularStep(showRegular, lowDetailMode, lowDetailZoomThreshold, _owner._zoom, maxStepResource);
         }
 
         private int BuildVisibleRegularDrawLists(RegularPad[] regularCandidates, int regularDecimationStep)
@@ -148,13 +148,10 @@ public sealed partial class PadCanvas
             foreach (var pad in regularCandidates)
             {
                 var isSelected = _owner._selectedRegIdx.Contains(pad.Index);
-                if (!isSelected && regularDecimationStep > 1)
+                if (PadDrawDensityPolicy.IsRegularDecimated(isSelected, pad.Row, pad.Col, regularDecimationStep))
                 {
-                    if ((Math.Abs(pad.Row) % regularDecimationStep) != 0 && (Math.Abs(pad.Col) % regularDecimationStep) != 0)
-                    {
-                        decimatedCount++;
-                        continue;
-                    }
+                    decimatedCount++;
+                    continue;
                 }
 
                 if (isSelected)
@@ -177,7 +174,7 @@ public sealed partial class PadCanvas
                 return new CadVisibleBuildPlan(DecimationStep: 1, MinScreenSize: 0.0);
             }
 
-            var maxVisibleUnselected = Math.Max(100, (int)Math.Round(_owner.GetResourceDouble("CanvasLowDetailCadMaxVisibleUnselected", 2500)));
+            var maxVisibleUnselectedResource = _owner.GetResourceDouble("CanvasLowDetailCadMaxVisibleUnselected", 2500);
             var visibleUnselectedCandidates = 0;
             foreach (var pad in cadCandidates)
             {
@@ -189,7 +186,7 @@ public sealed partial class PadCanvas
                 visibleUnselectedCandidates++;
             }
 
-            var decimationStep = Math.Max(1, (int)Math.Ceiling(visibleUnselectedCandidates / (double)maxVisibleUnselected));
+            var decimationStep = PadDrawDensityPolicy.CadStep(visibleUnselectedCandidates, maxVisibleUnselectedResource);
             var minScreenSize = _owner.GetResourceDouble("CanvasLowDetailCadMinScreenSize", 0.9);
             return new CadVisibleBuildPlan(decimationStep, minScreenSize);
         }

@@ -3,6 +3,7 @@
 using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.VisualTree;
 using FreeformHelper.Domain.Geometry;
 using FreeformHelper.Domain.Pads;
@@ -165,6 +166,45 @@ public sealed class WorkspaceIntegratedLayoutTests
         Assert.Null(presenter.BorderBrush);
         Assert.True(window.IsVisible);
     }
+
+    [AvaloniaFact]
+    public void ProductCollapsibleTemplateKeepsTheCoreVisualPartsExceptTheHeaderRole()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var core = new CollapsiblePanel { Title = "Core header", IsExpanded = true, UseGhostHeader = true };
+        var product = new CollapsiblePanel { Title = "Product header", IsExpanded = true };
+        var coreHost = new Border { Child = core };
+        coreHost.Styles.Add(new StyleInclude(new Uri("avares://Nvt.Core.Avalonia/"))
+        {
+            Source = new Uri("avares://Nvt.Core.Avalonia/Panels/PanelsStyles.axaml"),
+        });
+        var window = Show(new StackPanel { Children = { coreHost, product } });
+        try
+        {
+            var coreHeader = Assert.Single(core.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ToggleButton>(),
+                static control => control.Classes.Contains("panelBlockHeader"));
+            var productHeader = Assert.Single(product.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ToggleButton>(),
+                static control => control.Classes.Contains("panelBlockHeader"));
+            Assert.Contains("actionGhost", coreHeader.Classes);
+            Assert.DoesNotContain("actionGhost", productHeader.Classes);
+            Assert.False(product.UseGhostHeader);
+            var coreParts = PanelTemplateParts(core);
+            Assert.NotEmpty(coreParts);
+            Assert.Equal(coreParts, PanelTemplateParts(product));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    private static string[] PanelTemplateParts(CollapsiblePanel panel) => panel.GetVisualDescendants().OfType<Control>()
+        .Where(control => ReferenceEquals(control.TemplatedParent, panel))
+        .Select(static control => $"{control.GetType().FullName}|{control.Name}|{string.Join(' ', control.Classes
+            .Where(name => !name.StartsWith(':') && !(name == "actionGhost" &&
+                control is Avalonia.Controls.Primitives.ToggleButton && control.Classes.Contains("panelBlockHeader")))
+            .Order(StringComparer.Ordinal))}")
+        .Order(StringComparer.Ordinal).ToArray();
 
     private static Window Show(Control content)
     {

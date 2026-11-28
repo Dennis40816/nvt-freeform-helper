@@ -13,7 +13,11 @@ public sealed partial class FreeformHelperViewModel
 
     // The notch preview settings are stored once. The properties below forward to the record and raise
     // the same notifications and callbacks as the stored properties they replaced.
-    private NotchPreviewSettings _notchPreview = NotchPreviewSettings.Initial;
+    private NotchPreviewSettings _notchPreview
+    {
+        get => _calculationAndPreview.NotchPreview;
+        set => _calculationAndPreview.NotchPreview = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether Notch 2.2 canvas preview is active.
@@ -211,12 +215,12 @@ public sealed partial class FreeformHelperViewModel
         : "ToRegular OFF";
 
     public string NotchToFullSemanticSummary => EnableToFull
-        ? "ToFull: boundary support/cap/allowance only; target amount remains area-proportional."
+        ? "ToFull: expands pads into reachable free area."
         : "ToFull: disabled for baseline comparison.";
 
     public string NotchToFullShortText => EnableToFull
-        ? "ON - support/cap only"
-        : "OFF - no boundary support";
+        ? "ON - expand free area"
+        : "OFF - no expansion";
 
     public string NotchToFullStateText => EnableToFull
         ? "ToFull ON"

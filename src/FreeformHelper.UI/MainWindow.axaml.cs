@@ -98,13 +98,8 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var result = await _closeSeams.ConfirmSaveAsync(this);
-            if (result is null) return;
-            if (result.Value)
-            {
-                var save = helper.TryStartSaveProjectCommandAsync();
-                if (save is null || !await save) return;
-            }
+            var choice = await _closeSeams.ConfirmSaveAsync(this);
+            if (!await ProjectCloseWorkflow.CanCloseAsync(choice, helper.TryStartSaveProjectCommandAsync)) return;
 
             Closing -= OnClosing;
             Close();

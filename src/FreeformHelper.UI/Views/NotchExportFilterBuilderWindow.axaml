@@ -8,8 +8,8 @@
         MinWidth="{StaticResource NotchExportFilterHelperMinWidth}"
         MinHeight="{StaticResource NotchExportFilterHelperMinHeight}"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource BrushBgSurface}"
-        Foreground="{DynamicResource BrushTextPrimary}"
+        Background="{DynamicResource NfcSurfaceBrush}"
+        Foreground="{DynamicResource NfcTextBrush}"
         Title="Filter helper">
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
@@ -32,31 +32,31 @@
             RowSpacing="{StaticResource Space8}">
         <StackPanel Grid.Row="0" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="IC"/>
-          <TextBox x:Name="IcTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="IcTextBox"
                    PlaceholderText="e.g. 1"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="1" Classes="panelFormField right">
           <SelectableTextBlock Classes="stepNote" Text="Diff"/>
-          <TextBox x:Name="DiffTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="DiffTextBox"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="REG"/>
-          <TextBox x:Name="RegTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="RegTextBox"
                    PlaceholderText="e.g. 4820"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Classes="panelFormField right">
           <SelectableTextBlock Classes="stepNote" Text="CAD"/>
-          <TextBox x:Name="CadTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="CadTextBox"
                    PlaceholderText="e.g. 3777 / none"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="0" Classes="panelFormField left">
           <SelectableTextBlock Classes="stepNote" Text="Anchor (A)"/>
-          <TextBox x:Name="AnchorTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="AnchorTextBox"
                    PlaceholderText="e.g. 20"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>
@@ -74,7 +74,7 @@
         </StackPanel>
         <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Classes="panelFormField">
           <SelectableTextBlock Classes="stepNote" Text="Fuzzy text (optional)"/>
-          <TextBox x:Name="FuzzyTextBox"
+          <TextBox Classes="singleLineActionInput" x:Name="FuzzyTextBox"
                    PlaceholderText="e.g. CAD 3777 / transfer"
                    TextChanged="FilterInput_TextChanged"/>
         </StackPanel>

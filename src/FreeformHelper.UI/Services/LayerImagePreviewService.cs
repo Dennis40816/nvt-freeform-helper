@@ -17,10 +17,13 @@ public static class LayerImagePreviewService
         ArgumentNullException.ThrowIfNull(request);
         try
         {
-            await _renderGate.WaitAsync(token);
+            // The gate is shared by every caller in the process. Neither await may resume on the caller's
+            // synchronization context: if that context stops running callbacks (for example a closed window),
+            // the release below would never run and every later preview would wait on the gate forever.
+            await _renderGate.WaitAsync(token).ConfigureAwait(false);
             try
             {
-                return await Task.Run(() => Render(request, maxSidePixels, token), token);
+                return await Task.Run(() => Render(request, maxSidePixels, token), token).ConfigureAwait(false);
             }
             finally
             {

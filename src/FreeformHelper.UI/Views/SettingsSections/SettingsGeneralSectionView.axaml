@@ -1,7 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
-             xmlns:icons="clr-namespace:FreeformHelper.UI.Icons"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsGeneralSectionView">
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
@@ -38,7 +38,7 @@
                           Click="EditCascadeDetailsButton_Click"
                           ToolTip.Tip="Edit per-IC X/Y channels.">
                     <controls:FontIcon Classes="symbols iconSm"
-                                       Glyph="{x:Static icons:IconGlyphs.Edit}"/>
+                                       Glyph="{x:Static icons:NvtIcons.Edit}"/>
                   </Button>
                 </Grid>
               </StackPanel>
@@ -421,11 +421,21 @@
                   Classes="settingsFieldTile">
             <Grid ColumnDefinitions="Auto,*"
                   ColumnSpacing="{StaticResource Space12}">
-              <ToggleSwitch Grid.Column="0"
-                            IsChecked="{Binding UseLocalSizing, Mode=TwoWay}"
-                            OnContent="Local"
-                            OffContent="Global"
-                            VerticalAlignment="Center"/>
+              <StackPanel Grid.Column="0"
+                          Orientation="Horizontal"
+                          Spacing="{StaticResource Space8}"
+                          VerticalAlignment="Center">
+                <ToggleSwitch x:Name="SizingScopeSwitch"
+                              IsChecked="{Binding UseLocalSizing, Mode=TwoWay}"
+                              AutomationProperties.Name="Sizing scope"
+                              VerticalAlignment="Center"/>
+                <TextBlock PointerReleased="SizingScopeText_PointerReleased" Text="Local"
+                           IsVisible="{Binding UseLocalSizing}"
+                           VerticalAlignment="Center"/>
+                <TextBlock PointerReleased="SizingScopeText_PointerReleased" Text="Global"
+                           IsVisible="{Binding !UseLocalSizing}"
+                           VerticalAlignment="Center"/>
+              </StackPanel>
               <StackPanel Grid.Column="1"
                           Classes="panelFormField">
                 <controls:SettingsInfoLabel Text="Sizing scope" Tip="Local adjusts selected rows or columns; Global redistributes the whole generated grid."/>
@@ -468,12 +478,12 @@
                                          Classes="stepNote"
                                          TextWrapping="Wrap"/>
                   </StackPanel>
-                  <Button Grid.Row="0"
+                  <Button Classes="actionNeutral" Grid.Row="0"
                           Grid.Column="1"
                           Margin="{StaticResource InsetRight8}"
                           Content="On"
                           Command="{Binding EnableCommand}"/>
-                  <Button Grid.Row="0"
+                  <Button Classes="actionNeutral" Grid.Row="0"
                           Grid.Column="2"
                           Content="Off"
                           Command="{Binding DisableCommand}"/>
