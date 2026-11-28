@@ -16,7 +16,17 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/MenuStyles.axaml"/>
   </UserControl.Styles>
-  <Grid>
+  <controls:SidePanelGrid x:Name="CoordinateWorkspaceGrid"
+                          NarrowBelowWidth="{StaticResource CoordinateNarrowViewportWidth}"
+                          WideSidePanelWidth="{StaticResource CoordinatePanelRightWidthGrid}"
+                          NarrowSidePanelWidth="{StaticResource CoordinatePanelRightNarrowWidthGrid}"
+                          SidePanelSwitchedCommand="{Binding FitCanvasCommand}">
+    <controls:SidePanelGrid.KeepWide>
+      <MultiBinding Converter="{x:Static BoolConverters.Or}">
+        <Binding ElementName="CoordinateTable" Path="ShowPixelColumn"/>
+        <Binding ElementName="CoordinateTable" Path="ShowMachineColumn"/>
+      </MultiBinding>
+    </controls:SidePanelGrid.KeepWide>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="{StaticResource PanelLeftWidthGrid}"/>
       <ColumnDefinition Width="{StaticResource SplitterThicknessGrid}"/>
@@ -133,6 +143,6 @@
                   Background="{DynamicResource NfcBorderMutedBrush}"
                   HorizontalAlignment="Stretch"
                   ShowsPreview="True"/>
-    <sections:CoordinatePlannerWorkspaceDetailsPaneView Grid.Column="4"/>
-  </Grid>
+    <sections:CoordinatePlannerWorkspaceDetailsPaneView x:Name="CoordinateTable" Grid.Column="4"/>
+  </controls:SidePanelGrid>
 </UserControl>

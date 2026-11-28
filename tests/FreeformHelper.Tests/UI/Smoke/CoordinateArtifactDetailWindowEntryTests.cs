@@ -48,7 +48,7 @@ public sealed class CoordinateArtifactDetailWindowEntryTests
             Assert.Contains(row.SafeMachineText, text);
             Assert.Contains(row.WorldText, text);
             Assert.Contains(row.SourceBoundsText, text);
-            Assert.Contains(row.DetailText, text);
+            Assert.DoesNotContain(row.DetailText, text);
             Assert.False(detail.IsCompleted);
 
             UiEventProbe.Click(Assert.Single(window.GetVisualDescendants().OfType<Button>(),

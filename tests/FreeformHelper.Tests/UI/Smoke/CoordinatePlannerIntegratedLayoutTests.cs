@@ -24,7 +24,7 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class CoordinatePlannerIntegratedLayoutTests
 {
-    private static readonly string[] _footerLabels = ["Details", "Copy selected", "Copy all", "Export…"];
+    private static readonly string[] _footerLabels = ["Details", "Copy", "Copy all", "Export…"];
     private static readonly string[] _dismissLabels = ["Close"];
 
     [AvaloniaFact]
@@ -184,14 +184,14 @@ public sealed class CoordinatePlannerIntegratedLayoutTests
             var list = Assert.IsType<ListBox>(table.FindControl<ListBox>("CoordinateArtifactList"));
             var details = Action(view, "Details");
             Assert.False(details.IsEffectivelyEnabled);
-            Assert.False(Action(view, "Copy selected").IsEffectivelyEnabled);
+            Assert.False(Action(view, "Copy").IsEffectivelyEnabled);
             var row = workspace.ArtifactRows[0];
             list.SelectedItem = row;
             await HeadlessUiPump.FlushQueueAsync();
             Assert.Same(row, workspace.SelectedArtifactRow);
             Assert.Empty(requests);
             Assert.True(details.IsEffectivelyEnabled);
-            Assert.True(Action(view, "Copy selected").IsEffectivelyEnabled);
+            Assert.True(Action(view, "Copy").IsEffectivelyEnabled);
             Assert.Same(workspace.ShowArtifactDetailCommand, details.Command);
             await workspace.ShowArtifactDetailCommand.ExecuteAsync(details.CommandParameter);
             Assert.Same(row, Assert.Single(requests));
@@ -223,7 +223,7 @@ public sealed class CoordinatePlannerIntegratedLayoutTests
             detail.Show();
             await HeadlessUiPump.FlushQueueAsync();
             var coordinates = Section(detail, "Coordinates");
-            var source = Section(detail, "Source bounds and detail");
+            var source = Section(detail, "Source bounds");
             Assert.True(coordinates.IsExpanded);
             Assert.False(source.IsExpanded);
             source.IsExpanded = true;
@@ -232,7 +232,9 @@ public sealed class CoordinatePlannerIntegratedLayoutTests
             Assert.Contains(detail.GetVisualDescendants().OfType<SelectableTextBlock>(),
                 block => block.IsEffectivelyVisible && block.Text == row.SourceText);
             Assert.Contains(detail.GetVisualDescendants().OfType<SelectableTextBlock>(),
-                block => block.IsEffectivelyVisible && block.Text == row.DetailText);
+                block => block.IsEffectivelyVisible && block.Text == row.SourceBoundsText);
+            Assert.DoesNotContain(detail.GetVisualDescendants().OfType<SelectableTextBlock>(),
+                block => block.Text == row.DetailText);
             coordinates.IsExpanded = true;
             Assert.False(source.IsExpanded);
             Action(detail, "Close").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));

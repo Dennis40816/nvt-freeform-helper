@@ -587,6 +587,7 @@
   <x:Double x:Key="CoordinateOverlayModeComboWidth">132</x:Double>
   <x:Double x:Key="CoordinateCalibrationSummaryMaxWidth">112</x:Double>
   <x:Double x:Key="CoordinateTableOptionalColumnWidth">96</x:Double>
+  <x:Double x:Key="CoordinateNarrowViewportWidth">1600</x:Double>
   <x:Double x:Key="NotchExportSearchWidth">300</x:Double>
   <x:Double x:Key="NotchExportSortDropdownWidth">160</x:Double>
   <x:Double x:Key="NotchExportMiniPreviewMinHeight">84</x:Double>
@@ -668,6 +669,7 @@
   <GridLength x:Key="PanelLeftWidthGrid">280</GridLength>
   <GridLength x:Key="PanelRightWidthGrid">360</GridLength>
   <GridLength x:Key="CoordinatePanelRightWidthGrid">460</GridLength>
+  <GridLength x:Key="CoordinatePanelRightNarrowWidthGrid">360</GridLength>
   <GridLength x:Key="CoordinateArtifactLabelColumnGrid">1.15*</GridLength>
   <GridLength x:Key="CoordinateArtifactPixelColumnGrid">1.25*</GridLength>
   <GridLength x:Key="CoordinateArtifactMachineColumnGrid">1.4*</GridLength>

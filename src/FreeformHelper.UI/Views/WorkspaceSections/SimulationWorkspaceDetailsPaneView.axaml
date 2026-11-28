@@ -15,52 +15,53 @@
         <StackPanel Classes="panelForm"
             Spacing="{StaticResource Space14}">
           <Border Classes="workspaceSectionCard">
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space12}" RowSpacing="{StaticResource Space8}">
-              <SelectableTextBlock Grid.Row="0" Grid.ColumnSpan="2" Classes="workspaceSectionTitle" Text="Selected regular values"/>
-              <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="{DynamicResource Space4}">
-                <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedRegularHeaderText}"/>
-                <TextBlock Text="Select a regular pad on the canvas to inspect its values." IsVisible="{Binding !HasSelectedRegular}" TextWrapping="Wrap"/>
-              </StackPanel>
-              <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Text="Before" FontWeight="SemiBold"/>
-                <SelectableTextBlock Text="{Binding SelectedBeforeText}"/>
-              </StackPanel>
-              <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Text="After" FontWeight="SemiBold"/>
-                <SelectableTextBlock Text="{Binding SelectedAfterText}"/>
-              </StackPanel>
-              <StackPanel Grid.Row="3" Grid.Column="0" Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Text="Delta" FontWeight="SemiBold"/>
-                <SelectableTextBlock Text="{Binding SelectedDeltaText}"/>
-              </StackPanel>
-              <StackPanel Grid.Row="3" Grid.Column="1" Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Text="% change" FontWeight="SemiBold"/>
-                <SelectableTextBlock Text="{Binding SelectedPercentChangeText}"/>
-              </StackPanel>
-              <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
-                  IsVisible="{Binding ShowSimulationDiagnostics}">
-                <SelectableTextBlock Text="EMS status (this pad)" FontWeight="SemiBold"/>
-                <SelectableTextBlock Text="{Binding SelectedEmsStatusText}"/>
-              </StackPanel>
-              <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
-                  IsVisible="{Binding ShowSimulationDiagnostics}">
-                <SelectableTextBlock Text="Net flow" FontWeight="SemiBold"/>
-                <Border Classes="chipStatus"
-                    HorizontalAlignment="Left">
-                  <SelectableTextBlock Classes="chipStatusText"
-                      Text="{Binding SelectedNetFlowText}"/>
-                </Border>
-              </StackPanel>
-              <Border Grid.Row="6"
-                  Grid.ColumnSpan="2"
-                  Classes="workspaceDetailStrip flat">
-                <StackPanel Spacing="{StaticResource Space2}">
-                  <SelectableTextBlock Classes="chipStatusText" Text="Input source"/>
-                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedSourceText}"/>
-                  <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedRegularLocationText}"/>
+            <StackPanel Spacing="{StaticResource Space8}">
+              <SelectableTextBlock Classes="workspaceSectionTitle" Text="Selected regular values"/>
+              <TextBlock x:Name="SimulationNoSelectionText" Classes="workspaceSectionMeta" Text="Select a regular pad on the canvas." IsVisible="{Binding !HasSelectedRegular}" TextWrapping="Wrap"/>
+              <Grid x:Name="SimulationSelectedValues" IsVisible="{Binding HasSelectedRegular}"
+                  RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="{StaticResource Space12}" RowSpacing="{StaticResource Space8}">
+                <SelectableTextBlock Grid.Row="0" Grid.ColumnSpan="2" Classes="workspaceSectionMeta" Text="{Binding SelectedRegularHeaderText}"/>
+                <StackPanel Grid.Row="1" Grid.Column="0" Spacing="{StaticResource Space2}">
+                  <SelectableTextBlock Text="Before" FontWeight="SemiBold"/>
+                  <SelectableTextBlock Text="{Binding SelectedBeforeText}"/>
                 </StackPanel>
-              </Border>
-            </Grid>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="{StaticResource Space2}">
+                  <SelectableTextBlock Text="After" FontWeight="SemiBold"/>
+                  <SelectableTextBlock Text="{Binding SelectedAfterText}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Spacing="{StaticResource Space2}">
+                  <SelectableTextBlock Text="Delta" FontWeight="SemiBold"/>
+                  <SelectableTextBlock Text="{Binding SelectedDeltaText}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Spacing="{StaticResource Space2}">
+                  <SelectableTextBlock Text="% change" FontWeight="SemiBold"/>
+                  <SelectableTextBlock Text="{Binding SelectedPercentChangeText}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
+                    IsVisible="{Binding ShowSimulationDiagnostics}">
+                  <SelectableTextBlock Text="EMS status (this pad)" FontWeight="SemiBold"/>
+                  <SelectableTextBlock Text="{Binding SelectedEmsStatusText}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Spacing="{StaticResource Space2}"
+                    IsVisible="{Binding ShowSimulationDiagnostics}">
+                  <SelectableTextBlock Text="Net flow" FontWeight="SemiBold"/>
+                  <Border Classes="chipStatus"
+                      HorizontalAlignment="Left">
+                    <SelectableTextBlock Classes="chipStatusText"
+                        Text="{Binding SelectedNetFlowText}"/>
+                  </Border>
+                </StackPanel>
+                <Border Grid.Row="5"
+                    Grid.ColumnSpan="2"
+                    Classes="workspaceDetailStrip flat">
+                  <StackPanel Spacing="{StaticResource Space2}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="Input source"/>
+                    <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedSourceText}"/>
+                    <SelectableTextBlock Classes="workspaceSectionMeta" Text="{Binding SelectedRegularLocationText}"/>
+                  </StackPanel>
+                </Border>
+              </Grid>
+            </StackPanel>
           </Border>
           <controls:HidePanelBlock Title="EMS safety" IsVisible="{Binding ShowSimulationDiagnostics}"
               IsExpanded="{Binding IsSimulationSafetyExpanded, Mode=TwoWay}">
