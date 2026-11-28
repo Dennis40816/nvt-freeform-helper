@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.DevSections.DevActionRolePreviewView"
+             x:DataType="vm:DevViewModel">
+  <Border x:Name="CoreButtonRolesPreview" Classes="workspaceSectionCard">
+    <StackPanel Spacing="{DynamicResource Space12}">
+      <TextBlock Text="Core button roles" FontSize="{DynamicResource FontSizeLg}" FontWeight="SemiBold"/>
+      <TextBlock Text="Use Tab to inspect keyboard focus; hover and press each role to inspect its states." TextWrapping="Wrap"/>
+      <StackPanel x:Name="PrimaryButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Primary: actionPrimary" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionPrimary" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="actionPrimary" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionPrimary" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionPrimary" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="NeutralButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Neutral: actionNeutral" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionNeutral" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="actionNeutral" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionNeutral" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionNeutral" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="DangerButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Danger: actionDanger" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionDanger" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="actionDanger" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionDanger" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionDanger" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="GhostButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Ghost: actionGhost" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionGhost" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="actionGhost" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionGhost" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionGhost" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="FlatghostButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Flat ghost: actionGhost flat" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionGhost flat" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="actionGhost flat" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionGhost flat" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="actionGhost flat" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="ChipButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Chip: chipAction" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="chipAction" Content="Rest" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <ToggleButton Classes="chipAction" Content="Checked" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="chipAction" Content="Disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+          <Button Classes="chipAction" Content="A long action label that must remain readable and trim within its slot"
+                  MaxWidth="{DynamicResource WorkspaceSummaryChipMaxWidth}" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <StackPanel x:Name="IconButtonSamples" Spacing="{DynamicResource Space6}">
+        <TextBlock Text="Icon: actionIconButton + actionGhost" FontWeight="SemiBold"/>
+        <WrapPanel Orientation="Horizontal">
+          <Button Classes="actionIconButton actionGhost" ToolTip.Tip="Rest icon" Margin="{DynamicResource InsetRight8Bottom6}">
+            <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
+          </Button>
+          <ToggleButton Classes="actionIconButton actionGhost flat" IsChecked="True" ToolTip.Tip="Checked icon" Margin="{DynamicResource InsetRight8Bottom6}">
+            <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Visibility}"/>
+          </ToggleButton>
+          <Button Classes="actionIconButton actionGhost" IsEnabled="False" ToolTip.Tip="Disabled icon" Margin="{DynamicResource InsetRight8Bottom6}">
+            <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Delete}"/>
+          </Button>
+          <Button Classes="actionIconButton actionGhost" Content="A long icon label" ToolTip.Tip="Long-label clipping sample" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        </WrapPanel>
+      </StackPanel>
+      <WrapPanel x:Name="ProductButtonSamples" Orientation="Horizontal">
+        <ToggleButton Classes="actionGhost flat marked" Content="Canvas off" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        <ToggleButton Classes="actionGhost flat marked" Content="Canvas on" IsChecked="True" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        <ToggleButton Classes="actionGhost flat marked" Content="Canvas disabled" IsEnabled="False" Margin="{DynamicResource InsetRight8Bottom6}"/>
+        <ToggleButton Classes="canvasToolbarIcon" IsChecked="True" ToolTip.Tip="Canvas icon shape" Margin="{DynamicResource InsetRight8Bottom6}">
+          <controls:FontIcon Classes="symbols" Glyph="{x:Static icons:NvtIcons.Layers}"/>
+        </ToggleButton>
+        <Border Classes="chipStatus"><TextBlock Text="Status"/></Border>
+        <Border Classes="chipStatus warning"><TextBlock Text="Warning"/></Border>
+        <Border Classes="chipStatus danger"><TextBlock Text="Danger"/></Border>
+        <Border Classes="chipStatus success"><TextBlock Text="Success"/></Border>
+      </WrapPanel>
+    </StackPanel>
+  </Border>
+</UserControl>

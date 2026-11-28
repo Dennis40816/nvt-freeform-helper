@@ -1,0 +1,423 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
+             xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
+             x:Class="FreeformHelper.UI.Views.DevSections.DevSidebarPreviewView"
+             x:DataType="vm:DevViewModel">
+  <Border Classes="workspaceSectionCard">
+    <StackPanel Spacing="{DynamicResource Space12}">
+      <SelectableTextBlock Text="Sidebar control states"
+                           FontSize="{DynamicResource FontSizeLg}"
+                           FontWeight="SemiBold"/>
+      <Border Classes="workspaceSectionCard">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <Grid Classes="workspaceSectionHeader"
+                RowDefinitions="Auto,Auto">
+            <SelectableTextBlock Classes="workspaceSectionTitle"
+                                 Text="Input"/>
+            <SelectableTextBlock Grid.Row="1"
+                                 Classes="workspaceSectionSummary"
+                                 Text="Manual uniform source; visible regulars share one scenario snapshot."/>
+          </Grid>
+          <Border Classes="workspaceDetailStrip">
+            <SelectableTextBlock Classes="workspaceSectionMeta"
+                                 Text="Regular/FW memory frame input projected onto AA grid."/>
+          </Border>
+          <Grid ClipToBounds="False">
+            <ToggleButton Classes="workspaceFoldHeader actionGhost flat">
+              <Grid Classes="workspaceFoldHeaderContent"
+                    ColumnDefinitions="Auto,*">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols"
+                                   Glyph="{x:Static icons:NvtIcons.ExpandMore}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="workspaceSectionTitle"
+                                     Text="EMS safety"/>
+              </Grid>
+            </ToggleButton>
+            <Border Classes="workspaceFoldCornerBadge">
+              <SelectableTextBlock Classes="workspaceFoldCornerBadgeText"
+                                   Text="0"/>
+            </Border>
+          </Grid>
+          <Grid ColumnDefinitions="*,*"
+                ColumnSpacing="{DynamicResource Space8}">
+            <Button Classes="actionPrimary workspaceActionButton">
+              <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconTextButtonLeadingIcon"
+                                   Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="iconTextButtonLabel"
+                                     Text="Import"/>
+                <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+              </Grid>
+            </Button>
+            <Button Grid.Column="1"
+                    Classes="actionDanger workspaceActionButton">
+              <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconTextButtonLeadingIcon"
+                                   Glyph="{x:Static icons:NvtIcons.Remove}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Classes="iconTextButtonLabel"
+                                     Text="Clear"/>
+                <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+              </Grid>
+            </Button>
+          </Grid>
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <Border Classes="workspaceFileRow">
+              <Grid Classes="workspaceFileRowContent"
+                    ColumnDefinitions="Auto,*">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols workspaceFileRowIcon"
+                                   Glyph="{x:Static icons:NvtIcons.DataObject}"/>
+                <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+                  <SelectableTextBlock Classes="workspaceFileRowTitle"
+                                       Text="regular_frame_001.csv"/>
+                  <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                       Text="128 frames, compatible regular grid"/>
+                  <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                       Text="Shape 42 x 36, channel order preserved"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Border Classes="workspaceFileRow">
+              <Grid Classes="workspaceFileRowContent"
+                    ColumnDefinitions="Auto,*">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols workspaceFileRowIcon"
+                                   Glyph="{x:Static icons:NvtIcons.DataObject}"/>
+                <StackPanel Grid.Column="1" Spacing="{DynamicResource Space2}">
+                  <SelectableTextBlock Classes="workspaceFileRowTitle"
+                                       Text="regular_frame_delta_review_long_filename.csv"/>
+                  <SelectableTextBlock Classes="workspaceFileRowMeta"
+                                       Text="Inspector summary wraps while the filename trims safely."/>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="workspaceDetailStrip"
+              HorizontalAlignment="Left"
+              MaxWidth="{StaticResource PanelLeftWidth}">
+        <StackPanel Spacing="{DynamicResource Space8}">
+          <Grid ColumnDefinitions="*,Auto"
+                ColumnSpacing="{DynamicResource Space8}">
+            <Grid Classes="workspaceSectionHeader"
+                  RowDefinitions="Auto,Auto">
+              <SelectableTextBlock Classes="workspaceSectionTitle"
+                                   Text="DXF operation controls"/>
+              <SelectableTextBlock Grid.Row="1"
+                                   Classes="workspaceSectionSummary"
+                                   Text="Free-form edit actions using action role hierarchy."/>
+            </Grid>
+            <Button Grid.Column="1"
+                    Classes="actionDanger actionIconButton dxfEditHeaderAction"
+                    ToolTip.Tip="Reset all DXF edits.">
+              <controls:FontIcon Classes="symbols iconSm"
+                                 Glyph="{x:Static icons:NvtIcons.RestartAlt}"/>
+            </Button>
+          </Grid>
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                 Text="Quick actions"/>
+            <Border Classes="dxfEditActionGroup">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Classes="dxfEditActionGroupLabel"
+                                     Text="Hide / restore"/>
+                <Button Classes="dxfEditMiniAction actionDanger"
+                        ToolTip.Tip="Hide selected CAD pads.">
+                  <StackPanel Classes="dxfEditMiniActionContent"
+                              Orientation="Horizontal"
+                              Spacing="{DynamicResource Space4}">
+                    <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                       Glyph="{x:Static icons:NvtIcons.VisibilityOff}"/>
+                    <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                         Text="Hide selected"/>
+                  </StackPanel>
+                </Button>
+                <Grid Classes="dxfEditActionGroupRow"
+                      RowDefinitions="Auto,Auto">
+                  <Button Grid.Row="0"
+                          Classes="dxfEditMiniAction actionNeutral"
+                          ToolTip.Tip="Restore last hidden CAD batch.">
+                    <StackPanel Classes="dxfEditMiniActionContent"
+                                Orientation="Horizontal"
+                                Spacing="{DynamicResource Space4}">
+                      <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                         Glyph="{x:Static icons:NvtIcons.Undo}"/>
+                      <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                           Text="Undo hide"/>
+                    </StackPanel>
+                  </Button>
+                  <Button Grid.Row="1"
+                          Classes="dxfEditMiniAction actionNeutral"
+                          ToolTip.Tip="Restore all manually hidden CAD pads.">
+                    <StackPanel Classes="dxfEditMiniActionContent"
+                                Orientation="Horizontal"
+                                Spacing="{DynamicResource Space4}">
+                      <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                         Glyph="{x:Static icons:NvtIcons.Visibility}"/>
+                      <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                           Text="Show all"/>
+                    </StackPanel>
+                  </Button>
+                </Grid>
+              </StackPanel>
+            </Border>
+            <Border Classes="dxfEditActionGroup">
+              <StackPanel Spacing="{DynamicResource Space6}">
+                <SelectableTextBlock Classes="dxfEditActionGroupLabel"
+                                     Text="Combine / split"/>
+                <Button Classes="dxfEditMiniAction actionNeutral"
+                        IsEnabled="False"
+                        ToolTip.Tip="Combine selected CAD pads using geometry union.">
+                  <StackPanel Classes="dxfEditMiniActionContent"
+                              Orientation="Horizontal"
+                              Spacing="{DynamicResource Space4}">
+                    <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                       Glyph="{x:Static icons:NvtIcons.Merge}"/>
+                    <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                         Text="Combine"/>
+                  </StackPanel>
+                </Button>
+                <Button Classes="dxfEditMiniAction actionNeutral"
+                        IsEnabled="False"
+                        ToolTip.Tip="Split selected combined CAD groups back into their source pads.">
+                  <StackPanel Classes="dxfEditMiniActionContent"
+                              Orientation="Horizontal"
+                              Spacing="{DynamicResource Space4}">
+                    <controls:FontIcon Classes="symbols iconSm dxfEditMiniActionIcon"
+                                       Glyph="{x:Static icons:NvtIcons.CallSplit}"/>
+                    <SelectableTextBlock Classes="dxfEditMiniActionLabel"
+                                         Text="Split selected"/>
+                  </StackPanel>
+                </Button>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+          <Border Classes="workspaceDetailStrip flat">
+            <StackPanel Spacing="{DynamicResource Space6}">
+              <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                   Text="Layer bulk toggle"/>
+              <StackPanel Orientation="Horizontal"
+                          Spacing="{DynamicResource Space6}">
+                <ToggleButton Classes="dxfLayerBulkToggleButton chipAction"
+                              IsChecked="True"
+                              ToolTip.Tip="All layers are visible.">
+                  <Grid Classes="dxfLayerBulkToggleContent"
+                        ColumnDefinitions="Auto,*">
+                    <Border Classes="dxfLayerBulkMixedIndicator"
+                            IsVisible="False"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Classes="dxfLayerBulkToggleLabel"
+                                         Text="All on"/>
+                  </Grid>
+                </ToggleButton>
+                <ToggleButton Classes="dxfLayerBulkToggleButton chipAction"
+                              ToolTip.Tip="Every layer is hidden.">
+                  <Grid Classes="dxfLayerBulkToggleContent"
+                        ColumnDefinitions="Auto,*">
+                    <Border Classes="dxfLayerBulkMixedIndicator"
+                            IsVisible="False"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Classes="dxfLayerBulkToggleLabel"
+                                         Text="All off"/>
+                  </Grid>
+                </ToggleButton>
+                <ToggleButton Classes="dxfLayerBulkToggleButton chipAction"
+                              ToolTip.Tip="Some layers are hidden.">
+                  <Grid Classes="dxfLayerBulkToggleContent"
+                        ColumnDefinitions="Auto,*">
+                    <Border Classes="dxfLayerBulkMixedIndicator"/>
+                    <SelectableTextBlock Grid.Column="1"
+                                         Classes="dxfLayerBulkToggleLabel"
+                                         Text="All off"/>
+                  </Grid>
+                </ToggleButton>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <StackPanel Spacing="{DynamicResource Space6}">
+            <SelectableTextBlock Classes="dxfEditSectionLabel"
+                                 Text="Advanced edit"/>
+            <ToggleButton Classes="workspaceFoldHeader actionGhost flat"
+                          IsChecked="True">
+              <Grid Classes="workspaceFoldHeaderContent"
+                    ColumnDefinitions="Auto,*,Auto">
+                <controls:FontIcon Grid.Column="0"
+                                   Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:NvtIcons.Settings}"/>
+                <SelectableTextBlock Grid.Column="1"
+                                     Text="Advanced edit"
+                                     FontWeight="SemiBold"/>
+                <controls:FontIcon Grid.Column="2"
+                                   Classes="symbols iconSm"
+                                   Glyph="{x:Static icons:NvtIcons.ExpandLess}"/>
+              </Grid>
+            </ToggleButton>
+          </StackPanel>
+          <Border Classes="workspaceDetailStrip flat">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                  ColumnSpacing="{DynamicResource Space6}">
+              <SelectableTextBlock Grid.Column="0"
+                                   VerticalAlignment="Center"
+                                   Classes="dxfEditFieldLabel"
+                                   Text="Advanced compact actions"/>
+              <Button Grid.Column="1"
+                      Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                      ToolTip.Tip="Rotate selected CAD pads.">
+                <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                   Glyph="{x:Static icons:NvtIcons.RotateRight}"/>
+              </Button>
+              <Button Grid.Column="2"
+                      Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                      ToolTip.Tip="Move selected CAD pads to layer.">
+                <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                   Glyph="{x:Static icons:NvtIcons.DriveFileMove}"/>
+              </Button>
+              <Button Grid.Column="3"
+                      Classes="actionNeutral actionIconButton dxfEditCompactIconAction"
+                      ToolTip.Tip="Create layer and move selected CAD pads.">
+                <controls:FontIcon Classes="symbols iconSm dxfEditActionIcon"
+                                   Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
+              </Button>
+            </Grid>
+          </Border>
+        </StackPanel>
+      </Border>
+      <Border Classes="workspaceFirstPeekBar">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+          <StackPanel Spacing="{DynamicResource Space4}">
+            <SelectableTextBlock Classes="workspaceFirstPeekTitle"
+                                 Text="Simulation"/>
+            <SelectableTextBlock Classes="workspaceFirstPeekSubtitle"
+                                 Text="Regular-grid surface simulation."/>
+          </StackPanel>
+          <WrapPanel Grid.Column="1"
+                     Orientation="Horizontal"
+                     VerticalAlignment="Center">
+            <Border Classes="chipStatus"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="Session ready"/>
+            </Border>
+            <Border Classes="chipStatus"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="Manual source"/>
+            </Border>
+            <Border Classes="chipStatus warning"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="Safety warning"/>
+            </Border>
+          </WrapPanel>
+        </Grid>
+      </Border>
+      <Border Classes="workspaceSecondPeekBar">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space12}">
+          <WrapPanel Orientation="Horizontal"
+                     VerticalAlignment="Center">
+            <Border Classes="chipStatus"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="v1.1"/>
+            </Border>
+            <Border Classes="chipStatus"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="Heatmap"/>
+            </Border>
+            <Border Classes="chipStatus"
+                    Margin="{DynamicResource InsetRight6Bottom6}">
+              <SelectableTextBlock Classes="chipStatusText"
+                                   Text="AA area"/>
+            </Border>
+          </WrapPanel>
+          <SelectableTextBlock Grid.Column="1"
+                               Classes="workspaceSecondPeekStatus"
+                               Text="Canvas projected from current workspace"/>
+        </Grid>
+      </Border>
+      <WrapPanel Orientation="Horizontal">
+        <Button Classes="actionIconButton actionGhost"
+                Margin="{DynamicResource InsetRight8Bottom6}"
+                ToolTip.Tip="Icon button">
+          <controls:FontIcon Classes="symbols"
+                             Glyph="{x:Static icons:NvtIcons.Search}"/>
+        </Button>
+        <ToggleButton Classes="actionIconButton actionGhost"
+                      Margin="{DynamicResource InsetRight8Bottom6}"
+                      IsChecked="True"
+                      ToolTip.Tip="Selected icon button">
+          <controls:FontIcon Classes="symbols"
+                             Glyph="{x:Static icons:NvtIcons.Visibility}"/>
+        </ToggleButton>
+        <Button Classes="workspaceActionButton actionNeutral"
+                Width="{StaticResource NotchExportPrimaryButtonMinWidth}"
+                Margin="{DynamicResource InsetRight8Bottom6}"
+                ToolTip.Tip="Icon + text action">
+          <Grid Classes="iconTextButtonContent" ColumnDefinitions="Auto,*,Auto">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols iconTextButtonLeadingIcon"
+                               Glyph="{x:Static icons:NvtIcons.ContentCopy}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="iconTextButtonLabel"
+                                 Text="Copy result"/>
+            <Border Grid.Column="2" Classes="iconTextButtonTrailingSpacer"/>
+          </Grid>
+        </Button>
+      </WrapPanel>
+      <WrapPanel Orientation="Horizontal">
+        <Button Classes="chipAction"
+                Margin="{DynamicResource InsetRight6Bottom6}">
+          <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols"
+                               Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="workspacePresetButtonLabel"
+                                 Text="Uniform 400"/>
+          </Grid>
+        </Button>
+        <Button Classes="chipAction"
+                Margin="{DynamicResource InsetRight6Bottom6}">
+          <Grid Classes="workspacePresetButtonContent" ColumnDefinitions="Auto,*">
+            <controls:FontIcon Grid.Column="0"
+                               Classes="symbols"
+                               Glyph="{x:Static icons:NvtIcons.AddCircle}"/>
+            <SelectableTextBlock Grid.Column="1"
+                                 Classes="workspacePresetButtonLabel"
+                                 Text="Zero"/>
+          </Grid>
+        </Button>
+      </WrapPanel>
+      <WrapPanel Orientation="Horizontal">
+        <Border Classes="chipStatus"
+                Margin="{DynamicResource InsetRight6Bottom6}">
+          <SelectableTextBlock Classes="chipStatusText"
+                               Text="Primary summary"/>
+        </Border>
+        <Border Classes="chipStatus warning"
+                Margin="{DynamicResource InsetRight6Bottom6}">
+          <SelectableTextBlock Classes="chipStatusText"
+                               Text="Warning status"/>
+        </Border>
+        <Border Classes="chipStatus danger"
+                Margin="{DynamicResource InsetRight6Bottom6}">
+          <SelectableTextBlock Classes="chipStatusText"
+                               Text="Long AA source summary with active layer and coordinate reference details"/>
+        </Border>
+      </WrapPanel>
+      <Border Classes="workspaceInspectorContextStrip">
+        <SelectableTextBlock Classes="workspaceInspectorContextText"
+                             Text="Selected REG (R128, C064), AA center 25.000 mm x 18.750 mm, source layer L2 copper, export-ready coordinate status."/>
+      </Border>
+    </StackPanel>
+  </Border>
+</UserControl>
