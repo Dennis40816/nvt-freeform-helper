@@ -199,7 +199,7 @@ public sealed partial class UiLayoutGuardTests
         var repoRoot = TestPaths.RepoRoot;
         var stylesRoot = Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles");
         var actionStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Action.axaml"));
-        var coreStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Core.axaml"));
+        var coreStyles = ReadStylesWithIncludes(Path.Combine(stylesRoot, "Controls.Core.axaml"));
         var overlayStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Overlay.axaml"));
         var formStyles = TestFiles.ReadContent(Path.Combine(stylesRoot, "Controls.Form.axaml"));
         var tokens = TestFiles.ReadContent(Path.Combine(stylesRoot, "Tokens.axaml"));

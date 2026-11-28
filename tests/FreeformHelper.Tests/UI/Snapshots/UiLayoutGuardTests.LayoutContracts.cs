@@ -248,7 +248,10 @@ public sealed partial class UiLayoutGuardTests
     {
         var repoRoot = TestPaths.RepoRoot;
 
-        var coreStyles = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
+        var coreStyles = ReadStylesWithIncludes(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Styles", "Controls.Core.axaml"));
+        Assert.Contains("Style Selector=\"Border.validationCountPill\"", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"Button.validationTraceRow\"", coreStyles, StringComparison.Ordinal);
+        Assert.Contains("Style Selector=\"Grid.workspacePresetButtonContent\"", coreStyles, StringComparison.Ordinal);
         Assert.Contains("primitives|BalancedWrapPanel.badgeGroup", coreStyles, StringComparison.Ordinal);
         Assert.Contains("BalanceLastRow", coreStyles, StringComparison.Ordinal);
         Assert.Contains("DxfEditSummaryBadgeMinWidth", coreStyles, StringComparison.Ordinal);
