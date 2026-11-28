@@ -60,7 +60,7 @@ public sealed class LayerImageExportScreenshotTests
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            session.Window.FindControl<TextBox>("SearchBox")!.Focus();
+            session.SearchBox.Focus();
             session.Window.KeyTextInput(searchText);
             await HeadlessUiPump.FlushQueueAsync();
         }

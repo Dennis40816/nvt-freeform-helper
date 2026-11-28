@@ -42,19 +42,7 @@
       <Border BorderBrush="{DynamicResource NfcBorderMutedBrush}" BorderThickness="{DynamicResource BorderLeftThin}"
               Padding="{DynamicResource Inset12}">
         <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="{DynamicResource Space8}">
-          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{DynamicResource Space8}">
-            <Grid>
-              <TextBox x:Name="SearchBox" Classes="exportSearch singleLineActionInput" PlaceholderText="Search layers"
-                       Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                       AutomationProperties.Name="Search layers"/>
-              <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.Search}" IsHitTestVisible="False"
-                                 HorizontalAlignment="Left" Margin="{DynamicResource InsetLeft8}"/>
-            </Grid>
-            <Button x:Name="ClearSearchButton" Grid.Column="1" Classes="actionIconButton actionGhost flat"
-                    Command="{Binding ClearSearchCommand}" ToolTip.Tip="Clear search (Esc)" AutomationProperties.Name="Clear search">
-              <controls:FontIcon Classes="symbols" Glyph="{DynamicResource Nvt.Icon.Close}"/>
-            </Button>
-          </Grid>
+          <controls:LayerSearchBox x:Name="LayerSearch" Query="{Binding SearchText, Mode=TwoWay}"/>
           <Border Grid.Row="1" Classes="workspaceTableHeader" Padding="{DynamicResource InsetNone}">
             <CheckBox x:Name="AllLayersCheckBox" Classes="exportCheck" Content="{Binding AllLayersText}"
                       IsThreeState="True"

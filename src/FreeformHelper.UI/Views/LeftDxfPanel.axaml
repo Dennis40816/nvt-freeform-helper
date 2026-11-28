@@ -71,6 +71,7 @@
         </ToggleButton>
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}">
+            <controls:LayerSearchBox x:Name="LayerSearch" IsVisible="{Binding HasCadLayers}"/>
             <ItemsControl ItemsSource="{Binding LayerToggles}">
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -80,16 +81,38 @@
                                 HorizontalContentAlignment="Left"
                                 Padding="{StaticResource Inset4}"
                                 ToolTip.Tip="Ctrl+click: show only this layer.">
+                    <ToggleButton.IsVisible>
+                      <MultiBinding Converter="{x:Static converters:LayerSearchConverters.IsMatch}">
+                        <Binding Path="Name"/>
+                        <Binding Path="#LayerSearch.Query"/>
+                      </MultiBinding>
+                    </ToggleButton.IsVisible>
                     <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
                       <controls:FontIcon Classes="symbols iconSm"
                                          Glyph="{Binding IsSelected, Converter={StaticResource LayerVisibilityGlyph}}"/>
-                      <SelectableTextBlock Text="{Binding Name}"
-                                           VerticalAlignment="Center"/>
+                      <controls:HighlightedTextBlock Text="{Binding Name}"
+                                                     VerticalAlignment="Center">
+                        <controls:HighlightedTextBlock.Ranges>
+                          <MultiBinding Converter="{x:Static converters:LayerSearchConverters.Ranges}">
+                            <Binding Path="Name"/>
+                            <Binding Path="#LayerSearch.Query"/>
+                          </MultiBinding>
+                        </controls:HighlightedTextBlock.Ranges>
+                      </controls:HighlightedTextBlock>
                     </StackPanel>
                   </ToggleButton>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <SelectableTextBlock x:Name="NoLayerMatchHint" Classes="stepNote" Text="No layers match">
+              <SelectableTextBlock.IsVisible>
+                <MultiBinding Converter="{x:Static converters:LayerSearchConverters.HasNoMatch}">
+                  <Binding Path="#LayerSearch.Query"/>
+                  <Binding Path="LayerToggles"/>
+                  <Binding Path="LayerToggles.Count"/>
+                </MultiBinding>
+              </SelectableTextBlock.IsVisible>
+            </SelectableTextBlock>
       <StackPanel Spacing="{StaticResource Space6}">
         <StackPanel Orientation="Horizontal"
                     Spacing="{StaticResource Space8}">
