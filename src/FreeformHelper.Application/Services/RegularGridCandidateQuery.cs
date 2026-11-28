@@ -49,10 +49,10 @@ public static class RegularGridCandidateQuery
         }
 
         var safePadding = Math.Max(0, padding);
-        var rowMin = FindCellIndex(grid.YEdges, bounds.MinY) - safePadding;
-        var rowMax = FindCellIndex(grid.YEdges, bounds.MaxY) + safePadding;
-        var colMin = FindCellIndex(grid.XEdges, bounds.MinX) - safePadding;
-        var colMax = FindCellIndex(grid.XEdges, bounds.MaxX) + safePadding;
+        var rowMin = GridCellLookup.FindCellIndex(grid.YEdges, bounds.MinY, grid.YEdges.Count - 1) - safePadding;
+        var rowMax = GridCellLookup.FindCellIndex(grid.YEdges, bounds.MaxY, grid.YEdges.Count - 1) + safePadding;
+        var colMin = GridCellLookup.FindCellIndex(grid.XEdges, bounds.MinX, grid.XEdges.Count - 1) - safePadding;
+        var colMax = GridCellLookup.FindCellIndex(grid.XEdges, bounds.MaxX, grid.XEdges.Count - 1) + safePadding;
 
         rowMin = Math.Clamp(rowMin, 0, grid.Rows - 1);
         rowMax = Math.Clamp(rowMax, 0, grid.Rows - 1);
@@ -72,38 +72,5 @@ public static class RegularGridCandidateQuery
         return (rowMin, rowMax, colMin, colMax);
     }
 
-    private static int FindCellIndex(IReadOnlyList<double> edges, double coord)
-    {
-        if (edges.Count < 2)
-        {
-            return 0;
-        }
 
-        if (coord <= edges[0])
-        {
-            return 0;
-        }
-
-        if (coord >= edges[^1])
-        {
-            return edges.Count - 2;
-        }
-
-        var lo = 0;
-        var hi = edges.Count - 1;
-        while (lo + 1 < hi)
-        {
-            var mid = (lo + hi) / 2;
-            if (coord < edges[mid])
-            {
-                hi = mid;
-            }
-            else
-            {
-                lo = mid;
-            }
-        }
-
-        return Math.Clamp(lo, 0, edges.Count - 2);
-    }
 }

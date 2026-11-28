@@ -10,7 +10,7 @@ namespace FreeformHelper.Tests;
 public sealed class PadMatchOverlapContractTests
 {
     private static readonly double[] _expectedBestMatchScores = { 1.0, 1.0, 0.0 };
-    private static readonly int[] _expectedTiedRegularIds = { 30, 20 };
+    private static readonly int[] _expectedTiedRegularIds = { 20, 30 };
     private static readonly double[] _expectedReplacementScores = { 0.5, 0.0 };
     private static readonly double[] _expectedEmptyGridProgress = { 0.0, 1.0 };
     private static readonly double[] _expectedEmptyCadProgress = { 0, 0.925, 1, 1 };
@@ -124,7 +124,7 @@ public sealed class PadMatchOverlapContractTests
     [Theory]
     [InlineData(900, 100)]
     [InlineData(100, 900)]
-    public void Match_ExactTiesPreserveCurrentCandidateOrder(int firstCadId, int secondCadId)
+    public void MatchExactTiesOrderForwardByRegularIdAndKeepOldReversePick(int firstCadId, int secondCadId)
     {
         var grid = CreateGrid(0, 1, 2);
         var cad = new CadPadSet(new[]

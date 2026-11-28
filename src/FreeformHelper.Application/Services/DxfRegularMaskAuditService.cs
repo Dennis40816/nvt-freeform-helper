@@ -104,12 +104,13 @@ public static partial class DxfRegularMaskAuditService
     }
 
     private static CandidateSet BuildCandidateSet(
-        int cadPadId,
+        CadPad cadPad,
         IReadOnlyDictionary<int, IReadOnlyList<PadMatchLink>> cadToRegular,
         IReadOnlyDictionary<int, RegularPad> regularPadById,
         IReadOnlyDictionary<int, int> cadIcIndexByCadId,
         IReadOnlySet<int>? activeRegularPadIds)
     {
+        var cadPadId = cadPad.Id;
         if (!cadToRegular.TryGetValue(cadPadId, out var links) || links.Count == 0)
         {
             return CandidateSet.Empty;
@@ -149,30 +150,14 @@ public static partial class DxfRegularMaskAuditService
         return new CandidateSet(
             NormalizeCandidates(geometryCandidates),
             NormalizeCandidates(effectiveCsvCandidates),
-            BuildSeed(geometryCandidates),
-            BuildSeed(effectiveCsvCandidates));
+            CadBestMatchSeedService.ResolveBestMatchSeed(cadPad, cadToRegular, regularPadById, cadIcIndexByCadId, null),
+            CadBestMatchSeedService.ResolveBestMatchSeed(cadPad, cadToRegular, regularPadById, cadIcIndexByCadId, activeRegularPadIds));
     }
 
     private static IReadOnlyList<DxfRegularMaskAuditCandidate> NormalizeCandidates(List<DxfRegularMaskAuditCandidate> candidates) =>
         candidates.Count == 0
             ? Array.Empty<DxfRegularMaskAuditCandidate>()
             : candidates;
-
-    private static CadBestMatchSeed BuildSeed(List<DxfRegularMaskAuditCandidate> candidates)
-    {
-        if (candidates.Count == 0)
-        {
-            return CadBestMatchSeed.Empty;
-        }
-
-        var candidate = candidates[0];
-        return new CadBestMatchSeed(
-            candidate.RegularPadIndex,
-            candidate.IcIndex,
-            candidate.DiffIndex,
-            candidate.RegularCoverage,
-            candidate.CadCoverage);
-    }
 
     private static HashSet<(int IcIndex, int DiffIndex)> BuildDuplicateDiffKeySet(
         IReadOnlyList<CadPad> orderedCadPads,

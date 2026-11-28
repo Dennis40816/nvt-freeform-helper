@@ -19,7 +19,7 @@ public static partial class DxfRegularMaskAuditService
         {
             var cadPad = context.OrderedCadPads[index];
             var candidateSet = BuildCandidateSet(
-                cadPad.Id,
+                cadPad,
                 context.CadToRegular,
                 context.RegularPadById,
                 context.CadIcIndexByCadId,

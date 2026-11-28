@@ -54,7 +54,7 @@ public sealed class PadMatcher
 
             if (links.Count > 0)
             {
-                links.Sort(static (a, b) => CompareLinksDescending(a, b));
+                links.Sort(static (a, b) => CompareForwardLinksDescending(a, b));
                 cadToRegular[cadPad.Id] = links;
             }
 
@@ -236,6 +236,14 @@ public sealed class PadMatcher
         }
 
         return right.CadCoverage.CompareTo(left.CadCoverage);
+    }
+
+    private static int CompareForwardLinksDescending(PadMatchLink left, PadMatchLink right)
+    {
+        var byCoverage = CompareLinksDescending(left, right);
+        if (byCoverage != 0) return byCoverage;
+        var byCadId = left.CadPadId.CompareTo(right.CadPadId);
+        return byCadId != 0 ? byCadId : left.RegularPadId.CompareTo(right.RegularPadId);
     }
 
     private static PadMatchTelemetry BuildTelemetry(
