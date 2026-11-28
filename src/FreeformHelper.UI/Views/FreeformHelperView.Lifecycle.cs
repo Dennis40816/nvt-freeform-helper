@@ -245,15 +245,12 @@ public sealed partial class FreeformHelperView
     private void SyncConsoleRowHeight(bool isExpanded)
     {
         WorkspaceLayoutResourcePolicy.ApplyConsoleRowHeight(this, _consoleRow, isExpanded);
+        ConsoleSplitter.IsVisible = isExpanded;
     }
 
     private readonly GridLength?[] _savedPanelWidths = new GridLength?[5];
 
-    private void SetLeftPanelVisible(bool isVisible)
-    {
-        SetPanelVisible(0, LeftPanel, isVisible, ref _savedPanelWidths[0]);
-        CanvasOverlayControls.ShowLeftPanelButtonVisible = !isVisible;
-    }
+    private void SetLeftPanelVisible(bool isVisible) => _leftPanelNavigation.SetVisible(isVisible);
 
     private void SetRightPanelVisible(bool isVisible)
     {
@@ -272,7 +269,6 @@ public sealed partial class FreeformHelperView
     }
 
     private void HideLeftPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetLeftPanelVisible(false);
-    private void ShowLeftPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetLeftPanelVisible(true);
     private void HideRightPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetRightPanelVisible(false);
     private void ShowRightPanel_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => SetRightPanelVisible(true);
 }

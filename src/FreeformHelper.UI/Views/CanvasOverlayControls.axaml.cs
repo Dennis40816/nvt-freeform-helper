@@ -6,14 +6,7 @@ namespace FreeformHelper.UI.Views;
 
 public partial class CanvasOverlayControls : UserControl
 {
-    public event EventHandler<RoutedEventArgs>? ShowLeftPanelRequested;
     public event EventHandler<RoutedEventArgs>? ShowRightPanelRequested;
-
-    public bool ShowLeftPanelButtonVisible
-    {
-        get => ShowLeftPanelButton.IsVisible;
-        set => ShowLeftPanelButton.IsVisible = value;
-    }
 
     public bool ShowRightPanelButtonVisible
     {
@@ -42,11 +35,6 @@ public partial class CanvasOverlayControls : UserControl
         InitializeComponent();
         CanvasToolbar.GetObservable(BoundsProperty)
             .Subscribe(bounds => TopToolbarInset = CanvasToolbar.Margin.Top + bounds.Height);
-    }
-
-    private void ShowLeftPanelButton_Click(object? sender, RoutedEventArgs e)
-    {
-        ShowLeftPanelRequested?.Invoke(this, e);
     }
 
     private void ShowRightPanelButton_Click(object? sender, RoutedEventArgs e)

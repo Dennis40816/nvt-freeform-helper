@@ -23,6 +23,7 @@
             Classes="viewportBoundContent"
             Padding="{DynamicResource Inset24}">
       <StackPanel Spacing="{DynamicResource Space16}">
+        <views:LeftPanelRail HorizontalAlignment="Left"/>
         <views:NotchDetailContent x:Name="DevNotchDetailPreview" DataContext="{Binding NotchDetailPreview}"
                                   Width="{DynamicResource NotchDetailWidth}" HorizontalAlignment="Left"/>
         <SelectableTextBlock x:Name="DevLoadedText"

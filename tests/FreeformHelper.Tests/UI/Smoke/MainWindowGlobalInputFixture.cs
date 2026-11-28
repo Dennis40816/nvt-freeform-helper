@@ -11,6 +11,7 @@ using FreeformHelper.Application.Settings;
 using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI;
 using FreeformHelper.UI.ViewModels;
+using FreeformHelper.UI.Views;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -20,7 +21,7 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
     private readonly DxfEditingBehaviorTestScope _files = new();
     private readonly ShellViewModel _shell;
 
-    private MainWindowGlobalInputFixture()
+    private MainWindowGlobalInputFixture(bool devPageAvailable, int width, int height)
     {
         HeadlessAppBootstrap.EnsureInitialized();
         Helper = _files.CreateViewModel();
@@ -33,10 +34,10 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
         var cascade = Assert.Single(Helper.CascadeIcSettings);
         cascade.XChannels = 3;
         cascade.YChannels = 1;
-        _shell = new ShellViewModel(Helper) { IsConsoleExpanded = false, IsDevPageAvailable = false };
+        _shell = new ShellViewModel(Helper) { IsConsoleExpanded = false, IsDevPageAvailable = devPageAvailable };
         _shell.Simulation.RequestPrewarmWorkspaceAsync = null;
         _shell.CoordinatePlanner.RequestPrewarmWorkspaceAsync = null;
-        Window = new MainWindow { Width = 1280, Height = 900, WindowState = WindowState.Normal };
+        Window = new MainWindow { Width = width, Height = height, WindowState = WindowState.Normal };
         Window.SetShellViewModel(_shell);
         HeadlessSessionGuardAttribute.CloseAtTestEnd(Window);
         Window.Show();
@@ -45,9 +46,9 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
     public FreeformHelperViewModel Helper { get; }
     public MainWindow Window { get; }
 
-    public static async Task<MainWindowGlobalInputFixture> CreateAsync()
+    public static async Task<MainWindowGlobalInputFixture> CreateAsync(bool devPageAvailable = false, int width = 1280, int height = 900)
     {
-        var fixture = new MainWindowGlobalInputFixture();
+        var fixture = new MainWindowGlobalInputFixture(devPageAvailable, width, height);
         try
         {
             await HeadlessUiPump.FlushQueueAsync();
@@ -96,6 +97,13 @@ internal sealed class MainWindowGlobalInputFixture : IAsyncDisposable
 
     public async Task ClickLayerAsync(string name, RawInputModifiers modifiers)
     {
+        var rail = Assert.Single(Window.GetVisualDescendants().OfType<LeftPanelRail>());
+        if (rail.IsEffectivelyVisible)
+        {
+            rail.FindControl<Button>("ExpandButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            HeadlessUiPump.Drain(Window);
+        }
+
         var toggle = Assert.Single(Window.GetVisualDescendants().OfType<ToggleButton>(),
             button => button.Classes.Contains("layerToggle") &&
                 button.DataContext is LayerToggle layer && layer.Name == name);

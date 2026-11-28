@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:icons="using:Nvt.Core.Avalonia.Icons"
+             x:Class="FreeformHelper.UI.Views.LeftPanelRail"
+             Background="{DynamicResource NfcSurfaceBrush}">
+  <UserControl.Styles>
+    <Style Selector="Button.rail">
+      <Setter Property="Height" Value="NaN"/>
+      <Setter Property="Padding" Value="{DynamicResource Inset4}"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+    </Style>
+    <Style Selector="Button.rail TextBlock">
+      <Setter Property="FontSize" Value="{DynamicResource FontSizeSm}"/>
+      <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+  </UserControl.Styles>
+  <StackPanel Spacing="{DynamicResource Space4}">
+    <Button x:Name="ExpandButton" Classes="actionGhost flat rail"
+            AutomationProperties.Name="Expand Layers &amp; DXF panel" Click="OnSectionClick"
+            Tag="Expand">
+      <StackPanel Spacing="{DynamicResource Space2}">
+        <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.ChevronRight}"/>
+        <TextBlock Text="Expand"/>
+      </StackPanel>
+    </Button>
+    <Button Classes="actionGhost flat rail" AutomationProperties.Name="DXF"
+            Click="OnSectionClick" Tag="Dxf">
+      <StackPanel Spacing="{DynamicResource Space2}">
+        <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.FolderOpen}"/>
+        <TextBlock Text="DXF"/>
+      </StackPanel>
+    </Button>
+    <Button Classes="actionGhost flat rail" AutomationProperties.Name="Layers"
+            Click="OnSectionClick" Tag="Layers">
+      <StackPanel Spacing="{DynamicResource Space2}">
+        <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Layers}"/>
+        <TextBlock x:Name="LayerCount" Text="0 / 0"/>
+      </StackPanel>
+    </Button>
+    <Button Classes="actionGhost flat rail" AutomationProperties.Name="Edits"
+            Click="OnSectionClick" Tag="Edits">
+      <StackPanel Spacing="{DynamicResource Space2}">
+        <controls:FontIcon Classes="symbols iconSm" Glyph="{x:Static icons:NvtIcons.Edit}"/>
+        <TextBlock Text="Edits"/>
+      </StackPanel>
+    </Button>
+  </StackPanel>
+</UserControl>

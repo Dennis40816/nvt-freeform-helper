@@ -22,7 +22,7 @@ public sealed class ShellNavigationEntryTests
     private static readonly Point2[] _padCorners = [new(0, 0), new(10, 0), new(10, 10), new(0, 10)];
 
     [AvaloniaFact]
-    public Task LeftPanelHideAndOverlayShowRestoreVisibilityAsync() => AssertPanelHideAndShowAsync(isLeft: true);
+    public Task LeftPanelHideAndRailShowRestoreVisibilityAsync() => AssertPanelHideAndShowAsync(isLeft: true);
 
     [AvaloniaFact]
     public Task RightPanelHideAndOverlayShowRestoreVisibilityAsync() => AssertPanelHideAndShowAsync(isLeft: false);
@@ -143,20 +143,22 @@ public sealed class ShellNavigationEntryTests
         HeadlessAppBootstrap.EnsureInitialized();
         var view = new FreeformHelperView { DataContext = CreateWorkspaceViewModel() };
         var owner = CreateWorkspaceWindow(view);
+        owner.Width = 1920;
         try
         {
             owner.Show();
             await HeadlessUiPump.FlushQueueAsync();
             var panel = Assert.IsType<Border>(view.FindControl<Border>(isLeft ? "LeftPanel" : "RightPanel"));
             var overlay = Assert.IsType<CanvasOverlayControls>(view.FindControl<CanvasOverlayControls>("CanvasOverlayControls"));
-            var show = Assert.IsType<Button>(overlay.FindControl<Button>(isLeft ? "ShowLeftPanelButton" : "ShowRightPanelButton"));
+            var rail = Assert.IsType<LeftPanelRail>(view.FindControl<LeftPanelRail>("LeftRail"));
+            var show = Assert.IsType<Button>(isLeft ? rail.FindControl<Button>("ExpandButton") : overlay.FindControl<Button>("ShowRightPanelButton"));
             var hide = Assert.Single(panel.GetVisualDescendants().OfType<Button>(),
                 static button => button.Classes.Contains("panelChromeToggle"));
             var grid = Assert.IsType<Grid>(view.FindControl<Grid>("LayoutGrid"));
             var column = grid.ColumnDefinitions[isLeft ? 0 : 4];
             var expandedWidth = column.Width;
             Assert.True(panel.IsVisible);
-            Assert.False(show.IsVisible);
+            Assert.False(isLeft ? rail.IsVisible : show.IsVisible);
             Assert.True(expandedWidth.Value > 0);
 
             hide.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
@@ -164,12 +166,13 @@ public sealed class ShellNavigationEntryTests
 
             Assert.False(panel.IsVisible);
             Assert.True(show.IsEffectivelyVisible);
-            Assert.Equal(0d, column.Width.Value);
+            Assert.Equal(isLeft ? GridLength.Auto : new GridLength(0), column.Width);
+            Assert.Equal(isLeft ? rail.Bounds.Width : 0, column.ActualWidth);
             show.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             await HeadlessUiPump.FlushQueueAsync();
 
             Assert.True(panel.IsVisible);
-            Assert.False(show.IsVisible);
+            Assert.False(isLeft ? rail.IsVisible : show.IsVisible);
             Assert.Equal(expandedWidth, column.Width);
         }
         finally

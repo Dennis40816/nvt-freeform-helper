@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using FreeformHelper.UI.Services;
 using FreeformHelper.UI.ViewModels;
 
@@ -124,6 +125,12 @@ public sealed partial class MainWindow : Window
             dismissText: "Cancel",
             dismissTip: "Keep the project open.");
         return dialog.ShowDialog<bool?>(owner);
+    }
+
+    private void OpenSettingsWindow_Click(object? sender, RoutedEventArgs e)
+    {
+        this.GetVisualDescendants().OfType<Views.FreeformHelperView>().SingleOrDefault()
+            ?.OpenSettingsWindow_Click(sender, e);
     }
 }
 

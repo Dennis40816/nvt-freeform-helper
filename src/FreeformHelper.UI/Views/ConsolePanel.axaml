@@ -12,6 +12,21 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/LogConsoleStyles.axaml"/>
     <StyleInclude Source="avares://Nvt.Core.Avalonia/LogConsole/ConsoleListStyles.axaml"/>
+    <Style Selector="Border#ConsoleBorder">
+      <Setter Property="Padding" Value="{DynamicResource ConsolePanelPadding}"/>
+    </Style>
+    <Style Selector="ToggleButton#ConsoleToggleButton">
+      <Setter Property="Margin" Value="{DynamicResource InsetRight8}"/>
+    </Style>
+    <Style Selector="Border#ConsoleBorder.collapsed">
+      <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+    </Style>
+    <Style Selector="Border#ConsoleBorder.collapsed ToggleButton#ConsoleToggleButton">
+      <Setter Property="Margin" Value="{DynamicResource InsetNone}"/>
+    </Style>
+    <Style Selector="Border#ConsoleBorder.collapsed logConsole|ConsoleHeader > Border > Grid > StackPanel > TextBlock.nvtIcon">
+      <Setter Property="IsVisible" Value="False"/>
+    </Style>
   </UserControl.Styles>
   <UserControl.Resources>
     <converters:BooleanGlyphConverter x:Key="ConsoleToggleGlyph"
@@ -19,10 +34,10 @@
                                       TrueGlyph="{x:Static icons:NvtIcons.ExpandMore}"/>
   </UserControl.Resources>
   <Border x:Name="ConsoleBorder"
+          Classes.collapsed="{Binding !IsConsoleExpanded}"
           Background="{DynamicResource NfcSurfaceBrush}"
           BorderBrush="{DynamicResource NfcBorderMutedBrush}"
-          BorderThickness="{StaticResource BorderTopThin}"
-          Padding="{StaticResource ConsolePanelPadding}">
+          BorderThickness="{StaticResource BorderTopThin}">
     <Grid RowDefinitions="Auto,*">
       <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
         <ToggleButton x:Name="ConsoleToggleButton"
@@ -30,8 +45,7 @@
                       IsChecked="{Binding IsConsoleExpanded, Mode=TwoWay}"
                       ToolTip.Tip="Toggle console panel"
                       VerticalAlignment="Center"
-                      Grid.Column="0"
-                      Margin="{StaticResource InsetRight8}">
+                      Grid.Column="0">
           <controls:FontIcon Classes="consoleToggleIcon symbols"
                              Glyph="{Binding IsChecked,
                              RelativeSource={RelativeSource AncestorType=ToggleButton},

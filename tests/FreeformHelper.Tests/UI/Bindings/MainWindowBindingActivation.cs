@@ -51,7 +51,7 @@ internal sealed class MainWindowBindingActivation(MainWindow window, AvaloniaBin
         await OpenDisplayPopupAsync(view, shell.FreeformHelper);
         await OpenCanvasHelpAsync(view);
         await OpenMenusAndTooltipAsync(view);
-        await OpenSettingsAsync(view, shell);
+        await OpenSettingsAsync(shell);
         await ExerciseConsoleAsync(view, shell);
         await VisitShellPagesAsync(shell);
     }
@@ -137,7 +137,7 @@ internal sealed class MainWindowBindingActivation(MainWindow window, AvaloniaBin
     private async Task OpenMenusAndTooltipAsync(FreeformHelperView view)
     {
         capture.Phase = "menus and tooltip";
-        var menu = Assert.Single(view.GetVisualDescendants().OfType<Menu>());
+        var menu = Assert.IsType<Menu>(window.FindControl<Menu>("MainMenu"));
         foreach (var item in menu.Items.OfType<MenuItem>())
         {
             try
@@ -171,10 +171,10 @@ internal sealed class MainWindowBindingActivation(MainWindow window, AvaloniaBin
         }
     }
 
-    private async Task OpenSettingsAsync(FreeformHelperView view, ShellViewModel shell)
+    private async Task OpenSettingsAsync(ShellViewModel shell)
     {
         capture.Phase = "Settings entry";
-        var menu = Assert.Single(view.GetVisualDescendants().OfType<Menu>());
+        var menu = Assert.IsType<Menu>(window.FindControl<Menu>("MainMenu"));
         var entry = Assert.Single(menu.Items.OfType<MenuItem>().SelectMany(static item => item.Items.OfType<MenuItem>()),
             static item => Equals(item.Header, "Open Settings"));
         entry.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));

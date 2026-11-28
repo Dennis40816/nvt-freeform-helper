@@ -38,6 +38,7 @@ public sealed partial class FreeformHelperView : UserControl
     private readonly CadLoadSpinnerVisibilitySession _cadLoadSpinner = new();
     private PadInfoOverlayRenderer? _padInfoRenderer; // UI thread only.
     private FreeformHelperViewModel? _observedViewModel;
+    private readonly LeftPanelNavigation _leftPanelNavigation;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FreeformHelperView"/> class.
@@ -48,7 +49,7 @@ public sealed partial class FreeformHelperView : UserControl
         AttachedToVisualTree += OnAttachedToVisualTree;
         DetachedFromVisualTree += OnDetachedFromVisualTree;
 
-        SetLeftPanelVisible(true);
+        _leftPanelNavigation = new(this, LayoutGrid, LeftPanel, LeftRail, LeftSections);
         SetRightPanelVisible(true);
 
         _canvas = FindCanvas();
