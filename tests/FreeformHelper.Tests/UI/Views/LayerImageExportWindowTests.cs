@@ -33,7 +33,7 @@ public sealed class LayerImageExportWindowTests
     {
         using var session = new LayerImageExportViewTestSession();
         await session.ShowAsync();
-        var search = session.Window.FindControl<TextBox>("SearchBox")!;
+        var search = session.SearchBox;
         search.Focus();
 
         session.Window.KeyTextInput("ref");
@@ -83,7 +83,7 @@ public sealed class LayerImageExportWindowTests
         session.Window.KeyPress(Key.F, RawInputModifiers.Control, PhysicalKey.F, "f");
         session.Window.KeyRelease(Key.F, RawInputModifiers.Control, PhysicalKey.F, "f");
 
-        Assert.Same(session.Window.FindControl<TextBox>("SearchBox"), session.Window.FocusManager!.GetFocusedElement());
+        Assert.Same(session.SearchBox, session.Window.FocusManager!.GetFocusedElement());
     }
 
     [AvaloniaFact]
