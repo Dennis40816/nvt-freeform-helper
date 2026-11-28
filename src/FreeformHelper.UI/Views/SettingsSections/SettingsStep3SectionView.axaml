@@ -17,7 +17,8 @@
             </ComboBox.ItemTemplate>
           </ComboBox>
         </StackPanel>
-        <WrapPanel>
+        <WrapPanel ItemSpacing="{StaticResource Space8}"
+                   LineSpacing="{StaticResource Space8}">
           <Border Classes="chipStatus">
             <SelectableTextBlock Classes="chipStatusText"
                                  Text="{Binding NotchEffectiveModelSummary}"/>
@@ -34,7 +35,8 @@
       <StackPanel Spacing="{StaticResource Space8}">
         <SelectableTextBlock Classes="settingsSectionTitle"
                              Text="Signal semantics"/>
-        <WrapPanel>
+        <WrapPanel ItemSpacing="{StaticResource Space8}"
+                   LineSpacing="{StaticResource Space8}">
           <Border Classes="chipStatus">
             <SelectableTextBlock Classes="chipStatusText"
                                  Text="{Binding NotchAllocationModelShortText}"/>
@@ -54,87 +56,76 @@
     </Border>
 
     <Border Classes="settingsSectionBlock">
-      <StackPanel Spacing="{StaticResource Space8}">
+      <StackPanel Spacing="{StaticResource Space12}">
         <SelectableTextBlock Classes="settingsSectionTitle"
                              Text="Advanced allocation gates"
                              ToolTip.Tip="Compute gates and diagnostic trace controls."/>
         <Grid ColumnDefinitions="1*,1*"
-              ColumnSpacing="{StaticResource Space10}">
-          <Grid Grid.Column="0"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField left"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="To Regular EN (derived)" Tip="Derived from the selected compensation model; restores area-proportional signal before redistribution."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+              RowDefinitions="Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <StackPanel Grid.Row="0"
+                      Grid.Column="0"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="To Regular EN (derived)" Tip="Derived from the selected compensation model; restores area-proportional signal before redistribution."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToRegular, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-          <Grid Grid.Column="1"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField right"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables To Full expansion."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="To Full EN (derived)" Tip="Derived from the selected compensation model; enables To Full expansion."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="False"
                           IsChecked="{Binding EnableToFull, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-        </Grid>
-        <StackPanel Classes="panelFormField">
-          <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value. Higher ignores smaller overlaps."/>
-          <controls:NumberScrubber Minimum="0"
-                                   Maximum="100"
-                                   SmallChange="0.1"
-                                   FormatString="0.###"
-                                   SnapToStep="False"
-                                   Value="{Binding ToFullStrictOverlapPercent, Mode=TwoWay}"/>
-        </StackPanel>
-        <Grid ColumnDefinitions="1*,1*"
-              ColumnSpacing="{StaticResource Space10}">
-          <Grid Grid.Column="0"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField left"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full gate engine; OFF falls back to the legacy inline gate path."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1"
+                      Grid.Column="0"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Multi-owner strict overlap (%)" Tip="To Full ignores overlaps and free areas below this ratio. A smaller target share is ignored unless To Full applies to it. Blocking does not use this value. Higher ignores smaller overlaps."/>
+            <controls:NumberScrubber Minimum="0"
+                                     Maximum="100"
+                                     SmallChange="0.1"
+                                     FormatString="0.###"
+                                     SnapToStep="False"
+                                     Value="{Binding ToFullStrictOverlapPercent, Mode=TwoWay}"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2"
+                      Grid.Column="0"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Use To Full rule engine" Tip="ON uses the newer centralized To Full gate engine; OFF falls back to the legacy inline gate path."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding EnableToFullRuleEngine, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-          <Grid Grid.Column="1"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField right"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="Keep To Full trace" Tip="Store per-regular To Full rule decisions for diagnostics and runtime query payloads. Adds diagnostics only; notch output is unchanged."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2"
+                      Grid.Column="1"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Keep To Full trace" Tip="Store per-regular To Full rule decisions for diagnostics and runtime query payloads. Adds diagnostics only; notch output is unchanged."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsEnabled="{Binding EnableToFullRuleEngine}"
                           IsChecked="{Binding EnableToFullRuleTrace, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
         </Grid>
         <SelectableTextBlock Classes="stepNote"
                              Text="{Binding ToFullRuleEngineSummary}"/>
@@ -142,29 +133,29 @@
     </Border>
 
     <Border Classes="settingsSectionBlock">
-      <StackPanel Spacing="{StaticResource Space8}">
+      <StackPanel Spacing="{StaticResource Space12}">
         <SelectableTextBlock Classes="settingsSectionTitle"
                              Text="AA preview display"
                              ToolTip.Tip="Display-only diagnostics; generated notch rows are unchanged. Preview switches do not change computation."/>
         <Grid ColumnDefinitions="1*,1*"
-              ColumnSpacing="{StaticResource Space10}">
-          <Grid Grid.Column="0"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField left"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="Stage auto play" Tip="Loop the Step 3 preview layers automatically in the AA canvas."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+              RowDefinitions="Auto,Auto,Auto"
+              ColumnSpacing="{StaticResource Space12}"
+              RowSpacing="{StaticResource Space12}">
+          <StackPanel Grid.Row="0"
+                      Grid.Column="0"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Stage auto play" Tip="Loop the Step 3 preview layers automatically in the AA canvas."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding NotchPreviewAutoPlayEnabled, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-          <StackPanel Grid.Column="1"
-                      Classes="panelFormField right">
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="0"
+                      Grid.Column="1"
+                      Classes="panelFormField">
             <controls:SettingsInfoLabel Text="Interval (ms)" Tip="Delay between Step 3 preview layers during auto play."/>
             <controls:NumberScrubber Minimum="200"
                                      Maximum="5000"
@@ -172,44 +163,33 @@
                                      FormatString="0"
                                      Value="{Binding NotchPreviewAutoPlayIntervalMs, Mode=TwoWay}"/>
           </StackPanel>
-        </Grid>
-        <Grid ColumnDefinitions="1*,1*"
-              ColumnSpacing="{StaticResource Space10}">
-          <Grid Grid.Column="0"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField left"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="Show To Regular labels" Tip="Display To Regular ratio labels on the Step 3 preview canvas only."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+          <StackPanel Grid.Row="1"
+                      Grid.Column="0"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Show To Regular labels" Tip="Display To Regular ratio labels on the Step 3 preview canvas only."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding ShowNotchToRegularLabels, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-          <Grid Grid.Column="1"
-                ColumnDefinitions="1*,Auto"
-                ColumnSpacing="{StaticResource Space10}">
-            <StackPanel Grid.Column="0"
-                        Classes="panelFormField right"
-                        VerticalAlignment="Center">
-              <controls:SettingsInfoLabel Text="Show To Full overlay" Tip="Display To Full support stages on the Step 3 preview canvas only."/>
-            </StackPanel>
-            <ToggleSwitch Grid.Column="1"
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="1"
+                      Grid.Column="1"
+                      Classes="panelFormField">
+            <controls:SettingsInfoLabel Text="Show To Full overlay" Tip="Display To Full support stages on the Step 3 preview canvas only."/>
+            <ToggleSwitch Classes="settingsColumnSwitch"
                           IsChecked="{Binding ShowNotchCanvasPreview, Mode=TwoWay}"
                           OnContent=""
                           OffContent=""
                           MinWidth="{StaticResource ViewMenuSwitchMinWidth}"
-                          VerticalAlignment="Center"/>
-          </Grid>
-        </Grid>
-        <Grid ColumnDefinitions="1*,1*"
-              ColumnSpacing="{StaticResource Space10}">
-          <StackPanel Grid.Column="0"
-                      Classes="panelFormField left">
+                          Height="{StaticResource FormControlHeight}"
+                          HorizontalAlignment="Left"/>
+          </StackPanel>
+          <StackPanel Grid.Row="2"
+                      Grid.Column="0"
+                      Classes="panelFormField">
             <controls:SettingsInfoLabel Text="To Full layer stage" Tip="Choose the To Full preview layer: seed, candidate, or final support result."/>
             <controls:NumberScrubber Minimum="1"
                                      Maximum="3"

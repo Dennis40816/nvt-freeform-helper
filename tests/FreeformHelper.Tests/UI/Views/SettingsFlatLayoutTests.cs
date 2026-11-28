@@ -143,6 +143,58 @@ public sealed class SettingsFlatLayoutTests
         });
     }
 
+    [AvaloniaFact]
+    public async Task Step3FieldsShareTwoColumnsAndOneRowRhythmAsync()
+    {
+        await WithWindowAsync(async (window, draft) =>
+        {
+            var view = await ShowSectionAsync(window, SettingsWindowSection.Step3NotchCompensation);
+            Rect Area(Control control) => new(control.TranslatePoint(default, view)!.Value, control.Bounds.Size);
+            var pairs = new[]
+            {
+                ("To Regular EN (derived)", "To Full EN (derived)"),
+                ("Use To Full rule engine", "Keep To Full trace"),
+                ("Stage auto play", "Interval (ms)"),
+                ("Show To Regular labels", "Show To Full overlay"),
+            };
+            string[] singles = ["Multi-owner strict overlap (%)", "To Full layer stage"];
+            // A switch starts where its track is drawn, not where its click area begins.
+            double Start(Control input) => Area(input is ToggleSwitch
+                ? input.GetVisualDescendants().OfType<Border>().Single(static part => part.Name == "ToggleBody")
+                : input).X;
+            var left = Area(FindLabel(view, pairs[0].Item1)).X;
+            var right = Area(FindLabel(view, pairs[0].Item2)).X;
+
+            foreach (var (first, second) in pairs)
+            {
+                foreach (var (label, column) in new[] { (first, left), (second, right) })
+                {
+                    Assert.Equal(column, Area(FindLabel(view, label)).X, .5);
+                    Assert.Equal(column, Start(FindInput(view, label)), .5);
+                }
+
+                Assert.Equal(Area(FindLabel(view, first)).Y, Area(FindLabel(view, second)).Y, .5);
+                Assert.Equal(Area(FindInput(view, first)).Center.Y, Area(FindInput(view, second)).Center.Y, .5);
+            }
+
+            var columnWidth = right - left;
+            foreach (var label in singles)
+            {
+                Assert.Equal(left, Area(FindLabel(view, label)).X, .5);
+                Assert.Equal(left, Area(FindInput(view, label)).X, .5);
+            }
+
+            var widths = singles.Append("Interval (ms)").Select(label => Area(FindInput(view, label)).Width).ToArray();
+            Assert.All(widths, width => Assert.Equal(widths[0], width, .5));
+            Assert.True(widths[0] < columnWidth, $"A number input of {widths[0]} spans more than one column.");
+
+            // The full-width model list ends where the right column ends.
+            var model = Area(FindInput(view, "Compensation model"));
+            Assert.Equal(left, model.X, .5);
+            Assert.Equal(Area(FindInput(view, "Interval (ms)")).Right, model.Right, .5);
+        });
+    }
+
     [AvaloniaTheory]
     [InlineData(SettingsWindowSection.General)]
     [InlineData(SettingsWindowSection.Step1GeometryMatch)]
