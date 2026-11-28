@@ -16,60 +16,33 @@
       </panels:CollapsiblePanel.HeaderRight>
       <StackPanel Spacing="{StaticResource Space8}" HorizontalAlignment="Stretch">
 
-        <Border Classes="workflowStepStatusStrip">
-          <StackPanel Spacing="{StaticResource Space6}">
-            <Border Classes="workflowStepMetricTile">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workflowStepMetricLabel"
-                                     Text="CAD Output FW Diff assignment"/>
-                <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding CadOutputFwDiffAssignmentSummary}"
-                                     ToolTip.Tip="{Binding CadOutputFwDiffAssignmentSummary}"/>
-              </StackPanel>
-            </Border>
-            <Border Classes="workflowStepMetricTile">
-              <StackPanel Spacing="{StaticResource Space2}">
-                <SelectableTextBlock Classes="workflowStepMetricLabel"
-                                     Text="Duplicate diff status"/>
-                <SelectableTextBlock Classes="workflowStepMetricText compact"
-                                     Text="{Binding Step4Index.DuplicateDiffSummary}"
-                                     ToolTip.Tip="{Binding Step4Index.DuplicateDiffSummary}"/>
-              </StackPanel>
-            </Border>
-
-          </StackPanel>
-        </Border>
         <Button Classes="actionNeutral" Content="Analyze mapping"
                 Command="{Binding AnalyzeIndexMappingCommand}"
                 HorizontalAlignment="Stretch"
-                ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window."/>
-        <Border Classes="workflowStepSubsection"
-                IsVisible="{Binding HasStep4DuplicateDiffGroups}">
+                ToolTip.Tip="Step 4: analyze CAD↔Regular index mapping and open report window. Detailed issues open in a separate report window (copy supported)."/>
+        <Border IsVisible="{Binding HasStep4DuplicateDiffGroups}">
           <StackPanel Spacing="{StaticResource Space8}">
-            <SelectableTextBlock Text="Duplicate CAD Output FW Diff groups"
-                                 FontWeight="SemiBold"/>
-            <SelectableTextBlock Classes="stepNote"
-                                 Text="These groups currently share one IC+diff key. Select a group, then shift or override the CAD Output FW Diff."/>
+            <SelectableTextBlock Text="{Binding Step4Index.DuplicateDiffSummary}"
+                                 FontWeight="SemiBold" TextWrapping="Wrap"
+                                 ToolTip.Tip="These groups currently share one IC+diff key. Select a group, then shift or override the CAD Output FW Diff."/>
             <ItemsControl ItemsSource="{Binding Step4DuplicateDiffGroups}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Spacing="{StaticResource Space8}"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                  <Border Classes="workspaceDataRowCard">
+                  <Border>
                     <Grid ColumnDefinitions="*,Auto"
                           ColumnSpacing="{StaticResource Space8}">
-                      <StackPanel Spacing="{StaticResource Space4}">
-                        <SelectableTextBlock Text="{Binding TitleText}"
-                                             FontWeight="SemiBold"/>
-                        <SelectableTextBlock Classes="stepNote"
-                                             Text="{Binding CadSummaryText}"
-                                             TextWrapping="Wrap"/>
-                        <SelectableTextBlock Classes="stepNote"
-                                             Text="{Binding SuggestionText}"
-                                             TextWrapping="Wrap"/>
-                      </StackPanel>
+                      <SelectableTextBlock Text="{Binding CompactText}" VerticalAlignment="Center"
+                                           ToolTip.Tip="{Binding CadSummaryText}" TextWrapping="Wrap"/>
                       <Button Classes="actionNeutral" Grid.Column="1"
                               Content="Select"
                               Command="{Binding DataContext.SelectStep4DuplicateDiffGroupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                              CommandParameter="{Binding}"/>
+                              CommandParameter="{Binding}"
+                              ToolTip.Tip="{Binding SuggestionText}"/>
                     </Grid>
                   </Border>
                 </DataTemplate>
@@ -80,9 +53,8 @@
         <Border Classes="workflowStepSubsection">
           <StackPanel Spacing="{StaticResource Space8}">
             <SelectableTextBlock Text="Manual fix (changes indexes)"
-                                 FontWeight="SemiBold"/>
-            <SelectableTextBlock Classes="stepNote"
-                                 Text="Shift applies to selected CAD output pads."/>
+                                 FontWeight="SemiBold" TextWrapping="Wrap"
+                                 ToolTip.Tip="Shift applies to selected CAD output pads."/>
             <Grid ColumnDefinitions="*,Auto"
                   ColumnSpacing="{StaticResource Space8}">
               <controls:NumberScrubber Grid.Column="0"
@@ -99,7 +71,7 @@
                       Content="Shift"
                       ToolTip.Tip="Offset selected CAD Output FW Diff together. Empty gaps are allowed, but they will not become table anchors."/>
             </Grid>
-            <SelectableTextBlock Classes="stepNote"
+            <SelectableTextBlock Classes="stepNote" TextWrapping="Wrap"
                                  Text="Gap diffs stay empty. They can remain target-only and will not become anchor rows."/>
           </StackPanel>
         </Border>
@@ -109,11 +81,16 @@
                      Value="{Binding IndexMappingProgress}"
                      IsVisible="{Binding IsAnalyzingIndexMapping}"
                      Height="{StaticResource Space6}"/>
-        <SelectableTextBlock Classes="stepNote" Text="{Binding DxfRegularMappingSummary}"/>
         <SelectableTextBlock Classes="stepNote"
-                             Text="Detailed issues open in a separate report window (copy supported)."/>
+                             Text="{Binding Step4Index.AssignmentCountText}" TextWrapping="Wrap">
+          <ToolTip.Tip>
+            <StackPanel Spacing="{StaticResource Space4}">
+              <TextBlock Text="{Binding CadOutputFwDiffAssignmentSummary}" TextWrapping="Wrap"/>
+              <TextBlock Text="{Binding DxfRegularMappingSummary}" TextWrapping="Wrap"/>
+            </StackPanel>
+          </ToolTip.Tip>
+        </SelectableTextBlock>
         <Separator/>
-        <SelectableTextBlock Classes="stepNote" Text="Clears mapping diagnostics and invalidates export and validation." TextWrapping="Wrap"/>
         <Button Classes="actionDanger" Content="Clear result"
                 HorizontalAlignment="Right" Command="{Binding ClearStep4ResultCommand}"
                 ToolTip.Tip="Clears mapping diagnostics and invalidates export and validation."/>

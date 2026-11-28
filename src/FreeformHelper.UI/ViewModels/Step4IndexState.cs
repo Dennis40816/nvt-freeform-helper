@@ -28,5 +28,7 @@ public sealed partial class Step4IndexState : ObservableObject
     /// </summary>
     [ObservableProperty] private string _duplicateDiffSummary = "Duplicate CAD Output FW Diff: none.";
 
+    [ObservableProperty] private string _assignmentCountText = "CAD Output FW Diff assignment";
+
     partial void OnShiftDeltaChanged(decimal value) => _shiftDeltaChanged();
 }

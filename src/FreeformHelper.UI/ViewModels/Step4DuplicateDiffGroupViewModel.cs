@@ -6,4 +6,7 @@ public sealed record Step4DuplicateDiffGroupViewModel(
     IReadOnlyList<int> CadPadIds,
     string TitleText,
     string CadSummaryText,
-    string SuggestionText);
+    string SuggestionText)
+{
+    public string CompactText => $"{TitleText} · CAD {string.Join(", ", CadPadIds)}";
+}

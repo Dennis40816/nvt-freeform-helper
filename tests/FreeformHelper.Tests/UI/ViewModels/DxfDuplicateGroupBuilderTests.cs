@@ -45,7 +45,7 @@ public sealed class DxfDuplicateGroupBuilderTests
             "Use Select to load these CAD pads into the shared diff-shift workflow. Raw candidates: 10/11 · Masked candidates: 11.",
             group.SuggestionText);
         Assert.Equal(
-            $"Duplicate CAD Output FW Diff: 1 group(s), 2 CAD pad(s). Sample: IC1/diff7 -> CAD {pads[0].Id}, {pads[1].Id}.",
+            "Duplicate Output FW Diff · 2 CAD in 1 group",
             result.Summary);
     }
 
@@ -103,7 +103,7 @@ public sealed class DxfDuplicateGroupBuilderTests
         Assert.Equal(new[] { pads[2].Id, pads[3].Id }, result.Groups[0].CadPadIds);
         Assert.Equal(new[] { pads[0].Id, pads[1].Id }, result.Groups[1].CadPadIds);
         Assert.Equal(
-            $"Duplicate CAD Output FW Diff: 2 group(s), 4 CAD pad(s). Sample: IC1/diff20 -> CAD {pads[2].Id}, {pads[3].Id}.",
+            "Duplicate Output FW Diff · 4 CAD in 2 groups",
             result.Summary);
     }
 

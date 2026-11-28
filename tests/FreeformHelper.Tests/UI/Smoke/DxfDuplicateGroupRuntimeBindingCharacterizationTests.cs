@@ -37,15 +37,15 @@ public sealed class DxfDuplicateGroupRuntimeBindingCharacterizationTests
 
             var group = Assert.Single(vm.Step4DuplicateDiffGroups);
             Assert.Same(group, Assert.Single(rows.Items));
-            Assert.Contains(rows.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == group.TitleText);
-            Assert.Contains(rows.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == group.CadSummaryText);
+            var ids = Assert.Single(rows.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == group.CompactText);
+            Assert.Equal(group.CadSummaryText, Assert.IsType<TextBlock>(ToolTip.GetTip(ids)).Text);
             Assert.Single(vm.LayerToggles, static layer => layer.Name == "alpha").IsSelected = false;
             await WaitForGridRebuildAsync(vm);
             vm.IsStep4Expanded = true;
             await HeadlessUiPump.FlushQueueAsync();
             Assert.Empty(rows.Items);
             Assert.False(vm.HasStep4DuplicateDiffGroups);
-            Assert.DoesNotContain(rows.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == group.TitleText);
+            Assert.DoesNotContain(rows.GetVisualDescendants().OfType<SelectableTextBlock>(), text => text.Text == group.CompactText);
         }
         finally
         {

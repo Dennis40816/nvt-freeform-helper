@@ -32,7 +32,7 @@ public sealed class IndexMappingReportIntegratedLayoutTests
 
     private static readonly string[] _step4FooterLabels = ["Clear override", "Apply override", "Apply diff repair"];
     private static readonly string[] _step5FooterLabels = ["Apply segment repairs", "Apply visible repairs"];
-    private static readonly string[] _columnLabels = ["CAD", "REG", "Result", "Reason"];
+    private static readonly string[] _columnLabels = ["CAD", "REG", "Result"];
     private static readonly ThemeVariant[] _themes = [ThemeVariant.Dark, ThemeVariant.Light];
 
     [AvaloniaFact]
@@ -50,7 +50,7 @@ public sealed class IndexMappingReportIntegratedLayoutTests
                 await HeadlessUiPump.FlushQueueAsync();
                 Assert.Single(VisibleText(window), text => text == model.OpenIssueSummaryText);
                 Assert.Single(VisibleText(window), text => text == model.OverallStatusSummaryText);
-                Assert.Single(VisibleText(window), text => text == model.MaskAuditSummary);
+                Assert.DoesNotContain(VisibleText(window), text => text == model.MaskAuditSummary);
                 Assert.Single(VisibleText(window), static text => text!.Contains("Open issues", StringComparison.Ordinal));
                 Assert.DoesNotContain(VisibleText(window), static text => text!.StartsWith("Mode", StringComparison.Ordinal));
                 Assert.DoesNotContain(VisibleText(window), text => text == model.SelectedFilterLabel);
@@ -214,7 +214,7 @@ public sealed class IndexMappingReportIntegratedLayoutTests
     }
 
     [AvaloniaFact]
-    public async Task FourColumnsKeepSelectionLocateTooltipsAndOptionalStepSyncAsync()
+    public async Task ThreeColumnsKeepSelectionLocateTooltipsAndOptionalStepSyncAsync()
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var located = new List<(int? Cad, int? Regular)>();
@@ -247,17 +247,20 @@ public sealed class IndexMappingReportIntegratedLayoutTests
             Assert.Equal((row.CadPadId, row.LocateRegularPadIndex), Assert.Single(located));
             var result = Assert.Single(rowButton.GetVisualDescendants().OfType<TextBlock>(),
                 static text => Grid.GetColumn(text) == 2);
-            var reason = Assert.Single(rowButton.GetVisualDescendants().OfType<TextBlock>(),
-                static text => Grid.GetColumn(text) == 3);
+            var reason = Assert.Single(window.GetVisualDescendants().OfType<IndexMappingReportRightPaneView>())
+                .FindControl<SelectableTextBlock>("SelectedReason")!;
             foreach (var title in header.GetVisualDescendants().OfType<TextBlock>())
             {
                 var cell = Assert.Single(rowButton.GetVisualDescendants().OfType<TextBlock>(),
                     text => Grid.GetColumn(text) == Grid.GetColumn(title));
-                // The header has a 1 px border and the flat row has none.
-                Assert.InRange(title.TranslatePoint(default, window)!.Value.X - cell.TranslatePoint(default, window)!.Value.X, 0d, 1d);
+                // Header and row cells share the same column geometry.
+                var delta = title.TranslatePoint(default, window)!.Value.X - cell.TranslatePoint(default, window)!.Value.X;
+                Assert.True(delta is >= 0 and <= 1,
+                    $"{title.Text}: delta={delta}; header border={header.BorderThickness}; header={header.Bounds}; row={rowButton.Bounds}; header cell={title.Bounds}; row cell={cell.Bounds}");
             }
             Assert.Equal(row.StatusDisplay, TipText(result));
-            Assert.Equal(row.ReasonText, TipText(reason));
+            Assert.True(reason.IsEffectivelyVisible);
+            Assert.Equal(row.ReasonText, reason.Text);
             Assert.False(model.SyncFilterWithStepRail);
             model.SelectedFilterMode = IndexMappingDecisionFilterMode.ChangedByMask;
             model.SelectVerificationStepCommand.Execute(IndexMappingVerificationStep.Step5);
