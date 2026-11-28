@@ -21,6 +21,10 @@ Current document baseline: FreeformHelper g1 current-state audit, production evi
   - This is an aggregate state display + batch action, not a single layer toggle.
   - `On` is considered active only when all layers are visible.
   - `Off` is considered active only when all layers are hidden.
+- Layer search contract:
+  - The `Search layers` box above the layer list filters the rows by name (every term, case-insensitive) and highlights the matches. It is the same control as in the layer image export window.
+  - It only filters the list. Layer visibility and the bounds source layer do not change, and `Layers On / Off` still applies to all layers.
+  - `Esc` in the box and the clear button remove the query.
 - `Export Notch Rows` hide / restore contract:
   - The panel can temporarily `Hide panel (inspect AA)`, while AA remains usable in the main view.
   - The restore methods are fixed:

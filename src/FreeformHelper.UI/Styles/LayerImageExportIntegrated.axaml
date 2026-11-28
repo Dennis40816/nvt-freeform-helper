@@ -46,11 +46,6 @@
     <Setter Property="VerticalAlignment" Value="Center"/>
     <Setter Property="VerticalContentAlignment" Value="Center"/>
   </Style>
-  <Style Selector="TextBox.exportSearch">
-    <Setter Property="Height" Value="{DynamicResource NfcControlHeight}"/>
-    <Setter Property="Padding" Value="{DynamicResource LayerImageExportSearchPadding}"/>
-    <Setter Property="VerticalContentAlignment" Value="Center"/>
-  </Style>
   <Style Selector="ListBox.exportLayers ListBoxItem">
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
   </Style>

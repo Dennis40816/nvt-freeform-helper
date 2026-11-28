@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
 using Avalonia.Controls;
-using Avalonia.Input;
 using CommunityToolkit.Mvvm.Input;
 using FreeformHelper.UI.Converters;
 
@@ -23,11 +22,7 @@ public sealed partial class LayerImageExportWindow : Window
         LayerList.Focus();
     }
 
-    private void FocusSearch()
-    {
-        SearchBox.Focus(NavigationMethod.Tab);
-        SearchBox.SelectAll();
-    }
+    private void FocusSearch() => LayerSearch.FocusSearch();
 
     protected override void OnClosed(EventArgs e)
     {
