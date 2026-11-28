@@ -4,6 +4,7 @@
         xmlns:vm="clr-namespace:FreeformHelper.UI.ViewModels"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:converters="clr-namespace:FreeformHelper.UI.Converters"
+        xmlns:icons="using:Nvt.Core.Avalonia.Icons"
         x:Class="FreeformHelper.UI.Views.LayerImageExportWindow"
         x:DataType="vm:LayerImageExportViewModel"
         x:Name="ExportWindow"
@@ -22,8 +23,8 @@
     <converters:LayerPreviewBitmapConverter x:Key="PreviewBitmapConverter"/>
     <converters:LayerImageSelectionVisibilityConverter x:Key="HasSelectionConverter"/>
     <converters:LayerImageSelectionVisibilityConverter x:Key="NoSelectionConverter" Negate="True"/>
-    <converters:BooleanGlyphConverter x:Key="ThemeGlyph" TrueGlyph="dark_mode" FalseGlyph="light_mode"/>
-    <converters:BooleanGlyphConverter x:Key="RatioGlyph" TrueGlyph="link" FalseGlyph="link_off"/>
+    <converters:BooleanGlyphConverter x:Key="ThemeGlyph" TrueGlyph="{x:Static icons:NvtIcons.DarkMode}" FalseGlyph="{x:Static icons:NvtIcons.LightMode}"/>
+    <converters:BooleanGlyphConverter x:Key="RatioGlyph" TrueGlyph="{x:Static icons:NvtIcons.Link}" FalseGlyph="{x:Static icons:NvtIcons.LinkOff}"/>
   </Window.Resources>
   <Window.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/LayerImageExportIntegrated.axaml"/>
