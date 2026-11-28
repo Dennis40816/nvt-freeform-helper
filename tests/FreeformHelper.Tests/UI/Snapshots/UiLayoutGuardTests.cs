@@ -126,7 +126,7 @@ public sealed partial class UiLayoutGuardTests
             rightWorkflowSettings,
             StringComparison.Ordinal);
         var step5View = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "WorkflowSteps", "RightWorkflowStep5View.axaml"));
-        Assert.Contains("ToolTip.Tip=\"{Binding NotchExportSafetyPolicySummary}\"", step5View, StringComparison.Ordinal);
+        Assert.Matches(@"<ToolTip\.Tip>[\s\S]*?Text=""Review export safety""[\s\S]*?Text=""\{Binding NotchExportSafetyPolicySummary\}""", step5View);
     }
 
     [Fact]
@@ -339,7 +339,9 @@ public sealed partial class UiLayoutGuardTests
         var regularPadInfoContent = TestFiles.ReadContent(Path.Combine(repoRoot, "src", "FreeformHelper.UI", "Views", "PadInfoSections", "RegularPadInfoContentView.axaml"));
 
         Assert.Contains("x:Name=\"RegularPadInfoScroll\"", regularPadInfoContent, StringComparison.Ordinal);
-        Assert.Contains("MaxHeight=\"{DynamicResource PadInfoContentMaxHeight}\"", regularPadInfoContent, StringComparison.Ordinal);
+        // The popover is bounded by the canvas height, so the content must not carry its own limit.
+        Assert.Contains("Classes=\"viewportBoundScroll\"", regularPadInfoContent, StringComparison.Ordinal);
+        Assert.DoesNotContain("MaxHeight=", regularPadInfoContent, StringComparison.Ordinal);
         Assert.Contains("IsVisible=\"{Binding ShowGeometryDetails}\"", regularPadInfoContent, StringComparison.Ordinal);
     }
 

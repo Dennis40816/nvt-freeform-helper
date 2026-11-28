@@ -38,6 +38,8 @@ public sealed class PadInfoCanvasLayoutTests
         var canvas = new Canvas { Children = { popover } };
         Canvas.SetLeft(popover, 24);
         Canvas.SetTop(popover, 16);
+        // The overlay renderer bounds the panel by the canvas; a bare Canvas does not, so do it here.
+        popover.MaxHeight = 640 - (2 * 16);
         var window = new Window
         {
             Content = canvas,

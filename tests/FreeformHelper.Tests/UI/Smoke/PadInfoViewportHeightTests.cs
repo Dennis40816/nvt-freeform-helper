@@ -95,6 +95,48 @@ public sealed class PadInfoViewportHeightTests
         window.RequestedThemeVariant = ThemeVariant.Dark;
         window.Width = 1366;
         window.Height = 768;
+        var (canvas, popover) = await OpenExpandedPadInfoAsync(workspace, regular);
+        var scroll = Assert.Single(popover.GetVisualDescendants().OfType<ScrollViewer>(), static scroll =>
+            scroll.Name is "CadPadInfoScroll" or "RegularPadInfoScroll");
+        AssertInsideCanvas(canvas, popover, scroll);
+        Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
+        scroll.Offset = new Vector(0, scroll.Extent.Height);
+        await HeadlessUiPump.FlushQueueAsync();
+        Assert.True(scroll.Offset.Y > 0);
+        var smallHeight = popover.Bounds.Height;
+        var smallViewport = scroll.Viewport.Height;
+        window.Width = 1920;
+        window.Height = 1080;
+        await HeadlessUiPump.FlushQueueAsync();
+        AssertInsideCanvas(canvas, popover, scroll);
+        Assert.True(popover.Bounds.Height > smallHeight, $"Panel stayed at {smallHeight} after resize.");
+        Assert.True(scroll.Viewport.Height > smallViewport);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task TallViewportShowsAllContentWithoutAFixedHeightLimitAsync(bool regular)
+    {
+        await using var workspace = await MainWindowGlobalInputFixture.CreateAsync();
+        var window = workspace.Window;
+        window.Width = 1920;
+        window.Height = 2160;
+        var (canvas, popover) = await OpenExpandedPadInfoAsync(workspace, regular);
+        var scroll = Assert.Single(popover.GetVisualDescendants().OfType<ScrollViewer>(), static scroll =>
+            scroll.Name is "CadPadInfoScroll" or "RegularPadInfoScroll");
+
+        AssertInsideCanvas(canvas, popover, scroll);
+        // 560 was the former fixed limit; the content must be taller for this test to mean anything.
+        Assert.True(scroll.Extent.Height > 560, $"Content is only {scroll.Extent.Height} high.");
+        Assert.True(scroll.Viewport.Height >= scroll.Extent.Height,
+            $"Content {scroll.Extent.Height} scrolls in {scroll.Viewport.Height} although canvas is {canvas.Bounds.Height}.");
+    }
+
+    private static async Task<(PadCanvas Canvas, PadInfoPopover Popover)> OpenExpandedPadInfoAsync(
+        MainWindowGlobalInputFixture workspace, bool regular)
+    {
+        var window = workspace.Window;
         workspace.Helper.ShowCad = !regular;
         workspace.Helper.ShowRegular = regular;
         await HeadlessUiPump.FlushQueueAsync();
@@ -119,21 +161,7 @@ public sealed class PadInfoViewportHeightTests
         foreach (var panel in popover.GetVisualDescendants().OfType<CollapsiblePanel>().ToArray())
             panel.IsExpanded = true;
         await HeadlessUiPump.FlushQueueAsync();
-        var scroll = Assert.Single(popover.GetVisualDescendants().OfType<ScrollViewer>(), static scroll =>
-            scroll.Name is "CadPadInfoScroll" or "RegularPadInfoScroll");
-        AssertInsideCanvas(canvas, popover, scroll);
-        Assert.True(scroll.Extent.Height > scroll.Viewport.Height);
-        scroll.Offset = new Vector(0, scroll.Extent.Height);
-        await HeadlessUiPump.FlushQueueAsync();
-        Assert.True(scroll.Offset.Y > 0);
-        var smallHeight = popover.Bounds.Height;
-        var smallViewport = scroll.Viewport.Height;
-        window.Width = 1920;
-        window.Height = 1080;
-        await HeadlessUiPump.FlushQueueAsync();
-        AssertInsideCanvas(canvas, popover, scroll);
-        Assert.True(popover.Bounds.Height > smallHeight, $"Panel stayed at {smallHeight} after resize.");
-        Assert.True(scroll.Viewport.Height > smallViewport);
+        return (canvas, popover);
     }
 
     private static void AssertInsideCanvas(PadCanvas canvas, PadInfoPopover popover, ScrollViewer scroll)

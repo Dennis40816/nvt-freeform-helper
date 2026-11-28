@@ -80,11 +80,16 @@ internal sealed class PadInfoOverlayRenderer
             return;
         }
 
-        if (!_isPopoverObserved && popover is PadInfoPopover padInfoPopover)
+        if (!_isPopoverObserved)
         {
             _isPopoverObserved = true;
-            Avalonia.AvaloniaObjectExtensions.GetObservable(padInfoPopover, PadInfoPopover.IsCloseConfirmVisibleProperty)
-                .Subscribe(_ => QueueLayoutUpdate());
+            // Expanding a section grows the panel without a viewport or selection change.
+            popover.SizeChanged += (_, _) => QueueLayoutUpdate();
+            if (popover is PadInfoPopover padInfoPopover)
+            {
+                Avalonia.AvaloniaObjectExtensions.GetObservable(padInfoPopover, PadInfoPopover.IsCloseConfirmVisibleProperty)
+                    .Subscribe(_ => QueueLayoutUpdate());
+            }
         }
 
         if (!overlay.IsVisible || _getBoundsWorld() is not { } bounds)

@@ -7,13 +7,19 @@
              x:Class="FreeformHelper.UI.Views.RightWorkflowSections.RightWorkflowSettingsTabView">
     <StackPanel Spacing="{StaticResource Space10}"
                 IsVisible="{Binding IsRightPanelSettingsTab}">
-    <panels:CollapsiblePanel Title="Overview" IsExpanded="False">
+    <panels:CollapsiblePanel Classes="workflowCompactCard" Title="Overview" IsExpanded="False">
       <panels:CollapsiblePanel.HeaderRight>
         <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space6}">
           <Border Classes="chipStatus warning" Classes.danger="{Binding HasSimulationSafetyOverviewRisk}"
                   IsVisible="{Binding HasSimulationSafetyOverviewAttention}"
-                  ToolTip.Tip="{Binding SimulationSafetyOverviewSummaryText}">
-            <SelectableTextBlock Text="Simulation safety"/>
+                  AutomationProperties.Name="Simulation safety">
+            <ToolTip.Tip>
+              <StackPanel Spacing="{StaticResource Space6}">
+                <TextBlock Text="Simulation safety"/>
+                <TextBlock Text="{Binding SimulationSafetyOverviewSummaryText}" TextWrapping="Wrap"/>
+              </StackPanel>
+            </ToolTip.Tip>
+            <SelectableTextBlock Text="!"/>
           </Border>
               <Button Grid.Column="1"
                       Tag="General"
@@ -28,16 +34,16 @@
         <Border Classes="workflowOverviewSection"
                 ToolTip.Tip="Project geometry and regular-grid readiness summary. Edit values in Settings > General.">
           <StackPanel Spacing="{StaticResource Space8}">
-            <Grid Classes="workflowOverviewHeader" ColumnDefinitions="*,Auto">
-              <SelectableTextBlock Classes="workflowOverviewTitle" Text="Project / grid"/>
-
-            </Grid>
             <Grid Classes="workflowOverviewInfoGrid"
                   RowDefinitions="Auto,Auto,Auto"
                   ColumnDefinitions="Auto,*,Auto,*">
+              <ToolTip.Tip>
+                <TextBlock Text="Project / grid"/>
+              </ToolTip.Tip>
               <SelectableTextBlock Classes="workflowOverviewLabel" Text="CAD"/>
               <SelectableTextBlock Grid.Column="1"
                                    Classes="workflowOverviewValue"
+                                   TextWrapping="Wrap" TextTrimming="None"
                                    Text="{Binding CadPads.Count}"
                                    ToolTip.Tip="Loaded CAD pad count after DXF import and current DXF edits."/>
               <SelectableTextBlock Grid.Column="2"
@@ -45,6 +51,7 @@
                                    Text="REG"/>
               <SelectableTextBlock Grid.Column="3"
                                    Classes="workflowOverviewValue"
+                                   TextWrapping="Wrap" TextTrimming="None"
                                    Text="{Binding RegularPads.Count}"
                                    ToolTip.Tip="Generated regular-grid pad count."/>
               <SelectableTextBlock Grid.Row="1"
@@ -53,6 +60,7 @@
               <SelectableTextBlock Grid.Row="1"
                                    Grid.Column="1"
                                    Classes="workflowOverviewValue"
+                                   TextWrapping="Wrap" TextTrimming="None"
                                    Text="{Binding CascadeNum}"
                                    ToolTip.Tip="Cascade IC count from Settings > General."/>
               <SelectableTextBlock Grid.Row="1"
@@ -62,6 +70,7 @@
               <SelectableTextBlock Grid.Row="1"
                                    Grid.Column="3"
                                    Classes="workflowOverviewValue"
+                                   TextWrapping="Wrap" TextTrimming="None"
                                    Text="{Binding XChannels}"
                                    ToolTip.Tip="X-channel count per IC from Settings > General."/>
               <SelectableTextBlock Grid.Row="2"
@@ -70,17 +79,18 @@
               <SelectableTextBlock Grid.Row="2"
                                    Grid.Column="1"
                                    Classes="workflowOverviewValue"
+                                   TextWrapping="Wrap" TextTrimming="None"
                                    Text="{Binding YChannels}"
                                    ToolTip.Tip="Y-channel count per IC from Settings > General."/>
             </Grid>
             <StackPanel Classes="workflowOverviewMetaBlock">
               <SelectableTextBlock Classes="workflowOverviewMeta"
                                    Text="{Binding PitchSizeXSummary}"
-                                   TextWrapping="Wrap"
+                                   TextWrapping="Wrap" TextTrimming="None" MaxLines="0"
                                    ToolTip.Tip="{Binding PitchSizeXSummary}"/>
               <SelectableTextBlock Classes="workflowOverviewMeta"
                                    Text="{Binding PitchSizeYSummary}"
-                                   TextWrapping="Wrap"
+                                   TextWrapping="Wrap" TextTrimming="None" MaxLines="0"
                                    ToolTip.Tip="{Binding PitchSizeYSummary}"/>
             </StackPanel>
           </StackPanel>

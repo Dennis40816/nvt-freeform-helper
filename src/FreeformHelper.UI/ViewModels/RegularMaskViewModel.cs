@@ -27,6 +27,9 @@ public sealed partial class RegularMaskViewModel : ObservableObject, IRegularMas
     /// <summary>Gets or sets the last mask presentation, including rejected import diagnostics.</summary>
     [ObservableProperty] private string _summary = "Regular visibility mask: not loaded. Import Regular Visibility Mask (SeeRegular.csv) in Step 1 to constrain Step 4 and Simulation.";
 
+    /// <summary>Gets or sets whether the last mask load was rejected, so Step 1 must show why.</summary>
+    [ObservableProperty] private bool _hasLoadProblem;
+
     /// <summary>Gets or sets the picker attached by the view and cleared when it detaches.</summary>
     public Func<Task<string?>>? PickOpenRegularVisibilityMaskPathAsync { get; set; }
 
@@ -51,7 +54,10 @@ public sealed partial class RegularMaskViewModel : ObservableObject, IRegularMas
     }
 
     void IRegularMaskPresentation.UpdateSummary(RegularVisibilityMaskResult result, RegularGrid? grid, bool isEnabled)
-        => Summary = BuildSummary(result, grid, isEnabled);
+    {
+        Summary = BuildSummary(result, grid, isEnabled);
+        HasLoadProblem = result.Status is RegularVisibilityMaskStatus.Incompatible or RegularVisibilityMaskStatus.Failed;
+    }
 
     partial void OnIsEnabledChanged(bool value) => Workflow.OnEnabledChanged(value);
 
