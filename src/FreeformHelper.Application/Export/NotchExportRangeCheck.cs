@@ -38,7 +38,8 @@ internal static class NotchExportRangeCheck
             var nodes = ProjectV22(v22Rows, ResolveIcCount(v22Rows, grid), nullValue, profile, out var sourceRows);
             ValidateV22Nodes(nodes);
             ValidateGridDiffIndices(sourceRows.Where(static node => node.IcIndex >= 0).Select(node =>
-                (node.IcIndex, node.SourceDiffIndex, node.FirstTargetDiffIndex, node.SecondTargetDiffIndex)), grid);
+                (node.IcIndex, node.SourceDiffIndex, node.FirstTargetDiffIndex, node.SecondTargetDiffIndex)), grid,
+                sourceRows.Select(static node => (node.IcIndex, node.SourceDiffIndex, node.CadPadId)));
             return new NotchCExportProjection(Array.Empty<IReadOnlyList<NotchV21FirmwareNode>>(), nodes);
         }
 
@@ -49,12 +50,13 @@ internal static class NotchExportRangeCheck
                 v21Rows, nullValue, ResolveIcCount(v21Rows, grid), settings.Notch.ComputationMode);
             var nodes = projection.NodesByIc;
             ValidateV21Nodes(nodes, v21Rows, settings.Notch.ComputationMode);
+            var cadOutputDiffs = v21Rows.Select(static row => (row.IcIndex, row.Values[0], row.CadPadId));
             ValidateGridDiffIndices(projection.SourceRows.Where(static row => row.IcIndex >= 0).Select(row =>
-                (row.IcIndex, row.SourceDiffIndex, (int?)null, (int?)null)), grid);
+                (row.IcIndex, row.SourceDiffIndex, (int?)null, (int?)null)), grid, cadOutputDiffs);
             ValidateGridDiffIndices(nodes.SelectMany((bucket, ic) => bucket.Select(node =>
                 (ic, node.DestinationDiffIndex,
                  node.FirstDiffIndex == nullValue ? (int?)null : node.FirstDiffIndex,
-                 node.SecondDiffIndex == nullValue ? (int?)null : node.SecondDiffIndex))), grid);
+                 node.SecondDiffIndex == nullValue ? (int?)null : node.SecondDiffIndex))), grid, cadOutputDiffs);
             return new NotchCExportProjection(nodes, Array.Empty<IReadOnlyList<NotchV22FirmwareRow>>());
         }
 
@@ -64,7 +66,8 @@ internal static class NotchExportRangeCheck
 
     private static void ValidateGridDiffIndices(
         IEnumerable<(int IcIndex, int Source, int? First, int? Second)> indices,
-        RegularGrid grid)
+        RegularGrid grid,
+        IEnumerable<(int IcIndex, int Source, int? CadPadId)> cadOutputDiffs)
     {
         var cellCountByIc = grid.Pads.GroupBy(static pad => pad.IcIndex).ToDictionary(
             static group => group.Key,
@@ -80,8 +83,9 @@ internal static class NotchExportRangeCheck
             {
                 if (diff.HasValue && diff.Value >= count)
                 {
+                    var cad = DescribeCadOutputDiff(cadOutputDiffs, ic, diff.Value);
                     throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
-                        $"{field} diff index must be below IC rows × columns ({count}) at IC index {ic}: {diff.Value}."));
+                        $"{field} diff index must be below IC rows × columns ({count}) at IC index {ic}: {diff.Value}. {cad}"));
                 }
             }
         }
@@ -229,6 +233,25 @@ internal static class NotchExportRangeCheck
             ? string.Create(CultureInfo.InvariantCulture, $", CAD pad id {cadPadId.Value}")
             : string.Empty;
         return string.Create(CultureInfo.InvariantCulture, $"IC index {icIndex}, diff index {diffIndex}{cad}");
+    }
+
+    private static string DescribeCadOutputDiff(
+        IEnumerable<(int IcIndex, int Source, int? CadPadId)> sources, int icIndex, int diffIndex)
+    {
+        // A target belongs to the CAD whose source holds that output address, not the reporting row's CAD.
+        var ids = sources.Where(source => source.IcIndex == icIndex && source.Source == diffIndex && source.CadPadId.HasValue)
+            .Select(static source => source.CadPadId.GetValueOrDefault()).Distinct().Order().ToArray();
+        if (ids.Length == 0)
+        {
+            return "No CAD pad holds this output FW diff.";
+        }
+
+        const int displayLimit = 3;
+        var names = string.Join(", ", ids.Take(displayLimit).Select(static id =>
+            string.Create(CultureInfo.InvariantCulture, $"CAD {id}")));
+        return ids.Length > displayLimit
+            ? string.Create(CultureInfo.InvariantCulture, $"Held by {names} (+{ids.Length - displayLimit} more).")
+            : $"Held by {names}.";
     }
 }
 
