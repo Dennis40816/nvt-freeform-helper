@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:sys="using:System"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep3SectionView">
   <StackPanel Classes="panelForm settingsPage">
     <Border Classes="settingsSectionBlock">
@@ -19,7 +20,8 @@
         </StackPanel>
         <WrapPanel ItemSpacing="{StaticResource Space8}"
                    LineSpacing="{StaticResource Space8}">
-          <Border Classes="chipStatus">
+          <!-- The model summary is the page's own result line, so the chip width cap does not apply to it. -->
+          <Border Classes="chipStatus" MaxWidth="{x:Static sys:Double.PositiveInfinity}">
             <SelectableTextBlock Classes="chipStatusText"
                                  Text="{Binding NotchEffectiveModelSummary}"/>
           </Border>
