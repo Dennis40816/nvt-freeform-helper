@@ -42,7 +42,18 @@
         <Button Classes="actionGhost" Content="Canvas help" ToolTip.Tip="Canvas gestures, shortcuts and Pad Info">
           <Button.Flyout>
             <Flyout>
-              <StackPanel Spacing="{StaticResource Space6}" MaxWidth="{StaticResource ViewMenuPopupWidth}">
+              <StackPanel Classes="canvasHelpContent" Spacing="{StaticResource Space6}" MaxWidth="{StaticResource ViewMenuPopupWidth}">
+                <StackPanel.Styles>
+                  <!-- Flyout prose is a logical Button descendant, but must keep document text behavior. -->
+                  <Style Selector="StackPanel.canvasHelpContent SelectableTextBlock">
+                    <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+                    <Setter Property="TextWrapping" Value="Wrap"/>
+                    <Setter Property="TextTrimming" Value="None"/>
+                    <Setter Property="MaxLines" Value="0"/>
+                    <Setter Property="IsHitTestVisible" Value="True"/>
+                    <Setter Property="Focusable" Value="True"/>
+                  </Style>
+                </StackPanel.Styles>
                 <SelectableTextBlock Text="Canvas help" FontWeight="SemiBold"/>
                 <SelectableTextBlock Text="Click: select · Ctrl/Shift+click: add or remove" TextWrapping="Wrap"/>
                 <SelectableTextBlock Text="Drag empty space: box select · Alt: prefer Regular" TextWrapping="Wrap"/>
