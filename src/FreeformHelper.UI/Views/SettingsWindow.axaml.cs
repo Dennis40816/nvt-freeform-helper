@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using FreeformHelper.UI.ViewModels;
@@ -9,6 +10,11 @@ namespace FreeformHelper.UI.Views;
 
 public sealed partial class SettingsWindow : Window
 {
+    private static readonly string[] _navigationButtonNames =
+    [
+        "GeneralNavButton", "Step1NavButton", "Step2NavButton", "Step3NavButton", "Step4NavButton", "Step5NavButton",
+    ];
+
     private UiEventRunner? _uiEvents => _viewModel?.UiEvents;
 
     private SettingsWindowViewModel? _viewModel;
@@ -16,6 +22,11 @@ public sealed partial class SettingsWindow : Window
     public SettingsWindow()
     {
         InitializeComponent();
+        foreach (var name in _navigationButtonNames)
+        {
+            this.FindControl<ToggleButton>(name)!.Click += KeepNavigationMarked;
+        }
+
         Opened += OnOpened;
     }
 
@@ -80,6 +91,10 @@ public sealed partial class SettingsWindow : Window
 
         _viewModel.ResetAllSettingsToDefaults();
     }
+
+    // A navigation button is a ToggleButton: a second click would clear its mark while its page stays shown.
+    private static void KeepNavigationMarked(object? sender, RoutedEventArgs e) =>
+        (sender as ToggleButton)?.SetCurrentValue(ToggleButton.IsCheckedProperty, true);
 
     public void NavigateToSection(SettingsWindowSection? section)
     {

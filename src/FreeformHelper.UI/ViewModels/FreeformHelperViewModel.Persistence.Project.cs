@@ -190,6 +190,8 @@ public sealed partial class FreeformHelperViewModel
         var dxfElapsedMs = dxfLoadSw.ElapsedMilliseconds;
         if (outcome is null)
         {
+            // Nothing rebuilds the index map without CAD, so the previous project's summary would stay.
+            RebuildVisibleDxfIndexMap(Array.Empty<CadPad>());
             return (dxfElapsedMs, _cadEditReplay.KeepWithoutCad(file));
         }
 
