@@ -29,7 +29,7 @@ public sealed class NotchTableExporterEdgeCaseCharacterizationTests
     public void Comment_WithNonAsciiText_IsCopiedUnchanged()
     {
         const string comment = "焊盤 pad 😀";
-        var text = ExportC(TableWithComment(NotchAlgorithmVersion.V22, comment));
+        var text = ExportC(TableWithComment(NotchAlgorithmVersion.V22, comment), columnsPerIc: 21);
 
         Assert.Contains($"// {comment}; NODE KEEP=", text, StringComparison.Ordinal);
         Assert.Contains(text, static character => character > 127);
@@ -53,7 +53,7 @@ public sealed class NotchTableExporterEdgeCaseCharacterizationTests
     public void IcCountOf256_IsWrittenAndTheDispatchGuardIsAlwaysTrue(int icIndex, string icNum)
     {
         RequireGcc();
-        var text = ExportC(new NotchTable([V22Row(icIndex, 7, 50, NullDiff, 0, NullDiff, 0, 0, "last-ic")]));
+        var text = ExportC(new NotchTable([V22Row(icIndex, 7, 50, NullDiff, 0, NullDiff, 0, 0, "last-ic")]), columnsPerIc: 8);
 
         var result = CompileC99(text);
 

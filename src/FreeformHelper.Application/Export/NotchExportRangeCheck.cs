@@ -35,22 +35,56 @@ internal static class NotchExportRangeCheck
 
         if (v22Rows.Count > 0)
         {
-            var nodes = ProjectV22(v22Rows, ResolveIcCount(v22Rows, grid), nullValue, profile);
+            var nodes = ProjectV22(v22Rows, ResolveIcCount(v22Rows, grid), nullValue, profile, out var sourceRows);
             ValidateV22Nodes(nodes);
+            ValidateGridDiffIndices(sourceRows.Where(static node => node.IcIndex >= 0).Select(node =>
+                (node.IcIndex, node.SourceDiffIndex, node.FirstTargetDiffIndex, node.SecondTargetDiffIndex)), grid);
             return new NotchCExportProjection(Array.Empty<IReadOnlyList<NotchV21FirmwareNode>>(), nodes);
         }
 
         if (v21Rows.Count > 0)
         {
             ValidateV21Rows(v21Rows);
-            var nodes = NotchV21FirmwareProjector.Project(
-                v21Rows, nullValue, ResolveIcCount(v21Rows, grid), settings.Notch.ComputationMode).NodesByIc;
+            var projection = NotchV21FirmwareProjector.Project(
+                v21Rows, nullValue, ResolveIcCount(v21Rows, grid), settings.Notch.ComputationMode);
+            var nodes = projection.NodesByIc;
             ValidateV21Nodes(nodes, v21Rows, settings.Notch.ComputationMode);
+            ValidateGridDiffIndices(projection.SourceRows.Where(static row => row.IcIndex >= 0).Select(row =>
+                (row.IcIndex, row.SourceDiffIndex, (int?)null, (int?)null)), grid);
+            ValidateGridDiffIndices(nodes.SelectMany((bucket, ic) => bucket.Select(node =>
+                (ic, node.DestinationDiffIndex,
+                 node.FirstDiffIndex == nullValue ? (int?)null : node.FirstDiffIndex,
+                 node.SecondDiffIndex == nullValue ? (int?)null : node.SecondDiffIndex))), grid);
             return new NotchCExportProjection(nodes, Array.Empty<IReadOnlyList<NotchV22FirmwareRow>>());
         }
 
         return new NotchCExportProjection(
             Array.Empty<IReadOnlyList<NotchV21FirmwareNode>>(), Array.Empty<IReadOnlyList<NotchV22FirmwareRow>>());
+    }
+
+    private static void ValidateGridDiffIndices(
+        IEnumerable<(int IcIndex, int Source, int? First, int? Second)> indices,
+        RegularGrid grid)
+    {
+        var cellCountByIc = grid.Pads.GroupBy(static pad => pad.IcIndex).ToDictionary(
+            static group => group.Key,
+            group => (long)grid.Rows * group.Select(static pad => pad.Col).Distinct().Count());
+        foreach (var (ic, source, first, second) in indices)
+        {
+            cellCountByIc.TryGetValue(ic, out var count);
+            Validate(source, "Anchor");
+            Validate(first, "First target");
+            Validate(second, "Second target");
+
+            void Validate(int? diff, string field)
+            {
+                if (diff.HasValue && diff.Value >= count)
+                {
+                    throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture,
+                        $"{field} diff index must be below IC rows × columns ({count}) at IC index {ic}: {diff.Value}."));
+                }
+            }
+        }
     }
 
     private static int ResolveIcCount(IReadOnlyList<NotchTableRow> rows, RegularGrid grid)
@@ -74,9 +108,10 @@ internal static class NotchExportRangeCheck
         IReadOnlyList<NotchTableRow> rows,
         int icCount,
         int nullValue,
-        NotchExportProfile profile)
+        NotchExportProfile profile,
+        out IReadOnlyList<NotchV22FirmwareRow> sourceRows)
     {
-        return NotchV22ExportRows.ProjectNodes(rows, icCount, nullValue, profile);
+        return NotchV22ExportRows.ProjectNodes(rows, icCount, nullValue, profile, out sourceRows);
     }
 
     private static void ValidateV21Rows(IReadOnlyList<NotchTableRow> rows)

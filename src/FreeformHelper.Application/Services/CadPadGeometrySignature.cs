@@ -13,7 +13,7 @@ public static class CadPadGeometrySignature
     public static string Build(Polygon2 polygon, int decimals = 6, double epsilon = 1e-9) =>
         BuildCore(polygon, decimals, epsilon);
 
-    internal static string BuildExact(Polygon2 polygon) =>
+    public static string BuildExact(Polygon2 polygon) =>
         BuildCore(polygon, decimals: null, double.Epsilon);
 
     private static string BuildCore(Polygon2 polygon, int? decimals, double epsilon)

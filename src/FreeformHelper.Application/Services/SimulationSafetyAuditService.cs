@@ -159,7 +159,7 @@ public static class SimulationSafetyAuditService
 
         if (result.Cells.Count == 0)
         {
-            return SimulationSafetyAuditResult.Empty(afterCap);
+            return SimulationSafetyAuditResult.Empty(afterCap) with { TargetCoveragePercentCap = targetCoveragePercentCap };
         }
 
         var globalFlowAudit = BuildGlobalFlowAudit(result);

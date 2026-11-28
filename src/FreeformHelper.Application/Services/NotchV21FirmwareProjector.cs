@@ -12,13 +12,14 @@ internal static class NotchV21FirmwareProjector
         IReadOnlyList<NotchTableRow> rows,
         int nullValue,
         int icCount,
-        NotchComputationMode computationMode)
+        NotchComputationMode computationMode,
+        ICollection<string>? diagnostics = null)
     {
         ArgumentNullException.ThrowIfNull(rows);
         NotchSettings.ValidateNullValueOrThrow(nullValue);
 
         return computationMode == NotchComputationMode.CadAllocation
-            ? ProjectCadAllocation(rows, nullValue, icCount)
+            ? ProjectCadAllocation(rows, nullValue, icCount, diagnostics)
             : ProjectLegacy(rows, icCount);
     }
 
@@ -55,7 +56,8 @@ internal static class NotchV21FirmwareProjector
     private static NotchV21FirmwareProjection ProjectCadAllocation(
         IReadOnlyList<NotchTableRow> rows,
         int nullValue,
-        int icCount)
+        int icCount,
+        ICollection<string>? diagnostics)
     {
         var termsByDestination = new Dictionary<(int IcIndex, int DestinationDiffIndex), List<FirmwareTerm>>();
         var sourceRows = new List<NotchV21ProjectedSourceRow>();
@@ -69,7 +71,7 @@ internal static class NotchV21FirmwareProjector
 
             rowNumber++;
             var values = PadValues(row.Values);
-            var sourceRow = ProjectSourceRow(rowNumber, row, values, nullValue);
+            var sourceRow = ProjectSourceRow(rowNumber, row, values, nullValue, diagnostics);
             sourceRows.Add(sourceRow);
 
             if (sourceRow.SelfRatioQ7 != 0)
@@ -128,7 +130,8 @@ internal static class NotchV21FirmwareProjector
         int rowNumber,
         NotchTableRow row,
         int[] values,
-        int nullValue)
+        int nullValue,
+        ICollection<string>? diagnostics)
     {
         var sourceDiffIndex = values[0];
         var combinePercent = Math.Clamp(values[2], 0, byte.MaxValue);
@@ -137,6 +140,11 @@ internal static class NotchV21FirmwareProjector
         AddLeg(values[6], values[7], values[8]);
 
         var sourceRetainedPercent = combinePercent - legs.Sum(static leg => leg.SignedPercent);
+        if (sourceRetainedPercent < 0)
+        {
+            diagnostics?.Add(string.Create(CultureInfo.InvariantCulture,
+                $"V21 projection IC {row.IcIndex}, diff {sourceDiffIndex}: retained percent {sourceRetainedPercent} clamped to 0."));
+        }
         sourceRetainedPercent = Math.Max(0, sourceRetainedPercent);
         var sourceDeltaPercent = sourceRetainedPercent - 100;
         var selfType = sourceDeltaPercent switch
@@ -145,6 +153,8 @@ internal static class NotchV21FirmwareProjector
             < 0 => NotchV21Q7Codec.TypeSub,
             _ => NotchV21Q7Codec.TypeNone,
         };
+        var rawSelfQ7 = NotchV21Q7Codec.EncodeLegacyRowFractionRaw(Math.Abs((double)sourceDeltaPercent) / 100d);
+        ReportQ7Clamp(rawSelfQ7, row, diagnostics);
         var selfRatioQ7 = sourceDeltaPercent == 0
             ? 0
             : NotchV21Q7Codec.EncodePercentMagnitude(sourceDeltaPercent);
@@ -167,6 +177,7 @@ internal static class NotchV21FirmwareProjector
                 return;
             }
 
+            ReportQ7Clamp(ratioQ7, row, diagnostics);
             var normalizedRatio = NotchV21Q7Codec.NormalizeMagnitude(ratioQ7);
             var signedPercent = NotchV21Q7Codec.DecodeSignedPercent(type, normalizedRatio);
             if (signedPercent == 0)
@@ -175,6 +186,16 @@ internal static class NotchV21FirmwareProjector
             }
 
             legs.Add(new NotchV21ProjectedLeg(targetDiffIndex, type, normalizedRatio, signedPercent));
+        }
+
+    }
+
+    private static void ReportQ7Clamp(int rawQ7, NotchTableRow row, ICollection<string>? diagnostics)
+    {
+        if (rawQ7 > byte.MaxValue)
+        {
+            diagnostics?.Add(string.Create(CultureInfo.InvariantCulture,
+                $"V21 projection IC {row.IcIndex}, diff {row.Values[0]}: Q7 {rawQ7} clamped to 255."));
         }
     }
 

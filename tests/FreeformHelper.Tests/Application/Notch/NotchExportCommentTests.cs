@@ -11,7 +11,7 @@ namespace FreeformHelper.Tests;
 public sealed class NotchExportCommentTests
 {
     private const int NullDiff = 65534;
-    private static readonly int[] _gridDiffIndices = [0];
+    private static readonly int[] _gridDiffIndices = [0, 1, 2];
     private static readonly int[] _v21Values = [0, 100, 110, 1, 1, 32, 2, 1, 32];
     private static readonly int[] _v22Values = [0, 110, 1, 25, 2, 25, 0];
 

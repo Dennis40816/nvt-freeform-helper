@@ -19,7 +19,8 @@ public sealed record SimulationWorkspaceSession(
     IReadOnlyList<CadPad>? CadPadsForCopperProjection = null,
     IReadOnlyDictionary<int, int>? CadOutputFwDiffIndexByCadId = null,
     IReadOnlyDictionary<int, int>? CadIcIndexByCadId = null,
-    NotchComputationMode ComputationMode = NotchComputationMode.CadAllocation)
+    NotchComputationMode ComputationMode = NotchComputationMode.CadAllocation,
+    int TargetCoverageCapPercent = 120)
 {
     public RegularGrid FwDiffGrid => Grid;
     public RegularGrid CadOutputFwDiffGrid => CadOutputFwDiffGridProjection ?? Grid;

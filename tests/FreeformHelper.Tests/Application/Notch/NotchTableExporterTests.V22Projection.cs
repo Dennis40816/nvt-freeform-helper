@@ -39,7 +39,7 @@ public sealed partial class NotchTableExporterTests
             table,
             NotchAlgorithmVersion.V22,
             65535));
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -84,7 +84,7 @@ public sealed partial class NotchTableExporterTests
             table,
             NotchAlgorithmVersion.V22,
             65535));
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             grid,
@@ -123,7 +123,7 @@ public sealed partial class NotchTableExporterTests
                 comment: "ic2-v22"),
         });
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(3),
             CreateGridWithIcCount(3),
@@ -148,7 +148,7 @@ public sealed partial class NotchTableExporterTests
         var grid = CreateRuntimeParityGrid();
         var table = CreateRuntimeParityV22Table();
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSetWithIcCount(2),
             grid,
@@ -180,7 +180,7 @@ public sealed partial class NotchTableExporterTests
                 comment: "flagged"),
         });
 
-        var text = NotchTableExporter.ExportAsCInitializer(
+        var text = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             table,
             CreateCadSet(),
             CreateGrid(),
@@ -230,13 +230,13 @@ public sealed partial class NotchTableExporterTests
                 comment: "v21-only"),
         });
 
-        var v22OnlyText = NotchTableExporter.ExportAsCInitializer(
+        var v22OnlyText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             v22OnlyTable,
             CreateCadSet(),
             CreateGrid(),
             CreateProjectSettings(),
             NotchExportProfile.Debug);
-        var v21OnlyText = NotchTableExporter.ExportAsCInitializer(
+        var v21OnlyText = FirmwareExportTestSupport.ExportSparseFirmwareSample(
             v21OnlyTable,
             CreateCadSet(),
             CreateGrid(),

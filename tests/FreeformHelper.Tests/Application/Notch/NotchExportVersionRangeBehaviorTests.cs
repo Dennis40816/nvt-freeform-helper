@@ -42,7 +42,7 @@ public sealed class NotchExportVersionRangeBehaviorTests
     }
 
     [Fact]
-    public void ExportAsCInitializer_EmptyGrid_UsesTableIcIndicesWithoutDroppingTheRow()
+    public void ExportAsCInitializer_EmptyGrid_RejectsUntilTableIcHasCapacity()
     {
         using var culture = TestCulture.UseEnUs();
         var row = new NotchTableRow(2, 17, 0, null,
@@ -53,8 +53,13 @@ public sealed class NotchExportVersionRangeBehaviorTests
             Notch = new NotchSettings { NullValue = ushort.MaxValue },
         };
 
+        var error = Assert.Throws<InvalidOperationException>(() => NotchTableExporter.ExportAsCInitializer(
+            new NotchTable([row]), new CadPadSet([]), grid, settings));
+        Assert.Contains("rows × columns (0)", error.Message, StringComparison.Ordinal);
+
+        var capacityGrid = TestGeometryFactory.CreateRegularGrid(1, 8, icIndexSelector: (_, _) => 2);
         var text = NotchTableExporter.ExportAsCInitializer(
-            new NotchTable([row]), new CadPadSet([]), grid, settings);
+            new NotchTable([row]), new CadPadSet([]), capacityGrid, settings);
 
         Assert.Contains("#define USER_NHC_IC_NUM          (3u)", text, StringComparison.Ordinal);
         Assert.Contains("#define USER_NHC_NODE_NUM_IC1 (0u)", text, StringComparison.Ordinal);

@@ -476,12 +476,10 @@ public sealed class NotchExportGenerationCacheService
         foreach (var pad in cad.Pads)
         {
             hash = MixHash(hash, ToUnsigned(pad.Id));
-            hash = MixHash(hash, ToUnsigned(pad.Polygon.Vertices.Length));
-            hash = MixHash(hash, ToUnsigned(Quantize(pad.Bounds.MinX)));
-            hash = MixHash(hash, ToUnsigned(Quantize(pad.Bounds.MinY)));
-            hash = MixHash(hash, ToUnsigned(Quantize(pad.Bounds.MaxX)));
-            hash = MixHash(hash, ToUnsigned(Quantize(pad.Bounds.MaxY)));
-            hash = MixHash(hash, ToUnsigned(Quantize(pad.Area)));
+            foreach (var character in CadPadGeometrySignature.BuildExact(pad.Polygon))
+            {
+                hash = MixHash(hash, character);
+            }
         }
 
         return hash;

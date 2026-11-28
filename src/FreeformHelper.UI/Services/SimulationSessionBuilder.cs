@@ -133,7 +133,8 @@ internal sealed class SimulationSessionBuilder(SimulationSessionPorts ports, Log
             cad.Pads.ToArray(),
             workflowSnapshot.CadOutputFwDiffIndexByCadId,
             workflowSnapshot.CadIcIndexByCadId,
-            generation.ExportSettings.Notch.ComputationMode);
+            generation.ExportSettings.Notch.ComputationMode,
+            generation.ExportSettings.Notch.TargetCoverageCapPercent);
     }
 
     private void ReportSimulationWorkspaceReady(
