@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -244,6 +245,47 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
         finally
         {
             column.Close();
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task FirstRowOfAnIcGroupMarksTheDataRowAndNotTheGroupHeaderAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var selection = CreateSelection();
+        selection.SelectedRow = selection.Rows[0];
+        var window = new NotchExportSelectionWindow { DataContext = selection };
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var rows = Assert.Single(window.GetVisualDescendants().OfType<ListBox>(),
+                static list => list.Classes.Contains("notchExportRows"));
+            var item = Assert.Single(rows.GetVisualDescendants().OfType<ListBoxItem>(), static item => item.IsSelected);
+            var parts = item.GetVisualDescendants().OfType<Control>().ToArray();
+            var group = Assert.Single(parts.OfType<ContentControl>(), static part => part.Classes.Contains("exportIcGroup"));
+            var fill = Assert.Single(parts.OfType<Border>(), static part => part.Classes.Contains("exportRowFill"));
+            var mark = Assert.Single(parts.OfType<Border>(), static part => part.Classes.Contains("exportRowMark"));
+            var focus = Assert.Single(parts.OfType<Border>(), static part => part.Classes.Contains("exportRowFocus"));
+            Assert.True(group.IsEffectivelyVisible);
+            Assert.True(BoundsIn(window, group).Bottom <= BoundsIn(window, fill).Top);
+            Assert.True(mark.IsEffectivelyVisible);
+            Assert.True(BoundsIn(window, fill).Contains(BoundsIn(window, mark)));
+            Assert.Same(item.Background, fill.Background);
+            var presenter = Assert.Single(parts.OfType<ContentPresenter>(),
+                static part => part.Name == "PART_ContentPresenter" && part.TemplatedParent is ListBoxItem);
+            Assert.Equal(Colors.Transparent.A, Assert.IsAssignableFrom<ISolidColorBrush>(presenter.Background).Color.A);
+            Assert.False(Assert.Single(parts, static part => part.Name == "ListSelectionIndicator").IsVisible);
+
+            item.Focus(NavigationMethod.Tab);
+            await HeadlessUiPump.FlushQueueAsync();
+            Assert.True(focus.IsVisible);
+            Assert.True(BoundsIn(window, fill).Contains(BoundsIn(window, focus)));
+            Assert.False(Assert.Single(parts, static part => part.Name == "ListFocusRing").IsVisible);
+        }
+        finally
+        {
             window.Close();
         }
     }

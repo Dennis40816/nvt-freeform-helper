@@ -62,6 +62,52 @@
   <Style Selector="CheckBox.exportRowCheck /template/ Border#ChoiceRow">
     <Setter Property="Tag" Value="None"/>
   </Style>
+  <!-- The first item of an IC group also holds the group header. Core draws selection on the whole item,
+       so these rows draw the fill, the selection mark and the focus ring on the data row only. -->
+  <Style Selector="ListBox.notchExportRows ListBoxItem">
+    <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource BrushTransparent}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem /template/ Border#ListSelectionIndicator">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem /template/ Border#ListFocusRing">
+    <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ContentControl.exportIcGroup">
+    <Setter Property="Margin" Value="{DynamicResource Nvt.List.RowPadding}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows Border.exportRowFill">
+    <Setter Property="MinHeight" Value="{DynamicResource NfcControlHeight}"/>
+    <Setter Property="Padding" Value="{DynamicResource Nvt.List.RowPadding}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource Nvt.Shape.ControlCornerRadius}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows Border.exportRowMark">
+    <Setter Property="IsVisible" Value="False"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
+    <Setter Property="Width" Value="{DynamicResource Nvt.List.SelectionIndicatorWidth}"/>
+    <Setter Property="Height" Value="{DynamicResource Nvt.List.SelectionIndicatorHeight}"/>
+    <Setter Property="Margin" Value="{DynamicResource Nvt.List.SelectionIndicatorMargin}"/>
+    <Setter Property="HorizontalAlignment" Value="Left"/>
+    <Setter Property="VerticalAlignment" Value="Center"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource Nvt.Shape.RoundCornerRadius}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem:selected Border.exportRowMark">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows Border.exportRowFocus">
+    <Setter Property="IsVisible" Value="False"/>
+    <Setter Property="IsHitTestVisible" Value="False"/>
+    <Setter Property="Margin" Value="{DynamicResource Nvt.Controls.InsetFocusRingMargin}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource Nvt.Controls.FocusBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource Nvt.Focus.RingThickness}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource Nvt.List.FocusCornerRadius}"/>
+  </Style>
+  <Style Selector="ListBox.notchExportRows ListBoxItem:focus-visible:not(:disabled) Border.exportRowFocus">
+    <Setter Property="IsVisible" Value="True"/>
+  </Style>
   <Style Selector="ListBox.notchExportRows ListBoxItem:selected CheckBox.exportRowCheck">
     <Setter Property="Foreground" Value="{DynamicResource Nvt.List.SelectedLabelBrush}"/>
   </Style>
