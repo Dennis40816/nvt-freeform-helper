@@ -140,10 +140,10 @@ public sealed partial class FreeformHelperViewModel
                string.Equals(value, "Ready", StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string BuildStatusDisplayText(string? value)
-    {
-        return IsReadyStatusText(value) ? string.Empty : value ?? string.Empty;
-    }
+    // The banner only says that detection finished; the Step 2 panel shows the numbers.
+    private static string BuildStatusDisplayText(string? value) =>
+        value?.StartsWith("Freeform stats (auto-detect):", StringComparison.Ordinal) == true
+            ? "Freeform detection complete." : IsReadyStatusText(value) ? string.Empty : value ?? string.Empty;
 
     private static bool HasStatusDisplayFor(string? value)
     {
