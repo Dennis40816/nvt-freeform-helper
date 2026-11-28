@@ -1,6 +1,7 @@
 <UserControl x:CompileBindings="True" xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
     xmlns:icons="using:Nvt.Core.Avalonia.Icons"
     xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
     x:DataType="viewModels:SimulationWorkspaceViewModel"
@@ -90,7 +91,7 @@
       </StackPanel>
     </WrapPanel>
     <StackPanel Classes="panelFormField" IsVisible="{Binding IsThresholdMode}">
-      <controls:SettingsInfoLabel Text="TH (color scale only)" Tip="Controls the color scale reference; simulation thresholds and results stay the same."/>
+      <corePrimitives:InfoLabel Text="TH (color scale only)" Tip="Controls the color scale reference; simulation thresholds and results stay the same."/>
       <controls:NumberScrubber Minimum="0" Maximum="{DynamicResource NumericInputMaximum}" SmallChange="0.1"
           FormatString="0.###" SnapToStep="False" Value="{Binding ColorThresholdValue, Mode=TwoWay}"/>
     </StackPanel>

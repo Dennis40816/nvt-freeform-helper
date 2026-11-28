@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls">
+        xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+        xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives">
   <Style Selector="Border.settingsWindowChrome">
     <Setter Property="Background" Value="{DynamicResource NfcAppBackgroundBrush}"/>
     <Setter Property="Padding" Value="{StaticResource Inset16}"/>
@@ -51,11 +52,12 @@
     <Setter Property="Background" Value="{DynamicResource NfcSelectionSurfaceBrush}"/>
   </Style>
 
-  <Style Selector="controls|SettingsInfoLabel">
+  <Style Selector="corePrimitives|InfoLabel">
+    <Setter Property="TipTargetClass" Value="settingsFieldTile"/>
     <Setter Property="HorizontalAlignment" Value="Stretch"/>
   </Style>
 
-  <Style Selector="SelectableTextBlock.settingsInfoLabelText, TextBlock.settingsInfoLabelText">
+  <Style Selector="corePrimitives|InfoLabel SelectableTextBlock.infoLabelText, corePrimitives|InfoLabel TextBlock.infoLabelText">
     <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
   </Style>

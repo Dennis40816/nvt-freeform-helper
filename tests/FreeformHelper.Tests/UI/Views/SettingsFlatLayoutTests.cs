@@ -327,7 +327,7 @@ public sealed class SettingsFlatLayoutTests
 
     private static Control FindLabel(Control view, string label)
     {
-        var infoLabels = view.GetVisualDescendants().OfType<SettingsInfoLabel>().Where(item => item.Text == label).ToArray();
+        var infoLabels = view.GetVisualDescendants().OfType<Nvt.Core.Avalonia.Primitives.InfoLabel>().Where(item => item.Text == label).ToArray();
         return infoLabels.Length > 0
             ? Assert.Single(infoLabels)
             : Assert.Single(view.GetVisualDescendants().OfType<TextBlock>(), item => item.Text == label);

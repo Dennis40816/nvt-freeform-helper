@@ -1,13 +1,14 @@
 <UserControl x:CompileBindings="False" xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
+             xmlns:corePrimitives="using:Nvt.Core.Avalonia.Primitives"
              x:Class="FreeformHelper.UI.Views.SettingsSections.SettingsStep1SectionView">
   <StackPanel Classes="settingsPage">
     <Border Classes="settingsSectionBlock">
       <StackPanel Spacing="{StaticResource Space12}">
         <Border Classes="settingsFieldTile">
           <StackPanel Classes="panelFormField">
-            <controls:SettingsInfoLabel Text="Unmatched TH (overlap / regular area)"
+            <corePrimitives:InfoLabel Text="Unmatched TH (overlap / regular area)"
                                         Tip="Diagnostics threshold for unmatched regular pads; it does not rewrite Step 1 links."/>
             <controls:NumberScrubber Minimum="0"
                                      Maximum="1"
