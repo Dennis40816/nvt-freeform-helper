@@ -70,7 +70,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         "Need full AA view? Hide panel, inspect in workspace, then press Ctrl+Shift+E to restore.";
     private readonly string _subtitleText =
         "Review, filter, inspect, and export notch mappings.";
-    private const string DefaultSearchWatermark = "Search by row / diff / mapping / CAD...";
+    private const string DefaultSearchWatermark = "Search row, diff, mapping, CAD";
 
     public NotchExportSelectionViewModel(
         NotchTable table,
@@ -364,6 +364,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
         OnPropertyChanged(nameof(IsSimulationSafetyClean));
         OnPropertyChanged(nameof(NeedsSimulationCheckAttention));
         OnPropertyChanged(nameof(HasPassedExportChecks));
+        OnPropertyChanged(nameof(PassedChecksTitleText));
         OnPropertyChanged(nameof(SimulationSafetyExportBadgeText));
         OnPropertyChanged(nameof(SimulationSafetyExportSummaryText));
         OnPropertyChanged(nameof(SimulationSafetyExportHighRiskText));
@@ -421,6 +422,7 @@ public sealed partial class NotchExportSelectionViewModel : ObservableObject
     {
         SyncVersionSelectionToExportType();
         OnPropertyChanged(nameof(IsVersionSelectionPinnedByExportType));
+        OnPropertyChanged(nameof(VersionHintText));
         OnPropertyChanged(nameof(CanSelectVersion));
     }
 

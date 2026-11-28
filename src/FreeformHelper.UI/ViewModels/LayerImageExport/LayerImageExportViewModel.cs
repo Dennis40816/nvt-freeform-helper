@@ -79,10 +79,13 @@ public sealed class LayerImageExportViewModel : ObservableObject, IDisposable
     public string CountText => string.Create(CultureInfo.InvariantCulture, $"{_selection.CheckedCount:N0} / {_selection.TotalCount:N0}");
 
     public string AllLayersText => string.IsNullOrEmpty(SearchText) ? "All layers" : "All shown layers";
-    public string SelectionSummaryText => string.Create(CultureInfo.InvariantCulture,
-        $"{_visibleRows.Count(static row => row.IsChecked):N0} of {_visibleRows.Count:N0} shown selected · {CountText} layers selected");
+    // Without a query every layer is shown, so the shown counts would repeat the totals.
+    public string SelectionSummaryText => string.IsNullOrEmpty(SearchText)
+        ? $"{CountText} layers selected"
+        : string.Create(CultureInfo.InvariantCulture,
+            $"{_visibleRows.Count(static row => row.IsChecked):N0} of {_visibleRows.Count:N0} shown selected · {CountText} in total");
 
-    public string FooterText => $"{LayerImageSizeText.FormatSelection(_selection.CheckedCount)} · {PreviewSettings.OutputText}";
+    public string FooterText => PreviewSettings.OutputText;
 
     public bool HasLayers => _selection.TotalCount > 0;
 
@@ -155,7 +158,6 @@ public sealed class LayerImageExportViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(AllLayersState));
         OnPropertyChanged(nameof(CountText));
         OnPropertyChanged(nameof(SelectionSummaryText));
-        OnPropertyChanged(nameof(FooterText));
         ConfirmCommand.NotifyCanExecuteChanged();
         bool updated = _selection.CheckedCount > 0 && PreviewSettings.CurrentSize.Source != LayerImageSizeSource.Custom &&
             PreviewSettings.UpdateDefaultSize(_context.CreateDefaultSize(_selection.CheckedNames));

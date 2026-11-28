@@ -56,6 +56,7 @@ public sealed partial class NotchExportSelectionViewModel
         OnPropertyChanged(nameof(HasWorkspaceLinkedRows));
         OnPropertyChanged(nameof(HasNoWorkspaceLinkedRows));
         OnPropertyChanged(nameof(WorkspaceSelectionSummaryText));
+        OnPropertyChanged(nameof(LinkedRowsTitleText));
     }
 
     private void ApplyWorkspaceLinkedSelectedRow(NotchExportRowItemViewModel? preferredSelectedRow)

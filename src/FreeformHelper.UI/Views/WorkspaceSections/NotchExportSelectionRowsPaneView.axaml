@@ -7,9 +7,8 @@
   <UserControl.Styles>
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
   </UserControl.Styles>
-  <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="{StaticResource Space6}">
-    <TextBlock Text="{Binding VisibleRowsSummaryText}"/>
-    <Border Grid.Row="1" Classes="workspaceTableHeader">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="{StaticResource Space6}">
+    <Border Classes="workspaceTableHeader">
       <Grid ColumnSpacing="{StaticResource Space6}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{StaticResource NotchExportIntegratedCheckWidth}"/>
@@ -23,7 +22,7 @@
         <CheckBox Classes="exportRowCheck" IsChecked="{Binding VisibleRowsSelection, Mode=TwoWay}"
                   IsEnabled="{Binding HasRows}" HorizontalAlignment="Center"
                   AutomationProperties.Name="Include all shown rows in export"
-                  ToolTip.Tip="Include all shown rows in export"/>
+                  ToolTip.Tip="All shown rows"/>
         <Button Grid.Column="1" Classes="productFilterChip columnFilter" Classes.active="{Binding IsRowColumnFilterActive}"
                 Tag="row" Click="OpenHeaderFilterButton_Click" ToolTip.Tip="Filter # values (Excel-style).">
           <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}">
@@ -62,7 +61,7 @@
         </Button>
       </Grid>
     </Border>
-    <ListBox Grid.Row="2" Classes="notchExportRows"
+    <ListBox Grid.Row="1" Classes="notchExportRows"
              ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow, Mode=TwoWay}" ScrollViewer.VerticalScrollBarVisibility="Auto"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
       <ListBox.ItemsPanel>
@@ -113,16 +112,19 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <Border Grid.Row="2" IsVisible="{Binding HasNoRows}" VerticalAlignment="Top"
+    <Border Grid.Row="1" IsVisible="{Binding HasNoRows}" VerticalAlignment="Top"
             Background="{DynamicResource NfcSurfaceSubtleBrush}" Padding="{StaticResource Inset12}">
       <StackPanel Spacing="{StaticResource Space4}">
         <TextBlock Text="No rows match the view filters."/>
         <TextBlock Classes="stepNote" Text="Use Reset filters above to show every row."/>
       </StackPanel>
     </Border>
-    <Button Grid.Row="3" Classes="actionNeutral" Content="Replace selection with shown rows"
-            IsVisible="{Binding HasRows}"
-            HorizontalAlignment="Right" Command="{Binding UseShownOnlyCommand}"
-            ToolTip.Tip="Unchecks every hidden row and checks the shown rows."/>
+    <Grid Grid.Row="2" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
+      <TextBlock Text="{Binding VisibleRowsSummaryText}" VerticalAlignment="Center"/>
+      <Button Grid.Column="1" Classes="actionNeutral" Content="Select only shown rows"
+              IsVisible="{Binding HasRows}"
+              HorizontalAlignment="Right" Command="{Binding UseShownOnlyCommand}"
+              ToolTip.Tip="Clears other selections."/>
+    </Grid>
   </Grid>
 </UserControl>

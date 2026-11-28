@@ -16,13 +16,42 @@
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ChoiceStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Theme/ListStyles.axaml"/>
   <StyleInclude Source="avares://Nvt.Core.Avalonia/Primitives/PrimitivesStyles.axaml"/>
-  <Style Selector="panels|WorkspaceShell.exportRows /template/ SelectableTextBlock.workspaceMainTitle">
+  <!-- The window title names the view, so the shell header takes no space. -->
+  <Style Selector="panels|WorkspaceShell.exportRows /template/ StackPanel">
     <Setter Property="IsVisible" Value="False"/>
+  </Style>
+  <Style Selector="panels|WorkspaceShell.exportRows /template/ Border > Grid">
+    <Setter Property="RowSpacing" Value="{DynamicResource Space8}"/>
   </Style>
   <Style Selector="panels|WorkspaceShell.exportRows /template/ Border.workspaceTopLayerBox">
     <Setter Property="Background" Value="{x:Null}"/>
     <Setter Property="BorderThickness" Value="{DynamicResource BorderNone}"/>
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>
+  </Style>
+  <Style Selector="Border.exportCheckRow">
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource NfcCompactCornerRadius}"/>
+    <Setter Property="Padding" Value="{DynamicResource Inset8_6}"/>
+  </Style>
+  <Style Selector="Border.exportCheckRow controls|FontIcon.exportCheckWarning">
+    <Setter Property="Foreground" Value="{DynamicResource NfcWarningTextBrush}"/>
+    <Setter Property="VerticalAlignment" Value="Top"/>
+  </Style>
+  <Style Selector="Border.exportCode">
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceSubtleBrush}"/>
+    <Setter Property="CornerRadius" Value="{DynamicResource NfcCompactCornerRadius}"/>
+    <Setter Property="Padding" Value="{DynamicResource Inset8_6}"/>
+  </Style>
+  <Style Selector="SelectableTextBlock.exportFooterStatus.warning">
+    <Setter Property="Foreground" Value="{DynamicResource NfcWarningTextBrush}"/>
+  </Style>
+  <!-- The passed checks cover table rows, so the popup surface is opaque. -->
+  <Style Selector="FlyoutPresenter.exportChecks">
+    <Setter Property="Background" Value="{DynamicResource NfcSurfaceBrush}"/>
+    <Setter Property="BorderBrush" Value="{DynamicResource NfcBorderBrush}"/>
+    <Setter Property="BorderThickness" Value="{DynamicResource BorderThin}"/>
   </Style>
   <Style Selector="CheckBox.exportRowCheck">
     <Setter Property="Padding" Value="{DynamicResource InsetNone}"/>

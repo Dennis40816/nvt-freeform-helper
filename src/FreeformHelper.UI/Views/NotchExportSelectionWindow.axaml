@@ -2,7 +2,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:FreeformHelper.UI.Controls"
         xmlns:panels="clr-namespace:Nvt.Core.Avalonia.Panels;assembly=Nvt.Core.Avalonia"
-        xmlns:primitives="clr-namespace:Nvt.Core.Avalonia.Primitives;assembly=Nvt.Core.Avalonia"
         xmlns:viewModels="clr-namespace:FreeformHelper.UI.ViewModels"
         xmlns:sections="clr-namespace:FreeformHelper.UI.Views.WorkspaceSections"
         x:Class="FreeformHelper.UI.Views.NotchExportSelectionWindow"
@@ -21,47 +20,12 @@
     <StyleInclude Source="avares://FreeformHelper.UI/Styles/ExportNotchRows.axaml"/>
   </Window.Styles>
   <panels:WorkspaceShell Classes="exportRows"
-                         Subtitle="Check the rows to export, then press Export."
                          LeftColumnWidth="{StaticResource NotchExportMainLeftColumnWidth}"
                          RightColumnWidth="{StaticResource NotchExportIntegratedInspectorWidth}">
-    <panels:WorkspaceShell.HeaderRight>
-      <StackPanel Spacing="{StaticResource Space4}">
-        <Grid ColumnDefinitions="Auto,Auto">
-          <StackPanel Classes="panelFormField left" IsVisible="{Binding HasExportTypeOptions}">
-            <TextBlock Classes="stepNote" Text="Export format"/>
-            <ComboBox ItemsSource="{Binding ExportTypeOptions}"
-                      Width="{StaticResource NotchExportTopDropdownWidth}"
-                      IsEnabled="{Binding CanSelectExportType}"
-                      SelectedItem="{Binding SelectedExportTypeOption, Mode=TwoWay}">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:NotchExportFileTypeOption">
-                  <TextBlock Text="{Binding Display}"/>
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-          </StackPanel>
-          <StackPanel Grid.Column="1" Classes="panelFormField right" IsVisible="{Binding HasVersionOptions}">
-            <TextBlock Classes="stepNote" Text="Notch version"
-                       ToolTip.Tip="Single-version choice is saved with the next Save Project."/>
-            <ComboBox ItemsSource="{Binding VersionOptions}"
-                      Width="{StaticResource NotchExportIntegratedVersionWidth}"
-                      IsEnabled="{Binding CanSelectVersion}"
-                      SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="viewModels:NotchExportVersionOption">
-                  <TextBlock Text="{Binding Display}"/>
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-          </StackPanel>
-        </Grid>
-        <TextBlock Text="Version is set by Export format" HorizontalAlignment="Right"
-                   IsVisible="{Binding IsVersionSelectionPinnedByExportType}"/>
-      </StackPanel>
-    </panels:WorkspaceShell.HeaderRight>
     <panels:WorkspaceShell.SummaryContent>
-      <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space2}"
-                  ToolTip.Tip="Counts: rows in the current version scope matching each category.">
+      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
+        <WrapPanel x:Name="CategoryFilters" ItemSpacing="{StaticResource Space2}" LineSpacing="{StaticResource Space2}"
+                   ToolTip.Tip="Counts: rows in the current version scope matching each category.">
         <ToggleButton Classes="productFilterChip" Content="Selected only"
                       IsChecked="{Binding IsSelectedOnlyActive, Mode=OneWay}"
                       Command="{Binding ToggleSelectedOnlyCommand}"/>
@@ -85,14 +49,36 @@
                       IsChecked="{Binding IsFilterNoCadOnly, Mode=OneWay}"
                       Command="{Binding SetViewFilterModeCommand}"
                       CommandParameter="{x:Static viewModels:NotchExportRowDisplayMode.NoCadOnly}"/>
-      </StackPanel>
+        </WrapPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="{StaticResource Space6}"
+                    VerticalAlignment="Top" IsVisible="{Binding HasVersionOptions}">
+          <TextBlock VerticalAlignment="Center" Text="Notch version" ToolTip.Tip="{Binding VersionHintText}"/>
+          <ComboBox x:Name="VersionSelector" ItemsSource="{Binding VersionOptions}"
+                    Width="{StaticResource NotchExportSortDropdownWidth}"
+                    AutomationProperties.Name="Notch version"
+                    IsEnabled="{Binding CanSelectVersion}"
+                    SelectedItem="{Binding SelectedVersionOption, Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="viewModels:NotchExportVersionOption">
+                <TextBlock Text="{Binding Display}"/>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+      </Grid>
     </panels:WorkspaceShell.SummaryContent>
     <panels:WorkspaceShell.ToolbarContent>
       <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,*,Auto"
             ColumnSpacing="{StaticResource Space8}" RowSpacing="{StaticResource Space4}">
         <TextBox Classes="singleLineActionInput" Width="{StaticResource NotchExportSearchWidth}"
                  PlaceholderText="{Binding SearchWatermarkText}"
-                 Text="{Binding SearchKeyword, Mode=TwoWay}"/>
+                 AutomationProperties.Name="Search rows"
+                 Text="{Binding SearchKeyword, Mode=TwoWay}">
+          <TextBox.InnerLeftContent>
+            <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.Search}"
+                               Margin="{StaticResource InsetLeft8}" VerticalAlignment="Center"/>
+          </TextBox.InnerLeftContent>
+        </TextBox>
         <Button Grid.Column="1" Classes="actionGhost actionIconButton"
                 Click="ShowFilterBuilderButton_Click" ToolTip.Tip="Filter helper"
                 AutomationProperties.Name="Filter helper">
@@ -133,91 +119,50 @@
             <StackPanel x:Name="InspectorPanel" Spacing="{StaticResource Space6}" IsVisible="{Binding HasSelectedRow}">
               <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="{Binding InspectorHeaderText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                <Border Grid.Column="1" Classes="chipStatus">
-                  <TextBlock Text="{Binding SelectedRow.StatusText}"/>
-                </Border>
+                <TextBlock Grid.Column="1" Classes="stepNote" Text="{Binding SelectedRow.StatusText}"/>
               </Grid>
-              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto"
                     ColumnSpacing="{StaticResource Space12}" RowSpacing="{StaticResource Space4}">
                 <TextBlock Classes="stepNote" Text="Diff"/>
                 <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedRowPayloadAnchorText}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="1" Classes="stepNote" Text="Combine"/>
-                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRowPayloadCombineText}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="2" Classes="stepNote" Text="Target 1"/>
-                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRowPayloadTarget1Text}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="3" Classes="stepNote" Text="Target 2"/>
-                <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRowPayloadTarget2Text}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="4" Classes="stepNote" Text="Version"/>
-                <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedRow.VersionText}" TextWrapping="Wrap"/>
-                <TextBlock Grid.Row="5" Classes="stepNote" Text="Mapping"/>
-                <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedRowPadRelationText}" TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="1" Classes="stepNote" Text="Version"/>
+                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRow.VersionText}" TextWrapping="Wrap"/>
+                <TextBlock Grid.Row="2" Classes="stepNote" Text="Mapping"/>
+                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRowPadRelationText}" TextWrapping="Wrap"/>
               </Grid>
-              <SelectableTextBlock IsVisible="{Binding IsSelectedRowLegacy}" Text="{Binding SelectedRowCodePreviewText}"
-                                   TextWrapping="Wrap" ToolTip.Tip="Legacy payload columns"/>
-              <SelectableTextBlock Text="{Binding SelectedRowAnalysisText}" TextWrapping="Wrap"
-                                   ToolTip.Tip="{Binding SelectedRowOutcomeText}"/>
-              <Button Classes="actionGhost" HorizontalAlignment="Right" Click="CopyPayloadButton_Click"
-                      ToolTip.Tip="Copy payload">
+              <Border Classes="exportCode">
+                <SelectableTextBlock x:Name="PayloadCode" Text="{Binding SelectedRowCodePreviewText}"
+                                     FontFamily="{DynamicResource FontFamilyCode}" TextWrapping="Wrap"/>
+              </Border>
+              <Button x:Name="CopyPayloadButton" Classes="actionNeutral" HorizontalAlignment="Right" Click="CopyPayloadButton_Click">
                 <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
                   <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.ContentCopy}"/>
                   <TextBlock Text="Copy payload"/>
                 </StackPanel>
               </Button>
-              <panels:CollapsiblePanel x:Name="LowFrequencyDetail" Title="Low-frequency detail"
+              <panels:CollapsiblePanel x:Name="LowFrequencyDetail" Title="Targets and flags"
                                        IsExpanded="{Binding ShowSelectedRowDetailSection, Mode=TwoWay}">
-                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto"
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
                       ColumnSpacing="{StaticResource Space12}" RowSpacing="{StaticResource Space4}">
-                  <TextBlock Classes="stepNote" Text="Flags"/>
-                  <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedRowFlagsText}" TextWrapping="Wrap"/>
-                  <TextBlock Grid.Row="1" Classes="stepNote" Text="Comment"/>
-                  <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRowCommentText}" TextWrapping="Wrap"/>
+                  <TextBlock Classes="stepNote" Text="Combine"/>
+                  <SelectableTextBlock Grid.Column="1" Text="{Binding SelectedRowPayloadCombineText}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="1" Classes="stepNote" Text="Target 1"/>
+                  <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedRowPayloadTarget1Text}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="2" Classes="stepNote" Text="Target 2"/>
+                  <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedRowPayloadTarget2Text}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="3" Classes="stepNote" Text="Ratio sum"/>
+                  <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedRowAnalysisRatioSumText}" TextWrapping="Wrap"
+                                       ToolTip.Tip="{Binding SelectedRowOutcomeText}"/>
+                  <TextBlock Grid.Row="4" Classes="stepNote" Text="Flags"/>
+                  <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedRowFlagsText}" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Row="5" Classes="stepNote" Text="Comment"/>
+                  <SelectableTextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedRowCommentText}" TextWrapping="Wrap"/>
                 </Grid>
               </panels:CollapsiblePanel>
             </StackPanel>
             <TextBlock IsVisible="{Binding HasNoSelectedRow}" Text="Select a row on the left to inspect it."
                        Foreground="{DynamicResource NfcTextMutedBrush}" TextWrapping="Wrap"/>
-            <primitives:SectionFrame x:Name="ExportChecksSection" Title="Export checks">
-              <StackPanel Spacing="{StaticResource Space6}">
-                <panels:CollapsiblePanel Title="{Binding SimulationSafetyExportBadgeText}"
-                                         IsVisible="{Binding NeedsSimulationCheckAttention}"
-                                         IsExpanded="{Binding NeedsSimulationCheckAttention, Mode=OneWay}">
-                  <StackPanel Spacing="{StaticResource Space4}">
-                    <Border Classes="chipStatus warning" IsVisible="{Binding HasSimulationPhysicalAuditWarning}"
-                            ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
-                      <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
-                    </Border>
-                    <SelectableTextBlock IsVisible="{Binding HasNoSimulationPhysicalAuditWarning}"
-                                         Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
-                    <SelectableTextBlock IsVisible="{Binding IsExportBlockedBySimulationSafety}"
-                                         Text="{Binding SimulationSafetyExportHighRiskText}" TextWrapping="Wrap"/>
-                  </StackPanel>
-                </panels:CollapsiblePanel>
-                <panels:CollapsiblePanel Title="{Binding ToFullCoverageBadgeText}"
-                                         IsVisible="{Binding HasToFullCoverageWarning}"
-                                         IsExpanded="{Binding HasToFullCoverageWarning, Mode=OneWay}">
-                  <StackPanel Spacing="{StaticResource Space4}">
-                    <SelectableTextBlock Text="{Binding ToFullCoverageSummaryText}" TextWrapping="Wrap"/>
-                    <SelectableTextBlock Text="{Binding ToFullCoverageDetailText}" TextWrapping="Wrap"/>
-                    <SelectableTextBlock IsVisible="{Binding HasToFullCoverageMissingList}"
-                                         Text="{Binding ToFullCoverageMissingListText}" TextWrapping="Wrap"/>
-                  </StackPanel>
-                </panels:CollapsiblePanel>
-                <panels:CollapsiblePanel Title="Passed checks" IsVisible="{Binding HasPassedExportChecks}" IsExpanded="False">
-                  <StackPanel Spacing="{StaticResource Space6}">
-                    <StackPanel Spacing="{StaticResource Space4}" IsVisible="{Binding IsSimulationSafetyClean}">
-                      <TextBlock Text="{Binding SimulationSafetyExportBadgeText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                      <SelectableTextBlock Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                    <StackPanel Spacing="{StaticResource Space4}" IsVisible="{Binding HasNoToFullCoverageWarning}">
-                      <TextBlock Text="{Binding ToFullCoverageBadgeText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
-                      <SelectableTextBlock Text="{Binding ToFullCoverageSummaryText}" TextWrapping="Wrap"/>
-                      <SelectableTextBlock Text="{Binding ToFullCoverageDetailText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                  </StackPanel>
-                </panels:CollapsiblePanel>
-              </StackPanel>
-            </primitives:SectionFrame>
-            <panels:CollapsiblePanel Title="Workspace locate" IsExpanded="True">
+            <panels:CollapsiblePanel x:Name="LinkedRowsPanel" Title="{Binding LinkedRowsTitleText}" IsExpanded="False">
               <StackPanel Spacing="{StaticResource Space6}">
                 <SelectableTextBlock Text="{Binding WorkspaceSelectionSummaryText}" TextWrapping="Wrap"/>
                 <StackPanel Spacing="{StaticResource Space4}" IsVisible="{Binding CanHidePanelForInspect}">
@@ -258,18 +203,101 @@
       </ScrollViewer>
     </panels:WorkspaceShell.RightContent>
     <panels:WorkspaceShell.FooterContent>
-      <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
-        <SelectableTextBlock VerticalAlignment="Center" FontWeight="SemiBold"
-                             Text="{Binding ExportSummaryText}" TextWrapping="Wrap"/>
-        <StackPanel x:Name="FooterActions" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
-                    Spacing="{StaticResource Space8}">
-          <SelectableTextBlock VerticalAlignment="Center" Foreground="{DynamicResource NfcWarningTextBrush}" TextWrapping="Wrap"
-                               Text="{Binding HiddenSelectedRowsHintText}" IsVisible="{Binding HasHiddenSelectedRows}"/>
-          <Button Classes="actionNeutral" Content="Cancel" Click="CancelButton_Click"/>
-          <Button Classes="actionPrimary" Content="Export" IsEnabled="{Binding HasSelection}"
-                  ToolTip.Tip="Export checked rows in their original order." Click="ExportButton_Click"/>
-        </StackPanel>
-      </Grid>
+      <StackPanel Spacing="{StaticResource Space8}">
+        <Grid x:Name="ExportChecksBar" ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
+          <StackPanel Spacing="{StaticResource Space4}">
+            <Border x:Name="SimulationCheckRow" Classes="exportCheckRow" IsVisible="{Binding NeedsSimulationCheckAttention}">
+              <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource Space8}">
+                <controls:FontIcon Classes="symbols iconSm exportCheckWarning" Glyph="{DynamicResource Nvt.Icon.Warning}"/>
+                <SelectableTextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding SimulationSafetyExportBadgeText}"/>
+                <StackPanel Grid.Column="2" Spacing="{StaticResource Space4}">
+                  <Border Classes="chipStatus warning" IsVisible="{Binding HasSimulationPhysicalAuditWarning}"
+                          ToolTip.Tip="{Binding SimulationSafetyExportSummaryText}">
+                    <SelectableTextBlock Classes="chipStatusText" Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
+                  </Border>
+                  <SelectableTextBlock IsVisible="{Binding HasNoSimulationPhysicalAuditWarning}"
+                                       Foreground="{DynamicResource NfcTextMutedBrush}"
+                                       Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
+                  <SelectableTextBlock IsVisible="{Binding IsExportBlockedBySimulationSafety}"
+                                       Text="{Binding SimulationSafetyExportHighRiskText}" TextWrapping="Wrap"/>
+                </StackPanel>
+              </Grid>
+            </Border>
+            <Border x:Name="CoverageCheckRow" Classes="exportCheckRow" IsVisible="{Binding HasToFullCoverageWarning}">
+              <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="{StaticResource Space8}">
+                <controls:FontIcon Classes="symbols iconSm exportCheckWarning" Glyph="{DynamicResource Nvt.Icon.Warning}"/>
+                <SelectableTextBlock Grid.Column="1" FontWeight="SemiBold" Text="{Binding ToFullCoverageBadgeText}"/>
+                <StackPanel Grid.Column="2" Spacing="{StaticResource Space4}">
+                  <SelectableTextBlock Text="{Binding ToFullCoverageSummaryText}" TextWrapping="Wrap"/>
+                  <SelectableTextBlock Foreground="{DynamicResource NfcTextMutedBrush}"
+                                       Text="{Binding ToFullCoverageDetailText}" TextWrapping="Wrap"/>
+                  <ScrollViewer IsVisible="{Binding HasToFullCoverageMissingList}"
+                                MaxHeight="{StaticResource NotchExportCheckListMaxHeight}"
+                                HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <SelectableTextBlock Text="{Binding ToFullCoverageMissingListText}" TextWrapping="Wrap"/>
+                  </ScrollViewer>
+                </StackPanel>
+              </Grid>
+            </Border>
+          </StackPanel>
+          <Button x:Name="PassedChecksButton" Grid.Column="1" Classes="actionNeutral" VerticalAlignment="Bottom"
+                  IsVisible="{Binding HasPassedExportChecks}">
+            <StackPanel Orientation="Horizontal" Spacing="{StaticResource Space4}">
+              <TextBlock Text="{Binding PassedChecksTitleText}"/>
+              <controls:FontIcon Classes="symbols iconSm" Glyph="{DynamicResource Nvt.Icon.ExpandMore}"/>
+            </StackPanel>
+            <Button.Flyout>
+              <Flyout Placement="TopEdgeAlignedRight" FlyoutPresenterClasses="exportChecks">
+                <StackPanel x:Name="PassedChecksList" Classes="exportPassedChecks" Spacing="{StaticResource Space8}"
+                            MaxWidth="{StaticResource NotchExportPassedChecksMaxWidth}">
+                  <StackPanel.Styles>
+                    <!-- Flyout prose is a logical Button descendant, but must keep document text behavior. -->
+                    <Style Selector="StackPanel.exportPassedChecks TextBlock, StackPanel.exportPassedChecks SelectableTextBlock">
+                      <Setter Property="Foreground" Value="{DynamicResource NfcTextBrush}"/>
+                      <Setter Property="TextWrapping" Value="Wrap"/>
+                      <Setter Property="TextTrimming" Value="None"/>
+                      <Setter Property="MaxLines" Value="0"/>
+                    </Style>
+                  </StackPanel.Styles>
+                  <StackPanel Spacing="{StaticResource Space4}" IsVisible="{Binding IsSimulationSafetyClean}">
+                    <TextBlock Text="{Binding SimulationSafetyExportBadgeText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <SelectableTextBlock Text="{Binding SimulationSafetyExportSummaryText}" TextWrapping="Wrap"/>
+                  </StackPanel>
+                  <StackPanel Spacing="{StaticResource Space4}" IsVisible="{Binding HasNoToFullCoverageWarning}">
+                    <TextBlock Text="{Binding ToFullCoverageBadgeText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                    <SelectableTextBlock Text="{Binding ToFullCoverageSummaryText}" TextWrapping="Wrap"/>
+                    <SelectableTextBlock Text="{Binding ToFullCoverageDetailText}" TextWrapping="Wrap"/>
+                  </StackPanel>
+                </StackPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+        </Grid>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="{StaticResource Space8}">
+          <SelectableTextBlock x:Name="FooterStatus" Classes="exportFooterStatus"
+                               Classes.warning="{Binding HasHiddenSelectedRows}"
+                               Text="{Binding FooterStatusText}" VerticalAlignment="Center" TextWrapping="Wrap"/>
+          <StackPanel x:Name="FooterActions" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                      Spacing="{StaticResource Space8}">
+            <ComboBox x:Name="ExportFormatSelector" ItemsSource="{Binding ExportTypeOptions}"
+                      IsVisible="{Binding HasExportTypeOptions}"
+                      Width="{StaticResource NotchExportTopDropdownWidth}"
+                      ToolTip.Tip="Export format" AutomationProperties.Name="Export format"
+                      IsEnabled="{Binding CanSelectExportType}"
+                      SelectedItem="{Binding SelectedExportTypeOption, Mode=TwoWay}">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="viewModels:NotchExportFileTypeOption">
+                  <TextBlock Text="{Binding Display}"/>
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Button Classes="actionNeutral" Content="Cancel" Click="CancelButton_Click"/>
+            <Button x:Name="ExportButton" Classes="actionPrimary" Content="{Binding ExportButtonText}"
+                    IsEnabled="{Binding HasSelection}"
+                    ToolTip.Tip="Export checked rows in their original order." Click="ExportButton_Click"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
     </panels:WorkspaceShell.FooterContent>
   </panels:WorkspaceShell>
 </Window>

@@ -1,5 +1,6 @@
 // Copyright (c) 2026 Dennis Liu. All rights reserved.
 
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -13,7 +14,6 @@ using FreeformHelper.Tests.TestInfrastructure;
 using FreeformHelper.UI.ViewModels;
 using FreeformHelper.UI.Views;
 using Nvt.Core.Avalonia.Panels;
-using Nvt.Core.Avalonia.Primitives;
 using Xunit;
 
 namespace FreeformHelper.Tests;
@@ -21,11 +21,13 @@ namespace FreeformHelper.Tests;
 [Collection("HeadlessUiSerial")]
 public sealed class ExportNotchRowsIntegratedLayoutTests
 {
-    private static readonly string[] _lowFrequencyFields = ["Flags", "Comment"];
-    private static readonly string[] _mainFooterButtons = ["Cancel", "Export"];
+    private static readonly string[] _lowFrequencyFields =
+        ["Combine", "Target 1", "Target 2", "Ratio sum", "Flags", "Comment"];
     private static readonly string[] _helperFooterButtons = ["Clear", "Cancel", "Apply"];
     private static readonly string[] _columnFooterButtons = ["Cancel", "Apply"];
     private static readonly string[] _expectedRangeKeys = ["9", "12"];
+
+    private static readonly string[] _exportActionButtons = ["Cancel", "Export 2 rows"];
 
     [AvaloniaFact]
     public async Task MergedResultsHaveOnePresentationOwnerAsync()
@@ -39,25 +41,29 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
             window.Show();
             await HeadlessUiPump.FlushQueueAsync();
             var shell = Assert.Single(window.GetVisualDescendants().OfType<WorkspaceShell>());
-            var checks = Assert.IsType<SectionFrame>(window.FindControl<SectionFrame>("ExportChecksSection"));
-            var checkPanels = checks.GetVisualDescendants().OfType<CollapsiblePanel>().ToArray();
-            var passed = Assert.Single(checkPanels, static panel => panel.Title == "Passed checks");
-            Assert.False(passed.IsExpanded);
-            passed.IsExpanded = true;
-            await HeadlessUiPump.FlushQueueAsync();
-            Assert.Single(checkPanels, panel => panel.Title == viewModel.SimulationSafetyExportBadgeText);
-            Assert.Single(checkPanels, panel => panel.Title == viewModel.ToFullCoverageBadgeText);
+            var checks = Assert.IsType<Grid>(window.FindControl<Grid>("ExportChecksBar"));
+            var actions = Assert.IsType<StackPanel>(window.FindControl<StackPanel>("FooterActions"));
+            Assert.True(BoundsIn(window, checks).Bottom <= BoundsIn(window, actions).Top);
+            Assert.DoesNotContain(checks.GetVisualAncestors(), static ancestor => ancestor is ScrollViewer);
+            var passed = Assert.IsType<Button>(window.FindControl<Button>("PassedChecksButton"));
+            Assert.Equal(viewModel.PassedChecksTitleText,
+                Assert.Single(passed.GetVisualDescendants().OfType<TextBlock>(), static text => text.Text?.StartsWith("Passed", StringComparison.Ordinal) == true).Text);
             Assert.Single(VisibleText(window), text => text == viewModel.SimulationSafetyExportBadgeText);
-            Assert.Single(VisibleText(window), text => text == viewModel.ToFullCoverageBadgeText);
-            Assert.DoesNotContain(Assert.IsType<StackPanel>(shell.SummaryContent).GetVisualDescendants().OfType<CollapsiblePanel>(),
-                panel => panel.Title == viewModel.SimulationSafetyExportBadgeText);
-            Assert.Single(VisibleText(window), text => text == viewModel.HiddenSelectedRowsHintText);
-            Assert.Single(VisibleText(window), text => text == viewModel.ExportSummaryText);
+            passed.Flyout!.ShowAt(passed);
+            await HeadlessUiPump.FlushQueueAsync();
+            var passedList = Assert.IsType<StackPanel>(Assert.IsType<Flyout>(passed.Flyout).Content);
+            Assert.Single(VisibleText(passedList), text => text == viewModel.ToFullCoverageBadgeText);
+            Assert.DoesNotContain(VisibleText(passedList), text => text == viewModel.SimulationSafetyExportBadgeText);
+            Assert.All(passedList.GetVisualDescendants().OfType<TextBlock>(),
+                static text => Assert.Equal(0, text.MaxLines));
+            passed.Flyout.Hide();
+            Assert.Single(VisibleText(window), text => text == viewModel.FooterStatusText);
+            Assert.Single(VisibleText(window), static text => text == "Showing 1 rows");
             Assert.DoesNotContain(window.GetVisualDescendants().OfType<TextBlock>(),
                 text => text.Text == window.Title);
             Assert.DoesNotContain(window.GetVisualDescendants().OfType<SelectableTextBlock>(),
                 text => text.Text == window.Title);
-            var filters = Assert.IsType<StackPanel>(shell.SummaryContent);
+            var filters = Assert.IsType<WrapPanel>(window.FindControl<WrapPanel>("CategoryFilters"));
             var selectedOnly = Assert.Single(filters.Children.OfType<ToggleButton>(),
                 button => button.Command == viewModel.ToggleSelectedOnlyCommand);
             Assert.Equal("Selected only", selectedOnly.Content);
@@ -76,7 +82,7 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
     }
 
     [AvaloniaFact]
-    public async Task PayloadStaysInInspectorAndLowFrequencyKeepsFlagsAndCommentAsync()
+    public async Task PayloadStaysInInspectorAndTargetsAndFlagsCollapseAsync()
     {
         HeadlessAppBootstrap.EnsureInitialized();
         var viewModel = CreateSelection();
@@ -98,7 +104,12 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
             Assert.Equal(_lowFrequencyFields,
                 detailContent.Children.OfType<TextBlock>().Where(static text => Grid.GetColumn(text) == 0)
                     .Select(static text => text.Text).ToArray());
-            Assert.Equal(new[] { viewModel.SelectedRowFlagsText, viewModel.SelectedRowCommentText },
+            Assert.Equal(new[]
+                {
+                    viewModel.SelectedRowPayloadCombineText, viewModel.SelectedRowPayloadTarget1Text,
+                    viewModel.SelectedRowPayloadTarget2Text, viewModel.SelectedRowAnalysisRatioSumText,
+                    viewModel.SelectedRowFlagsText, viewModel.SelectedRowCommentText,
+                },
                 detailContent.GetVisualDescendants().OfType<SelectableTextBlock>().Select(static text => text.Text).ToArray());
             Assert.DoesNotContain(VisibleText(window), static text => text is "Payload details" or "Column breakdown" or "Values / Comment");
         }
@@ -146,16 +157,19 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
             await HeadlessUiPump.FlushQueueAsync();
             var primary = Assert.Single(window.GetVisualDescendants().OfType<Button>(),
                 static button => button.Classes.Contains("actionPrimary"));
-            Assert.Equal("Export", primary.Content);
+            Assert.Equal("Export 2 rows", primary.Content);
             var actions = Assert.IsType<StackPanel>(window.FindControl<StackPanel>("FooterActions"));
             Assert.Equal(HorizontalAlignment.Right, actions.HorizontalAlignment);
-            Assert.Equal(_mainFooterButtons, actions.Children.OfType<Button>().Select(static button => button.Content));
+            Assert.Equal("ExportFormatSelector", actions.Children[0].Name);
+            Assert.Equal(_exportActionButtons,
+                actions.Children.OfType<Button>().Select(static button => button.Content as string).ToArray());
             var replace = Assert.Single(window.GetVisualDescendants().OfType<Button>(),
                 button => button.Command == viewModel.UseShownOnlyCommand);
             Assert.Equal(HorizontalAlignment.Right, replace.HorizontalAlignment);
-            var copy = Assert.Single(window.GetVisualDescendants().OfType<Button>(),
-                static button => button.Content is StackPanel content
-                    && content.Children.OfType<TextBlock>().Any(static text => text.Text == "Copy payload"));
+            Assert.Equal("Select only shown rows", replace.Content);
+            Assert.Equal("Clears other selections.",
+                ToolTip.GetTip(replace) is TextBlock tip ? tip.Text : ToolTip.GetTip(replace) as string);
+            var copy = Assert.IsType<Button>(window.FindControl<Button>("CopyPayloadButton"));
             Assert.Equal(HorizontalAlignment.Right, copy.HorizontalAlignment);
         }
         finally
@@ -252,7 +266,11 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
             selection.SearchKeyword = helper.GeneratedQuery;
             Assert.Equal(expectedRows, selection.Rows);
             var panel = Assert.Single(window.GetVisualDescendants().OfType<CollapsiblePanel>(),
-                static item => item.Title == "Workspace locate");
+                static item => item.Name == "LinkedRowsPanel");
+            Assert.Equal("Linked rows (0)", panel.Title);
+            Assert.False(panel.IsExpanded);
+            panel.IsExpanded = true;
+            await HeadlessUiPump.FlushQueueAsync();
             var header = Assert.Single(panel.GetVisualDescendants().OfType<ToggleButton>(),
                 static button => button.Classes.Contains("panelBlockHeader"));
             Assert.True(header.IsChecked);
@@ -266,6 +284,33 @@ public sealed class ExportNotchRowsIntegratedLayoutTests
         {
             window.Close();
             helper.Close();
+        }
+    }
+
+    private static Rect BoundsIn(Window window, Control control) =>
+        new(control.TranslatePoint(default, window)!.Value, control.Bounds.Size);
+
+    [AvaloniaFact]
+    public async Task VersionSelectorShowsItsLongestOptionInFullAsync()
+    {
+        HeadlessAppBootstrap.EnsureInitialized();
+        var viewModel = CreateSelection();
+        var window = new NotchExportSelectionWindow { DataContext = viewModel };
+        try
+        {
+            window.Show();
+            await HeadlessUiPump.FlushQueueAsync();
+            var selector = Assert.IsType<ComboBox>(window.FindControl<ComboBox>("VersionSelector"));
+            var label = Assert.Single(selector.GetVisualDescendants().OfType<TextBlock>(),
+                static text => text.Text == "All versions");
+            var needed = new TextBlock { Text = label.Text, FontSize = label.FontSize, FontFamily = label.FontFamily };
+            needed.Measure(Size.Infinity);
+            Assert.True(label.Bounds.Width >= needed.DesiredSize.Width,
+                $"label width {label.Bounds.Width}, text needs {needed.DesiredSize.Width}");
+        }
+        finally
+        {
+            window.Close();
         }
     }
 

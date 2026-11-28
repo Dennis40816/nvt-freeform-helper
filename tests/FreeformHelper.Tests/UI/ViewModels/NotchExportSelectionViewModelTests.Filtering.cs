@@ -296,7 +296,7 @@ public sealed partial class NotchExportSelectionViewModelTests
         var selectedKeys = new[] { allKeys[0] };
         vm.ApplyColumnFilterSelection(NotchExportColumnFilterField.Diff, selectedKeys, allKeys);
 
-        Assert.Equal("Search by row / diff / mapping / CAD...", vm.SearchWatermarkText);
+        Assert.Equal("Search row, diff, mapping, CAD", vm.SearchWatermarkText);
         Assert.True(vm.HasHeaderFilterChip);
         Assert.Contains("Header:", vm.HeaderFilterChipText, StringComparison.Ordinal);
     }
